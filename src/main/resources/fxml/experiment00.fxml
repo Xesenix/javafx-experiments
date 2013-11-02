@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="view" prefHeight="264.0" prefWidth="320.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="pl.xesenix.experiments.Experiment00Controller">
+  <children>
+    <GridPane disable="false" focusTraversable="false" gridLinesVisible="false" prefHeight="40.0" prefWidth="300.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <children>
+        <Label text="person:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <ComboBox fx:id="combobox" prefHeight="21.0" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+          <items>
+            <FXCollections fx:factory="observableArrayList" />
+          </items>
+        </ComboBox>
+        <Label text="name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="name" prefHeight="21.0" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        <Label text="age:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <TextField id="name" fx:id="age" prefHeight="21.0" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+        <Label text="skills:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <ListView fx:id="list" orientation="VERTICAL" prefHeight="116.0" prefWidth="180.00009999999747" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+      </children>
+      <columnConstraints>
+        <ColumnConstraints fillWidth="true" halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="25.0" prefWidth="100.0" />
+        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+      </columnConstraints>
+      <rowConstraints>
+        <RowConstraints fillHeight="true" maxHeight="10.0" minHeight="30.0" percentHeight="-1.0" prefHeight="10.0" valignment="TOP" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="10.0" minHeight="30.0" percentHeight="-1.0" prefHeight="10.0" valignment="TOP" vgrow="SOMETIMES" />
+        <RowConstraints maxHeight="10.0" minHeight="30.0" prefHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
+        <RowConstraints maxHeight="10.0" minHeight="140.0" prefHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
+      </rowConstraints>
+    </GridPane>
+  </children>
+</AnchorPane>
