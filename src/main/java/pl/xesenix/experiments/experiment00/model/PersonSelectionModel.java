@@ -1,9 +1,8 @@
 
-package pl.xesenix.experiments.experiment00;
+package pl.xesenix.experiments.experiment00.model;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import pl.xesenix.experiments.Person;
 
 
 public class PersonSelectionModel implements IPersonSelectionModel

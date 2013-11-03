@@ -1,47 +1,41 @@
 
-package pl.xesenix.experiments;
+package pl.xesenix.experiments.experiment00;
 
-import java.net.URL;
-import java.util.List;
+import java.lang.ref.WeakReference;
 import java.util.ResourceBundle;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.Property;
-import javafx.beans.property.SimpleListProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.event.EventHandler;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
-import javafx.util.converter.IntegerStringConverter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pl.xesenix.experiments.experiment00.model.Person;
+import pl.xesenix.experiments.experiment00.model.Skill;
+import pl.xesenix.experiments.experiment00.views.IPersonDetailView;
+import pl.xesenix.experiments.experiment00.views.IPersonListMediator;
+import pl.xesenix.experiments.experiment00.views.IPersonListView;
+import pl.xesenix.experiments.experiment00.views.IPersonOverviewMediator;
+
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import pl.xesenix.experiments.experiment00.IPersonDetailView;
-import pl.xesenix.experiments.experiment00.IPersonListMediator;
-import pl.xesenix.experiments.experiment00.IPersonListView;
-import pl.xesenix.experiments.experiment00.IPersonOverviewMediator;
 
 
 
 @Singleton
-public class Experiment00Controller implements IPersonListView, IPersonDetailView
+public class Controller implements IPersonListView, IPersonDetailView
 {
-	private static Logger log = LoggerFactory.getLogger(Experiment00Controller.class);
+	private static Logger log = LoggerFactory.getLogger(Controller.class);
 	
 	
 	@Inject
@@ -61,7 +55,11 @@ public class Experiment00Controller implements IPersonListView, IPersonDetailVie
 
 
 	@FXML
-	private ListView<Skill> list;
+	private ListView<Person> peopleList;
+
+
+	@FXML
+	private ListView<Skill> skillList;
 
 
 	@FXML
@@ -78,13 +76,11 @@ public class Experiment00Controller implements IPersonListView, IPersonDetailVie
 
 	public Parent getView()
 	{
-		
-		
 		return view;
 	}
 
 
-	public Experiment00Controller()
+	public Controller()
 	{
 		log.debug("construct");
 	}
@@ -98,7 +94,8 @@ public class Experiment00Controller implements IPersonListView, IPersonDetailVie
 	{
 		assert age != null : "fx:id=\"age\" was not injected: check your FXML file 'experiment00.fxml'.";
 		assert combobox != null : "fx:id=\"combobox\" was not injected: check your FXML file 'experiment00.fxml'.";
-		assert list != null : "fx:id=\"list\" was not injected: check your FXML file 'experiment00.fxml'.";
+		assert skillList != null : "fx:id=\"skillList\" was not injected: check your FXML file 'experiment00.fxml'.";
+		assert peopleList != null : "fx:id=\"personList\" was not injected: check your FXML file 'experiment00.fxml'.";
 		assert name != null : "fx:id=\"name\" was not injected: check your FXML file 'experiment00.fxml'.";
 		assert view != null : "fx:id=\"view\" was not injected: check your FXML file 'experiment00.fxml'.";
 
@@ -177,11 +174,26 @@ public class Experiment00Controller implements IPersonListView, IPersonDetailVie
 	/**
 	 * @interface IPersonListView
 	 */
-	public void updatePersonList(List<Person> persons)
+	public void updatePersonList(ObservableList<Person> persons)
 	{
 		log.debug("updatePersonList: {}", persons);
-		combobox.setItems(FXCollections.observableList(persons));
+		combobox.setItems(persons);
+		
 	}
+
+
+	/**
+	 * @interface IPersonListView
+	 */
+	public void bindPersonList(ListProperty<Person> property)
+	{
+		log.debug("bindPersonList: {}", property);
+		combobox.itemsProperty().bind(property);
+		peopleList.itemsProperty().bind(property);
+	}
+	
+	
+	Person viewedPerson;
 
 
 	/**
@@ -190,12 +202,38 @@ public class Experiment00Controller implements IPersonListView, IPersonDetailVie
 	public void updatePersonDetailsView(Person person)
 	{
 		log.debug("updatePersonDetails: {}", person);
-		name.textProperty().bindBidirectional(person.getNameProperty());
-		age.textProperty().bind(person.getAgeProperty().asString());
-		list.itemsProperty().bind(person.getSkillsProperty());
+		
+		if (viewedPerson != null)
+		{
+			name.textProperty().unbindBidirectional(viewedPerson.getNameProperty());
+			age.textProperty().unbindBidirectional(viewedPerson.getAgeProperty());
+		}
+		
+		viewedPerson = person;
+		
+		name.textProperty().bindBidirectional(viewedPerson.getNameProperty());
+		age.textProperty().bindBidirectional((Property<Number>) viewedPerson.getAgeProperty(), new IntegerStringConverter());
+		skillList.itemsProperty().bind(viewedPerson.getSkillsProperty());
 	}
 	
 	
+	private final class IntegerStringConverter extends StringConverter<Number>
+	{
+		@Override
+		public Integer fromString(String value)
+		{
+			return Integer.parseInt(value);
+		}
+
+
+		@Override
+		public String toString(Number value)
+		{
+			return String.valueOf((Integer) value);
+		}
+	}
+
+
 	private class PersonsListSelectionChangedHandler implements ChangeListener<Person> {
 
 		public void changed(ObservableValue<? extends Person> observed, Person oldPerson, Person newPerson)

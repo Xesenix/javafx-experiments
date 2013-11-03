@@ -2,37 +2,74 @@
 
 <?import java.lang.*?>
 <?import javafx.collections.*?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.*?>
+<?scenebuilder-preview-i18n-resource ../translations/experiment00.properties?>
 
-<AnchorPane fx:id="view" prefHeight="264.0" prefWidth="320.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="pl.xesenix.experiments.Experiment00Controller">
+<AnchorPane fx:id="view" prefHeight="400.0" prefWidth="620.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="pl.xesenix.experiments.experiment00.Controller">
   <children>
-    <GridPane disable="false" focusTraversable="false" gridLinesVisible="false" prefHeight="40.0" prefWidth="300.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0">
+    <ScrollPane id="ScrollPane" fitToHeight="true" fitToWidth="true" pannable="false" prefViewportHeight="236.0" prefViewportWidth="480.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
+      <content>
+        <GridPane disable="false" focusTraversable="false" gridLinesVisible="false" hgap="0.0" prefHeight="40.0" prefWidth="300.0" vgap="0.0">
+          <children>
+            <Label text="%label.person" GridPane.columnIndex="1" GridPane.rowIndex="0">
+              <GridPane.margin>
+                <Insets left="4.0" right="4.0" top="2.0" fx:id="x1" />
+              </GridPane.margin>
+            </Label>
+            <ComboBox fx:id="combobox" prefHeight="22.0" prefWidth="220.0" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.vgrow="ALWAYS">
+              <items>
+                <FXCollections fx:factory="observableArrayList" />
+              </items>
+            </ComboBox>
+            <Label text="%label.person.name" GridPane.columnIndex="1" GridPane.margin="$x1" GridPane.rowIndex="1" />
+            <TextField fx:id="name" prefHeight="22.0" prefWidth="180.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+            <Label text="%label.person.age" GridPane.columnIndex="1" GridPane.margin="$x1" GridPane.rowIndex="2" />
+            <TextField id="name" fx:id="age" prefHeight="22.0" prefWidth="180.0" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <Label text="%label.person.skills" GridPane.columnIndex="1" GridPane.margin="$x1" GridPane.rowIndex="3" />
+            <ListView id="list" fx:id="skillList" orientation="VERTICAL" prefHeight="51.0" prefWidth="225.0" GridPane.columnIndex="2" GridPane.hgrow="NEVER" GridPane.rowIndex="3" />
+            <ListView fx:id="peopleList" prefHeight="200.0" prefWidth="200.0" GridPane.columnIndex="0" GridPane.rowIndex="1" GridPane.rowSpan="2147483647" />
+            <Label text="%label.people" GridPane.columnIndex="0" GridPane.margin="$x1" GridPane.rowIndex="0" />
+          </children>
+          <columnConstraints>
+            <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" minWidth="180.0" prefWidth="180.0" />
+            <ColumnConstraints halignment="RIGHT" hgrow="ALWAYS" maxWidth="80.0" minWidth="80.0" prefWidth="80.0" />
+            <ColumnConstraints hgrow="ALWAYS" maxWidth="220.0" minWidth="220.0" prefWidth="220.0" />
+          </columnConstraints>
+          <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+          </padding>
+          <rowConstraints>
+            <RowConstraints fillHeight="true" maxHeight="-Infinity" minHeight="-Infinity" percentHeight="-1.0" prefHeight="30.0" valignment="TOP" vgrow="ALWAYS" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" percentHeight="-1.0" prefHeight="33.0" valignment="TOP" vgrow="ALWAYS" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="33.0" valignment="TOP" vgrow="ALWAYS" />
+            <RowConstraints maxHeight="-1.0" minHeight="140.0" prefHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
+          </rowConstraints>
+        </GridPane>
+      </content>
+    </ScrollPane>
+    <StackPane id="StackPane" prefHeight="80.0" style="-fx-background-color: #000;&#10;&#10;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <children>
-        <Label text="person:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-        <ComboBox fx:id="combobox" prefHeight="21.0" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
-          <items>
-            <FXCollections fx:factory="observableArrayList" />
-          </items>
-        </ComboBox>
-        <Label text="name:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-        <TextField fx:id="name" prefHeight="21.0" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-        <Label text="age:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-        <TextField id="name" fx:id="age" prefHeight="21.0" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-        <Label text="skills:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-        <ListView fx:id="list" orientation="VERTICAL" prefHeight="116.0" prefWidth="180.00009999999747" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+        <Text boundsType="VISUAL" fill="WHITE" fontSmoothingType="LCD" scaleX="1.0" scaleY="1.0" scaleZ="1.0" smooth="true" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="%app.name" textOrigin="TOP" StackPane.alignment="TOP_LEFT">
+          <effect>
+            <Bloom threshold="0.2">
+              <input>
+                <Reflection topOffset="5.0" topOpacity="0.4" />
+              </input>
+            </Bloom>
+          </effect>
+          <font>
+            <Font name="DejaVu Sans Bold" size="30.0" />
+          </font>
+          <StackPane.margin>
+            <Insets left="20.0" top="20.0" />
+          </StackPane.margin>
+        </Text>
       </children>
-      <columnConstraints>
-        <ColumnConstraints fillWidth="true" halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" percentWidth="25.0" prefWidth="100.0" />
-        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-      </columnConstraints>
-      <rowConstraints>
-        <RowConstraints fillHeight="true" maxHeight="10.0" minHeight="30.0" percentHeight="-1.0" prefHeight="10.0" valignment="TOP" vgrow="SOMETIMES" />
-        <RowConstraints maxHeight="10.0" minHeight="30.0" percentHeight="-1.0" prefHeight="10.0" valignment="TOP" vgrow="SOMETIMES" />
-        <RowConstraints maxHeight="10.0" minHeight="30.0" prefHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
-        <RowConstraints maxHeight="10.0" minHeight="140.0" prefHeight="10.0" valignment="TOP" vgrow="ALWAYS" />
-      </rowConstraints>
-    </GridPane>
+    </StackPane>
   </children>
 </AnchorPane>

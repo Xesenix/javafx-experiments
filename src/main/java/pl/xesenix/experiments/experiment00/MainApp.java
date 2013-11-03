@@ -1,5 +1,5 @@
 
-package pl.xesenix.experiments;
+package pl.xesenix.experiments.experiment00;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -20,6 +20,13 @@ import org.slf4j.LoggerFactory;
 
 
 
+
+
+
+
+
+import pl.xesenix.experiments.experiment00.application.translations.ITranslationProvider;
+
 import com.cathive.fx.guice.GuiceApplication;
 import com.cathive.fx.guice.GuiceFXMLLoader;
 import com.google.inject.Inject;
@@ -35,6 +42,10 @@ public class MainApp extends GuiceApplication
 
 	@Inject
 	private GuiceFXMLLoader fxmlLoader;
+	
+	
+	@Inject
+	ITranslationProvider translation;
 
 
 	public static void main(String[] args) throws Exception
@@ -47,11 +58,11 @@ public class MainApp extends GuiceApplication
 	{
 		log.debug("application start");
 		
-		final Experiment00Controller controller = (Experiment00Controller) fxmlLoader.load(getClass().getResource("/fxml/experiment00.fxml"), null).getController();
+		final Controller controller = (Controller) fxmlLoader.load(getClass().getResource("/fxml/experiment00.fxml"), translation.getResourceBundle()).getController();
 		
 		StageBuilder
 			.create()
-			.title("Binding tests").resizable(false)
+			.title(translation.getString("app.name")).resizable(false)
 			.scene(SceneBuilder
 				.create()
 				.root(controller.getView())
@@ -68,6 +79,6 @@ public class MainApp extends GuiceApplication
 	@Override
 	public void init(List<Module> modules) throws Exception
 	{
-		modules.add(new PersonManagerModule());
+		modules.add(new Experiment00Module());
 	}
 }

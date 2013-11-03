@@ -1,5 +1,5 @@
 
-package pl.xesenix.experiments;
+package pl.xesenix.experiments.experiment00.model;
 
 import java.util.ArrayList;
 

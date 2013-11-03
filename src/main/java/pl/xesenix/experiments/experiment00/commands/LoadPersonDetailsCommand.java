@@ -1,7 +1,7 @@
 
-package pl.xesenix.experiments.experiment00;
+package pl.xesenix.experiments.experiment00.commands;
 
-import pl.xesenix.experiments.Person;
+import pl.xesenix.experiments.experiment00.model.Person;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 

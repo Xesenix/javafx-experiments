@@ -1,5 +1,5 @@
 
-package pl.xesenix.experiments.experiment00;
+package pl.xesenix.experiments.experiment00.commands;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;

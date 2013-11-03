@@ -14,12 +14,18 @@ public class ResourceBundleTranslationProvider implements ITranslationProvider
 	public ResourceBundleTranslationProvider()
 	{
 		Locale locale = Locale.getDefault();
-		bundle = ResourceBundle.getBundle("translations.PersonManager", locale);
+		bundle = ResourceBundle.getBundle("translations.experiment00", locale);
 	}
 
 
 	public String getString(String key)
 	{
 		return bundle.getString(key);
+	}
+
+
+	public ResourceBundle getResourceBundle()
+	{
+		return bundle;
 	}
 }

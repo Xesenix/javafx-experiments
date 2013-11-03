@@ -1,6 +1,6 @@
-package pl.xesenix.experiments.experiment00;
+package pl.xesenix.experiments.experiment00.views;
 
-import pl.xesenix.experiments.Person;
+import pl.xesenix.experiments.experiment00.model.Person;
 
 public interface IPersonListMediator
 {

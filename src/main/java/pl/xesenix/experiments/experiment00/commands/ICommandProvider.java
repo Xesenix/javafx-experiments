@@ -1,4 +1,4 @@
-package pl.xesenix.experiments.experiment00;
+package pl.xesenix.experiments.experiment00.commands;
 
 import javafx.concurrent.Service;
 
