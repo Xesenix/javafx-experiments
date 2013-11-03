@@ -1,47 +1,75 @@
-
+/*******************************************************************************
+ * Copyright (c) 2013 Paweł Kapalla, Xessenix.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ * Contributors:
+ *     Paweł Kapalla, Xessenix - initial API and implementation
+ ******************************************************************************/
 package pl.xesenix.experiments.experiment00;
 
-import java.lang.ref.WeakReference;
 import java.util.ResourceBundle;
 
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.animation.TimelineBuilder;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.StringConverter;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
+import javafx.scene.text.Text;
+import javafx.util.Duration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pl.xesenix.experiments.experiment00.model.Person;
 import pl.xesenix.experiments.experiment00.model.Skill;
-import pl.xesenix.experiments.experiment00.views.IPersonDetailView;
-import pl.xesenix.experiments.experiment00.views.IPersonListMediator;
-import pl.xesenix.experiments.experiment00.views.IPersonListView;
-import pl.xesenix.experiments.experiment00.views.IPersonOverviewMediator;
+import pl.xesenix.experiments.experiment00.utils.IntegerStringConverter;
+import pl.xesenix.experiments.experiment00.views.console.ConsoleMessage;
+import pl.xesenix.experiments.experiment00.views.console.IConsoleMediator;
+import pl.xesenix.experiments.experiment00.views.console.IConsoleView;
+import pl.xesenix.experiments.experiment00.views.console.IMessage;
+import pl.xesenix.experiments.experiment00.views.console.IMessageType;
+import pl.xesenix.experiments.experiment00.views.persons.IPersonDetailView;
+import pl.xesenix.experiments.experiment00.views.persons.IPersonListMediator;
+import pl.xesenix.experiments.experiment00.views.persons.IPersonListView;
+import pl.xesenix.experiments.experiment00.views.persons.IPersonOverviewMediator;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 
-
 @Singleton
-public class Controller implements IPersonListView, IPersonDetailView
+public class Controller implements IPersonListView, IPersonDetailView, IConsoleView
 {
 	private static Logger log = LoggerFactory.getLogger(Controller.class);
-	
-	
+
+
+	@Inject
+	private IConsoleMediator consoleMediator;
+
+
 	@Inject
 	private IPersonListMediator listMediator;
-	
-	
+
+
 	@Inject
 	private IPersonOverviewMediator mediator;
 
@@ -71,7 +99,20 @@ public class Controller implements IPersonListView, IPersonDetailView
 
 
 	@FXML
+	private Text console;
+
+
+	@FXML
 	private AnchorPane view;
+
+
+	private Person selectedPerson;
+
+
+	private Timeline switchConsoleMessageTransition;
+
+
+	private IMessage consoleUpdateMessage;
 
 
 	public Parent getView()
@@ -98,76 +139,32 @@ public class Controller implements IPersonListView, IPersonDetailView
 		assert peopleList != null : "fx:id=\"personList\" was not injected: check your FXML file 'experiment00.fxml'.";
 		assert name != null : "fx:id=\"name\" was not injected: check your FXML file 'experiment00.fxml'.";
 		assert view != null : "fx:id=\"view\" was not injected: check your FXML file 'experiment00.fxml'.";
+		assert console != null : "fx:id=\"message\" was not injected: check your FXML file 'experiment00.fxml'.";
 
-		/*log.debug("init");
-
-		Skill karate = new Skill("karate");
-		Skill programming = new Skill("programming");
-		Skill walking = new Skill("walking");
-
-		Person adam = new Person("Adam");
-		adam.setAge(12);
-		adam.getSkills().add(walking);
-		adam.getSkills().add(programming);
-
-		Person ewa = new Person("Ewa");
-		ewa.getSkills().add(karate);
-
-		persons.addAll(adam, ewa);
-
-		//final ObjectProperty<Person> selected = new SimpleObjectProperty<Person>(this, "selected");
-
-		combobox.itemsProperty().bindBidirectional(persons);
-		//selected.bind(combobox.getSelectionModel().selectedItemProperty());
-		
-		//Bindings.<Person>select(selected)
-		combobox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Person>() {
-			public void changed(ObservableValue<? extends Person> observable, Person oldValue, Person newValue)
-			{
-				log.debug("changed: {}", newValue);
-				
-				if (name.textProperty().isBound())
-				{
-					log.debug("unbinding: {}", observable);
-					name.textProperty().unbindBidirectional(observable.getValue().getNameProperty());
-				}
-				
-				name.textProperty().bind(newValue.getNameProperty());
-				age.textProperty().bindBidirectional((Property<Number>) newValue.getAgeProperty(), new StringConverter<Number>() {
-
-					@Override
-					public Integer fromString(String arg0)
-					{
-						return Integer.parseInt(arg0);
-					}
-
-					@Override
-					public String toString(Number arg0)
-					{
-						return String.valueOf((Integer) arg0);
-					}
-					
-				});
-				list.itemsProperty().bind(newValue.getSkillsProperty());
-			}
-		});
-		
-		/*Bindings.selectString(selected, "name").addListener(new ChangeListener<String>() {
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue)
-			{
-				log.debug("changed name: {}", newValue);
-			}
-		});*/
-
-		// list.itemsProperty().bind(selected.get().getSkillsProperty());
-		// name.textProperty().bind(Bindings.convert(combobox.getSelectionModel().selectedItemProperty()));
-		// name.textProperty().bind(selected.get().getNameProperty());
-		// list.itemsProperty().bind(selected.get().getSkillsProperty());
-		
 		combobox.getSelectionModel().selectedItemProperty().addListener(new PersonsListSelectionChangedHandler());
 		
 		mediator.init();
 		listMediator.loadPersons();
+		
+		// console view setup
+		
+		consoleUpdateMessage = ConsoleMessage.info("");
+		
+		switchConsoleMessageTransition = TimelineBuilder.create()
+			.keyFrames(
+				new KeyFrame(Duration.ZERO, new KeyValue(console.translateXProperty(), 0)),
+				new KeyFrame(new Duration(800), new SwitchMessageAction(console, consoleUpdateMessage)),
+				new KeyFrame(new Duration(800), new KeyValue(console.opacityProperty(), 0)),
+				new KeyFrame(new Duration(800), new KeyValue(console.translateXProperty(), 100, Interpolator.EASE_OUT)),
+				new KeyFrame(new Duration(1600), new KeyValue(console.opacityProperty(), 1)),
+				new KeyFrame(new Duration(1600), new KeyValue(console.translateXProperty(), 0, Interpolator.EASE_IN))
+			)
+			.autoReverse(true)
+			.build();
+		
+		console.opacityProperty().set(0);
+		
+		consoleMediator.showMessage(ConsoleMessage.info("message.welcome"));
 	}
 
 
@@ -178,7 +175,6 @@ public class Controller implements IPersonListView, IPersonDetailView
 	{
 		log.debug("updatePersonList: {}", persons);
 		combobox.setItems(persons);
-		
 	}
 
 
@@ -191,9 +187,6 @@ public class Controller implements IPersonListView, IPersonDetailView
 		combobox.itemsProperty().bind(property);
 		peopleList.itemsProperty().bind(property);
 	}
-	
-	
-	Person viewedPerson;
 
 
 	/**
@@ -202,45 +195,97 @@ public class Controller implements IPersonListView, IPersonDetailView
 	public void updatePersonDetailsView(Person person)
 	{
 		log.debug("updatePersonDetails: {}", person);
-		
-		if (viewedPerson != null)
+
+		if (selectedPerson != null)
 		{
-			name.textProperty().unbindBidirectional(viewedPerson.getNameProperty());
-			age.textProperty().unbindBidirectional(viewedPerson.getAgeProperty());
+			name.textProperty().unbindBidirectional(selectedPerson.getNameProperty());
+			age.textProperty().unbindBidirectional(selectedPerson.getAgeProperty());
 		}
-		
-		viewedPerson = person;
-		
-		name.textProperty().bindBidirectional(viewedPerson.getNameProperty());
-		age.textProperty().bindBidirectional((Property<Number>) viewedPerson.getAgeProperty(), new IntegerStringConverter());
-		skillList.itemsProperty().bind(viewedPerson.getSkillsProperty());
+
+		selectedPerson = person;
+
+		name.textProperty().bindBidirectional(selectedPerson.getNameProperty());
+		age.textProperty().bindBidirectional((Property<Number>) selectedPerson.getAgeProperty(), new IntegerStringConverter());
+		skillList.itemsProperty().bind(selectedPerson.getSkillsProperty());
 	}
-	
-	
-	private final class IntegerStringConverter extends StringConverter<Number>
+
+
+	/**
+	 * @interface IConsoleView
+	 */
+	public void showMessage(String message, IMessageType type)
 	{
-		@Override
-		public Integer fromString(String value)
+		log.debug("showMessage: '{}' type: {}", message, type);
+		
+		switchConsoleMessageTransition.stop();
+		
+		consoleUpdateMessage.setMessage(message);
+		consoleUpdateMessage.setMessageType(type);
+		
+		switchConsoleMessageTransition.play();
+	}
+	
+	
+	/**
+	 * @interface IConsoleView
+	 */
+	public void showMessage(IMessage message)
+	{
+		showMessage(message.getMessage(), message.getType());
+	}
+
+
+	public class SwitchMessageAction implements EventHandler<ActionEvent>
+	{
+		private Text console;
+
+
+		private IMessage message;
+
+
+		public SwitchMessageAction(Text console, IMessage message)
 		{
-			return Integer.parseInt(value);
+			this.console = console;
+			this.message = message;
+		}
+		
+		
+		@Override
+		public void handle(ActionEvent event)
+		{
+			if (message != null)
+			{
+				this.console.textProperty().set(message.getMessage());
+				this.console.getStyleClass().add(message.getType().getCssClassName());
+			}
+			else
+			{
+				this.console.textProperty().set("");
+			}
 		}
 
 
-		@Override
-		public String toString(Number value)
+		public IMessage getMessage()
 		{
-			return String.valueOf((Integer) value);
+			return message;
+		}
+
+
+		public void setMessage(IMessage message)
+		{
+			this.message = message;
 		}
 	}
 
 
-	private class PersonsListSelectionChangedHandler implements ChangeListener<Person> {
+	private class PersonsListSelectionChangedHandler implements ChangeListener<Person>
+	{
 
 		public void changed(ObservableValue<? extends Person> observed, Person oldPerson, Person newPerson)
 		{
 			log.debug("combobox selection changed to: {}", newPerson);
+			consoleMediator.showMessage(ConsoleMessage.error(String.format("Editing person: %s", newPerson.getName())));
 			listMediator.updateSelectedPerson(newPerson);
 		}
-		
 	}
 }
