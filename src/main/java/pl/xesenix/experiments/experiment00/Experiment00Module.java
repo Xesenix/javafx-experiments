@@ -1,4 +1,13 @@
-
+/*******************************************************************************
+ * Copyright (c) 2013 Paweł Kapalla, Xessenix.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ * Contributors:
+ *     Paweł Kapalla, Xessenix - initial API and implementation
+ ******************************************************************************/
 package pl.xesenix.experiments.experiment00;
 
 import pl.xesenix.experiments.experiment00.application.translations.ITranslationProvider;
@@ -9,12 +18,15 @@ import pl.xesenix.experiments.experiment00.model.IPersonSelectionModel;
 import pl.xesenix.experiments.experiment00.model.PersonSelectionModel;
 import pl.xesenix.experiments.experiment00.service.IPersonService;
 import pl.xesenix.experiments.experiment00.service.StubPersonService;
-import pl.xesenix.experiments.experiment00.views.IPersonDetailView;
-import pl.xesenix.experiments.experiment00.views.IPersonListMediator;
-import pl.xesenix.experiments.experiment00.views.IPersonListView;
-import pl.xesenix.experiments.experiment00.views.IPersonOverviewMediator;
-import pl.xesenix.experiments.experiment00.views.PersonListMediator;
-import pl.xesenix.experiments.experiment00.views.PersonOverviewMediator;
+import pl.xesenix.experiments.experiment00.views.console.ConsoleMediator;
+import pl.xesenix.experiments.experiment00.views.console.IConsoleMediator;
+import pl.xesenix.experiments.experiment00.views.console.IConsoleView;
+import pl.xesenix.experiments.experiment00.views.persons.IPersonDetailView;
+import pl.xesenix.experiments.experiment00.views.persons.IPersonListMediator;
+import pl.xesenix.experiments.experiment00.views.persons.IPersonListView;
+import pl.xesenix.experiments.experiment00.views.persons.IPersonOverviewMediator;
+import pl.xesenix.experiments.experiment00.views.persons.PersonListMediator;
+import pl.xesenix.experiments.experiment00.views.persons.PersonOverviewMediator;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Singleton;
@@ -38,13 +50,15 @@ public class Experiment00Module extends AbstractModule
 
 	private void mapViews()
 	{
-		bind(IPersonListView.class).to(Controller.class);
+		bind(IConsoleView.class).to(Controller.class);
 		bind(IPersonDetailView.class).to(Controller.class);
+		bind(IPersonListView.class).to(Controller.class);
 	}
 
 
 	private void mapMediators()
 	{
+		bind(IConsoleMediator.class).to(ConsoleMediator.class);
 		bind(IPersonOverviewMediator.class).to(PersonOverviewMediator.class);
 		bind(IPersonListMediator.class).to(PersonListMediator.class);
 	}

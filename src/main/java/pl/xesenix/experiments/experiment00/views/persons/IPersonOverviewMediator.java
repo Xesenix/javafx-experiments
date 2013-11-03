@@ -8,18 +8,9 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment00.model;
+package pl.xesenix.experiments.experiment00.views.persons;
 
-import javafx.beans.property.ObjectProperty;
-
-
-public interface IPersonSelectionModel
+public interface IPersonOverviewMediator
 {
-	Person getSelectedPerson();
-
-
-	void setSelectedPerson(Person person);
-
-
-	ObjectProperty<Person> getSelectedPersonProperty();
+	void init();
 }

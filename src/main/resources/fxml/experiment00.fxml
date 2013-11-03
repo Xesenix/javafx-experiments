@@ -54,19 +54,38 @@
     </ScrollPane>
     <StackPane id="StackPane" prefHeight="80.0" style="-fx-background-color: #000;&#10;&#10;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <children>
-        <Text boundsType="VISUAL" fill="WHITE" fontSmoothingType="LCD" scaleX="1.0" scaleY="1.0" scaleZ="1.0" smooth="true" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="%app.name" textOrigin="TOP" StackPane.alignment="TOP_LEFT">
+        <Text boundsType="VISUAL" fill="WHITE" fontSmoothingType="LCD" scaleX="1.0" scaleY="1.0" scaleZ="1.0" smooth="true" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="%app.name" textOrigin="TOP" x="0.0" StackPane.alignment="TOP_LEFT">
           <effect>
-            <Bloom threshold="0.2">
+            <Glow level="0.2">
               <input>
-                <Reflection topOffset="5.0" topOpacity="0.4" />
+                <Bloom threshold="0.2">
+                  <input>
+                    <Reflection topOffset="5.0" topOpacity="0.4" />
+                  </input>
+                </Bloom>
               </input>
-            </Bloom>
+            </Glow>
           </effect>
           <font>
             <Font name="DejaVu Sans Bold" size="30.0" />
           </font>
           <StackPane.margin>
             <Insets left="20.0" top="20.0" />
+          </StackPane.margin>
+        </Text>
+        <Text id="message" fx:id="console" blendMode="SRC_OVER" boundsType="LOGICAL" fill="#8fff00" scaleX="1.0" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="message-info" text="%message.welcome" textAlignment="LEFT" textOrigin="BASELINE" translateX="0.0" underline="false" x="0.0" StackPane.alignment="BOTTOM_LEFT">
+          <effect>
+            <Bloom>
+              <input>
+                <Glow />
+              </input>
+            </Bloom>
+          </effect>
+          <font>
+            <Font size="18.0" />
+          </font>
+          <StackPane.margin>
+            <Insets bottom="5.0" left="20.0" />
           </StackPane.margin>
         </Text>
       </children>

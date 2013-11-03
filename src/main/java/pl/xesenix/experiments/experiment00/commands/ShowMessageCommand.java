@@ -11,22 +11,33 @@
 package pl.xesenix.experiments.experiment00.commands;
 
 import javafx.concurrent.Service;
+import javafx.concurrent.Task;
+import pl.xesenix.experiments.experiment00.application.translations.ITranslationProvider;
+import pl.xesenix.experiments.experiment00.views.console.IMessage;
 
 import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
 
-@Singleton
-public class CommandProvider implements ICommandProvider
+public class ShowMessageCommand extends  Service<IMessage>
 {
 	@Inject
-	public Injector injector;
-
-
-	@SuppressWarnings("rawtypes")
-	public <T extends Service> T get(Class<T> type)
+	public ITranslationProvider translationProvider;
+	
+	
+	public IMessage message;
+	
+	
+	@Override
+	protected Task<IMessage> createTask()
 	{
-		 return injector.getInstance(type);
+		return new Task<IMessage>() {
+
+			@Override
+			protected IMessage call() throws Exception
+			{
+				message.setMessage(translationProvider.getString(message.getMessage()));
+				return message;
+			}
+		};
 	}
 
 }

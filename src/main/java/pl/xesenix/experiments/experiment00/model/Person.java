@@ -1,14 +1,19 @@
-
+/*******************************************************************************
+ * Copyright (c) 2013 Paweł Kapalla, Xessenix.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ * Contributors:
+ *     Paweł Kapalla, Xessenix - initial API and implementation
+ ******************************************************************************/
 package pl.xesenix.experiments.experiment00.model;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ListProperty;
-import javafx.beans.property.Property;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -17,6 +22,9 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Person
