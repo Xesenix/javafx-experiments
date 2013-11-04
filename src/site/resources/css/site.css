@@ -1,0 +1,7 @@
+body.topBarEnabled {
+	padding-top: 0;
+}
+
+.navbar-fixed-top {
+	position: static;
+}
