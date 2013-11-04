@@ -8,32 +8,19 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment00.model;
+package pl.xesenix.experiments.experiment00.model.persons;
 
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import pl.xesenix.experiments.experiment00.vo.Person;
 
 
-public class PersonSelectionModel implements IPersonSelectionModel
+public interface IPersonSelectionModel
 {
-	private ObjectProperty<Person> selectedPerson = new SimpleObjectProperty<Person>(this, "selectedPerson");
+	Person getSelectedPerson();
 
 
-	public Person getSelectedPerson()
-	{
-		return selectedPerson.get();
-	}
+	void setSelectedPerson(Person person);
 
 
-	public void setSelectedPerson(Person person)
-	{
-		selectedPerson.set(person);
-	}
-
-
-	public ObjectProperty<Person> getSelectedPersonProperty()
-	{
-		return selectedPerson;
-	}
-
+	ObjectProperty<Person> getSelectedPersonProperty();
 }

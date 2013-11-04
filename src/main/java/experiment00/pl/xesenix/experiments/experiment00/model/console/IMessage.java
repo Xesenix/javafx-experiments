@@ -8,18 +8,18 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment00.model;
+package pl.xesenix.experiments.experiment00.model.console;
 
-import javafx.beans.property.ListProperty;
-import javafx.collections.ObservableList;
-
-public interface IPersonsListModel
+public interface IMessage
 {
-	ObservableList<Person> getPersonsList();
+	void setMessage(String message);
 	
 	
-	void setPersonsList(ObservableList<Person> persons);
-	
-	
-	ListProperty<Person> getPersonsListProperty();
+	void setMessageType(IMessageType type);
+
+
+	String getMessage();
+
+
+	IMessageType getType();
 }

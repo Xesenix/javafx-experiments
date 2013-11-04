@@ -15,8 +15,8 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import pl.xesenix.experiments.experiment01.commands.ICommandProvider;
 import pl.xesenix.experiments.experiment01.commands.LoadPersonDetailsCommand;
-import pl.xesenix.experiments.experiment01.model.Person;
 import pl.xesenix.experiments.experiment01.model.persons.IPersonSelectionModel;
+import pl.xesenix.experiments.experiment01.vo.Person;
 
 import com.google.inject.Inject;
 

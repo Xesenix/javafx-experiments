@@ -10,6 +10,8 @@
  ******************************************************************************/
 package pl.xesenix.experiments.experiment00.views.console;
 
+import pl.xesenix.experiments.experiment00.model.console.IMessage;
+
 
 
 

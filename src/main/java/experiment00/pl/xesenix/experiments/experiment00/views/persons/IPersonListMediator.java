@@ -10,7 +10,7 @@
  ******************************************************************************/
 package pl.xesenix.experiments.experiment00.views.persons;
 
-import pl.xesenix.experiments.experiment00.model.Person;
+import pl.xesenix.experiments.experiment00.vo.Person;
 
 public interface IPersonListMediator
 {

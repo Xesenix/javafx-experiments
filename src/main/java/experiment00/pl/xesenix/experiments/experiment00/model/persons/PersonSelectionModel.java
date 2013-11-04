@@ -8,11 +8,11 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment01.model.persons;
+package pl.xesenix.experiments.experiment00.model.persons;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment00.vo.Person;
 
 
 public class PersonSelectionModel implements IPersonSelectionModel

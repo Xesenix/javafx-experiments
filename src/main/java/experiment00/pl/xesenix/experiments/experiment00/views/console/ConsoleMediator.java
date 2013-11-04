@@ -15,6 +15,7 @@ import javafx.event.EventHandler;
 import pl.xesenix.experiments.experiment00.application.translations.ITranslationProvider;
 import pl.xesenix.experiments.experiment00.commands.ICommandProvider;
 import pl.xesenix.experiments.experiment00.commands.ShowMessageCommand;
+import pl.xesenix.experiments.experiment00.model.console.IMessage;
 
 import com.google.inject.Inject;
 

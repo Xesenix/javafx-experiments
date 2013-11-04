@@ -8,19 +8,38 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment01.model.persons;
+package pl.xesenix.experiments.experiment01.vo;
 
-import javafx.beans.property.ListProperty;
-import javafx.collections.ObservableList;
-import pl.xesenix.experiments.experiment01.model.Person;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
-public interface IPersonsListModel
+public class Skill
 {
-	ObservableList<Person> getPersonsList();
+	private StringProperty name = new SimpleStringProperty(this, "name", "");
+
+	public Skill(String name)
+	{
+		setName(name);
+	}
+
+	public StringProperty getNameProperty()
+	{
+		return name;
+	}
 	
+	public String getName()
+	{
+		return name.get();
+	}
+
+	public void setName(String name)
+	{
+		this.name.set(name);
+	}
 	
-	void setPersonsList(ObservableList<Person> persons);
-	
-	
-	ListProperty<Person> getPersonsListProperty();
+	@Override
+	public String toString()
+	{
+		return "Skill: " + getName();
+	}
 }

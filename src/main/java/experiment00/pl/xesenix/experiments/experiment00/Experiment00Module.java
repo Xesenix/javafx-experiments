@@ -14,8 +14,8 @@ import pl.xesenix.experiments.experiment00.application.translations.ITranslation
 import pl.xesenix.experiments.experiment00.application.translations.ResourceBundleTranslationProvider;
 import pl.xesenix.experiments.experiment00.commands.CommandProvider;
 import pl.xesenix.experiments.experiment00.commands.ICommandProvider;
-import pl.xesenix.experiments.experiment00.model.IPersonSelectionModel;
-import pl.xesenix.experiments.experiment00.model.PersonSelectionModel;
+import pl.xesenix.experiments.experiment00.model.persons.IPersonSelectionModel;
+import pl.xesenix.experiments.experiment00.model.persons.PersonSelectionModel;
 import pl.xesenix.experiments.experiment00.service.IPersonService;
 import pl.xesenix.experiments.experiment00.service.StubPersonService;
 import pl.xesenix.experiments.experiment00.views.console.ConsoleMediator;

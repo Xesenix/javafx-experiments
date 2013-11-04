@@ -11,7 +11,7 @@
 package pl.xesenix.experiments.experiment01.model.persons;
 
 import javafx.beans.property.ObjectProperty;
-import pl.xesenix.experiments.experiment01.model.Person;
+import pl.xesenix.experiments.experiment01.vo.Person;
 
 
 public interface IPersonSelectionModel

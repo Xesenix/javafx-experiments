@@ -17,7 +17,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.animation.TimelineBuilder;
-import javafx.beans.property.ListProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -35,8 +34,6 @@ import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pl.xesenix.experiments.experiment01.model.Person;
-import pl.xesenix.experiments.experiment01.model.Skill;
 import pl.xesenix.experiments.experiment01.model.console.ConsoleMessage;
 import pl.xesenix.experiments.experiment01.model.console.IMessage;
 import pl.xesenix.experiments.experiment01.model.console.IMessageType;
@@ -47,6 +44,8 @@ import pl.xesenix.experiments.experiment01.views.persons.IPersonDetailsMediator;
 import pl.xesenix.experiments.experiment01.views.persons.IPersonListMediator;
 import pl.xesenix.experiments.experiment01.views.persons.IPersonListView;
 import pl.xesenix.experiments.experiment01.views.persons.IPersonOverviewMediator;
+import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment01.vo.Skill;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;

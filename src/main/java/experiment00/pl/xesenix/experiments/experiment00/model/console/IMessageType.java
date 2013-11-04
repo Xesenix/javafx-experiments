@@ -8,14 +8,9 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment01.views.persons;
+package pl.xesenix.experiments.experiment00.model.console;
 
-import pl.xesenix.experiments.experiment01.vo.Person;
-
-public interface IPersonListMediator
+public interface IMessageType
 {
-	void loadPersons();
-	
-	
-	void updateSelectedPerson(Person person);
+	String getCssClassName();
 }

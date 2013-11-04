@@ -12,7 +12,7 @@ package pl.xesenix.experiments.experiment01.service;
 
 import javafx.beans.property.ListProperty;
 import javafx.collections.ObservableList;
-import pl.xesenix.experiments.experiment01.model.Person;
+import pl.xesenix.experiments.experiment01.vo.Person;
 
 public interface IPersonService
 {

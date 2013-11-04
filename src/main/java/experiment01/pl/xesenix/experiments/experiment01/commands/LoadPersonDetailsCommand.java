@@ -12,7 +12,7 @@ package pl.xesenix.experiments.experiment01.commands;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import pl.xesenix.experiments.experiment01.model.Person;
+import pl.xesenix.experiments.experiment01.vo.Person;
 
 
 public class LoadPersonDetailsCommand extends Service<Person>

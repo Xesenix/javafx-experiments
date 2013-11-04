@@ -21,7 +21,6 @@ import javafx.beans.property.ListProperty;
 import javafx.beans.property.Property;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -36,18 +35,18 @@ import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pl.xesenix.experiments.experiment00.model.Person;
-import pl.xesenix.experiments.experiment00.model.Skill;
+import pl.xesenix.experiments.experiment00.model.console.ConsoleMessage;
+import pl.xesenix.experiments.experiment00.model.console.IMessage;
+import pl.xesenix.experiments.experiment00.model.console.IMessageType;
 import pl.xesenix.experiments.experiment00.utils.IntegerStringConverter;
-import pl.xesenix.experiments.experiment00.views.console.ConsoleMessage;
 import pl.xesenix.experiments.experiment00.views.console.IConsoleMediator;
 import pl.xesenix.experiments.experiment00.views.console.IConsoleView;
-import pl.xesenix.experiments.experiment00.views.console.IMessage;
-import pl.xesenix.experiments.experiment00.views.console.IMessageType;
 import pl.xesenix.experiments.experiment00.views.persons.IPersonDetailView;
 import pl.xesenix.experiments.experiment00.views.persons.IPersonListMediator;
 import pl.xesenix.experiments.experiment00.views.persons.IPersonListView;
 import pl.xesenix.experiments.experiment00.views.persons.IPersonOverviewMediator;
+import pl.xesenix.experiments.experiment00.vo.Person;
+import pl.xesenix.experiments.experiment00.vo.Skill;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -173,16 +172,6 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 	public Parent getView()
 	{
 		return view;
-	}
-
-
-	/**
-	 * @interface IPersonListView
-	 */
-	public void updatePersonList(ObservableList<Person> persons)
-	{
-		log.debug("updatePersonList: {}", persons);
-		combobox.setItems(persons);
 	}
 
 

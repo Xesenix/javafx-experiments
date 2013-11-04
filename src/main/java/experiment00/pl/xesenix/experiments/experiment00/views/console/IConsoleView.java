@@ -10,6 +10,9 @@
  ******************************************************************************/
 package pl.xesenix.experiments.experiment00.views.console;
 
+import pl.xesenix.experiments.experiment00.model.console.IMessage;
+import pl.xesenix.experiments.experiment00.model.console.IMessageType;
+
 public interface IConsoleView
 {
 	void showMessage(String message, IMessageType type);

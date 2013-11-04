@@ -16,8 +16,8 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import pl.xesenix.experiments.experiment00.commands.ICommandProvider;
 import pl.xesenix.experiments.experiment00.commands.LoadPersonDetailsCommand;
-import pl.xesenix.experiments.experiment00.model.IPersonSelectionModel;
-import pl.xesenix.experiments.experiment00.model.Person;
+import pl.xesenix.experiments.experiment00.model.persons.IPersonSelectionModel;
+import pl.xesenix.experiments.experiment00.vo.Person;
 
 import com.google.inject.Inject;
 
@@ -45,7 +45,7 @@ public class PersonOverviewMediator implements IPersonOverviewMediator
 	private class SelectedPersonChangeHandler implements ChangeListener<Person>
 	{
 
-		public void changed(ObservableValue<? extends Person> arg0, Person oldPerson, Person newPerson)
+		public void changed(ObservableValue<? extends Person> observed, Person oldPerson, Person newPerson)
 		{
 			LoadPersonDetailsCommand command = commandProvider.get(LoadPersonDetailsCommand.class);
 			command.person = newPerson;

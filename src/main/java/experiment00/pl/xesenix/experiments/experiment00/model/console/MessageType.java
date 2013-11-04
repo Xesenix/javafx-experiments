@@ -8,38 +8,22 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment01.model;
+package pl.xesenix.experiments.experiment00.model.console;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
-public class Skill
-{
-	private StringProperty name = new SimpleStringProperty(this, "name", "");
-
-	public Skill(String name)
-	{
-		setName(name);
-	}
-
-	public StringProperty getNameProperty()
-	{
-		return name;
-	}
+public enum MessageType implements IMessageType {
+	INFO ("info"),
+	ERROR ("error");
 	
-	public String getName()
+	private String cssClassName;
+	
+	MessageType(String cssClass)
 	{
-		return name.get();
+		cssClassName = cssClass;
 	}
 
-	public void setName(String name)
+	public String getCssClassName()
 	{
-		this.name.set(name);
-	}
-	
-	@Override
-	public String toString()
-	{
-		return "Skill: " + getName();
+		return cssClassName;
 	}
 }

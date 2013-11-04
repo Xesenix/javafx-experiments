@@ -13,8 +13,8 @@ package pl.xesenix.experiments.experiment00.commands;
 import javafx.beans.property.ListProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import pl.xesenix.experiments.experiment00.model.Person;
 import pl.xesenix.experiments.experiment00.service.IPersonService;
+import pl.xesenix.experiments.experiment00.vo.Person;
 
 import com.google.inject.Inject;
 
@@ -33,6 +33,8 @@ public class LoadPersonsListPropertyCommand extends Service<ListProperty<Person>
 			@Override
 			protected ListProperty<Person> call() throws Exception
 			{
+				personService.loadPersons();
+				
 				return personService.getPersonsListProperty();
 			}
 		};

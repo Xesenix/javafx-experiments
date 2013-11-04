@@ -13,7 +13,7 @@ package pl.xesenix.experiments.experiment00.commands;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import pl.xesenix.experiments.experiment00.application.translations.ITranslationProvider;
-import pl.xesenix.experiments.experiment00.views.console.IMessage;
+import pl.xesenix.experiments.experiment00.model.console.IMessage;
 
 import com.google.inject.Inject;
 

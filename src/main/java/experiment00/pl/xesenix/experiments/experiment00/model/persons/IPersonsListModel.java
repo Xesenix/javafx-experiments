@@ -8,18 +8,19 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment00.model;
+package pl.xesenix.experiments.experiment00.model.persons;
 
-import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ListProperty;
+import javafx.collections.ObservableList;
+import pl.xesenix.experiments.experiment00.vo.Person;
 
-
-public interface IPersonSelectionModel
+public interface IPersonsListModel
 {
-	Person getSelectedPerson();
-
-
-	void setSelectedPerson(Person person);
-
-
-	ObjectProperty<Person> getSelectedPersonProperty();
+	ObservableList<Person> getPersonsList();
+	
+	
+	void setPersonsList(ObservableList<Person> persons);
+	
+	
+	ListProperty<Person> getPersonsListProperty();
 }

@@ -8,11 +8,10 @@ import pl.xesenix.experiments.experiment01.application.translations.ITranslation
 import pl.xesenix.experiments.experiment01.commands.CommitPropertyEditCommand;
 import pl.xesenix.experiments.experiment01.commands.ICommandProvider;
 import pl.xesenix.experiments.experiment01.commands.UpdatePersonsListCommand;
-import pl.xesenix.experiments.experiment01.model.Person;
 import pl.xesenix.experiments.experiment01.model.console.ConsoleMessage;
 import pl.xesenix.experiments.experiment01.model.persons.IPersonSelectionModel;
 import pl.xesenix.experiments.experiment01.views.console.IConsoleView;
-
+import pl.xesenix.experiments.experiment01.vo.Person;
 
 import com.google.inject.Inject;
 
