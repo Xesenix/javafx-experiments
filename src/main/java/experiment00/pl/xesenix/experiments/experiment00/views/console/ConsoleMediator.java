@@ -33,7 +33,6 @@ public class ConsoleMediator implements IConsoleMediator
 	public IConsoleView view;
 
 
-	@Override
 	public void showMessage(IMessage message)
 	{
 		ShowMessageCommand command = commandProvider.get(ShowMessageCommand.class);

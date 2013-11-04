@@ -25,14 +25,11 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
 
@@ -115,12 +112,6 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 	private IMessage consoleUpdateMessage;
 
 
-	public Parent getView()
-	{
-		return view;
-	}
-
-
 	public Controller()
 	{
 		log.debug("construct");
@@ -141,12 +132,17 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 		assert view != null : "fx:id=\"view\" was not injected: check your FXML file 'experiment00.fxml'.";
 		assert console != null : "fx:id=\"message\" was not injected: check your FXML file 'experiment00.fxml'.";
 
+		// people list aspect view setup
+		
 		combobox.getSelectionModel().selectedItemProperty().addListener(new PersonsListSelectionChangedHandler());
+		peopleList.getSelectionModel().selectedItemProperty().addListener(new PersonsListSelectionChangedHandler());
 		
 		mediator.init();
 		listMediator.loadPersons();
 		
-		// console view setup
+		// persons details aspect view
+		
+		// console aspect view setup
 		
 		consoleUpdateMessage = ConsoleMessage.info("");
 		
@@ -164,6 +160,19 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 		console.opacityProperty().set(0);
 		
 		consoleMediator.showMessage(ConsoleMessage.info("message.welcome"));
+	}
+	
+	
+	// View aspects
+
+
+	/**
+	 * @interface IController
+	 * @return Parent root node
+	 */
+	public Parent getView()
+	{
+		return view;
 	}
 
 
@@ -203,6 +212,9 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 
 		selectedPerson = person;
 
+		combobox.getSelectionModel().select(selectedPerson);
+		peopleList.getSelectionModel().select(selectedPerson);
+		
 		name.textProperty().bindBidirectional(selectedPerson.getNameProperty());
 		age.textProperty().bindBidirectional((Property<Number>) selectedPerson.getAgeProperty(), new IntegerStringConverter());
 		skillList.itemsProperty().bind(selectedPerson.getSkillsProperty());
@@ -232,9 +244,12 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 	{
 		showMessage(message.getMessage(), message.getType());
 	}
+	
+	
+	// view helpers
 
 
-	public class SwitchMessageAction implements EventHandler<ActionEvent>
+	private class SwitchMessageAction implements EventHandler<ActionEvent>
 	{
 		private Text console;
 
@@ -249,7 +264,6 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 		}
 		
 		
-		@Override
 		public void handle(ActionEvent event)
 		{
 			if (message != null)
@@ -262,28 +276,15 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 				this.console.textProperty().set("");
 			}
 		}
-
-
-		public IMessage getMessage()
-		{
-			return message;
-		}
-
-
-		public void setMessage(IMessage message)
-		{
-			this.message = message;
-		}
 	}
 
 
 	private class PersonsListSelectionChangedHandler implements ChangeListener<Person>
 	{
-
 		public void changed(ObservableValue<? extends Person> observed, Person oldPerson, Person newPerson)
 		{
 			log.debug("combobox selection changed to: {}", newPerson);
-			consoleMediator.showMessage(ConsoleMessage.error(String.format("Editing person: %s", newPerson.getName())));
+			consoleMediator.showMessage(ConsoleMessage.info(String.format("Editing person: %s", newPerson.getName())));
 			listMediator.updateSelectedPerson(newPerson);
 		}
 	}

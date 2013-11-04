@@ -1,6 +1,5 @@
 package pl.xesenix.experiments.experiment00.views.console;
 
-import pl.xesenix.experiments.experiment00.Controller;
 
 public class ConsoleMessage implements IMessage {
 
@@ -35,25 +34,21 @@ public class ConsoleMessage implements IMessage {
 	}
 	
 	
-	@Override
 	public void setMessage(String message)
 	{
 		this.message = message;
 	}
 
-	@Override
 	public void setMessageType(IMessageType type)
 	{
 		this.type = type;
 	}
 
-	@Override
 	public String getMessage()
 	{
 		return message;
 	}
 
-	@Override
 	public IMessageType getType()
 	{
 		return type;
