@@ -62,7 +62,6 @@ public class StubPersonService implements IPersonService
 	}
 
 
-	@Override
 	public void loadPersons()
 	{
 		Skill karate = new Skill("karate");
