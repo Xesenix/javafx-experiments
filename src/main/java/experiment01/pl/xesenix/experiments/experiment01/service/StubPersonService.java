@@ -40,7 +40,6 @@ public class StubPersonService implements IPersonService
 	{
 		personsList.addListener(new ChangeListener<ObservableList<Person>>() {
 
-			@Override
 			public void changed(ObservableValue<? extends ObservableList<Person>> observable,
 				ObservableList<Person> oldValue, ObservableList<Person> newValue)
 			{
@@ -83,7 +82,6 @@ public class StubPersonService implements IPersonService
 	}
 
 
-	@Override
 	public void loadPersons()
 	{
 		Skill karate = new Skill("karate");

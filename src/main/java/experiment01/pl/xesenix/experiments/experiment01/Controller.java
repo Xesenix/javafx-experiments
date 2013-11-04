@@ -12,6 +12,7 @@ package pl.xesenix.experiments.experiment01;
 
 import java.util.ResourceBundle;
 
+import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -23,12 +24,18 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.util.Callback;
 import javafx.util.Duration;
 
 import org.slf4j.Logger;
@@ -133,8 +140,20 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 
 		// people list aspect view setup
 		
+		Callback<ListView<Person>, ListCell<Person>> peopleCellFactory = new Callback<ListView<Person>, ListCell<Person>>() {
+
+			public ListCell<Person> call(ListView<Person> param)
+			{
+				return new PersonListCell();
+			}
+		};
+		
 		combobox.getSelectionModel().selectedItemProperty().addListener(new PersonsListSelectionChangedHandler());
+		combobox.setButtonCell(new PersonListCell());
+		combobox.setCellFactory(peopleCellFactory);
+		
 		peopleList.getSelectionModel().selectedItemProperty().addListener(new PersonsListSelectionChangedHandler());
+		peopleList.setCellFactory(peopleCellFactory);
 		
 		mediator.init();
 		listMediator.loadPersons();
@@ -153,7 +172,6 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 	{
 		name.focusedProperty().addListener(new ChangeListener<Boolean>() {
 
-			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)
 			{
 				if (!newValue)
@@ -167,7 +185,6 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 		
 		age.focusedProperty().addListener(new ChangeListener<Boolean>() {
 
-			@Override
 			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)
 			{
 				if (!newValue)
@@ -228,6 +245,7 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 	public void updatePersonList(ObservableList<Person> persons)
 	{
 		log.debug("updatePersonList: {}", persons);
+		
 		combobox.setItems(persons);
 		peopleList.setItems(persons);
 	}
@@ -295,6 +313,68 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 	// view helpers
 
 
+	private class PersonListCell extends ListCell<Person>
+	{
+		private ChangeListener<String> personChangeParameterListener;
+
+		@Override
+		protected void updateItem(Person item, boolean empty)
+		{
+			if (!empty)
+			{
+				log.debug("list cell value {}", item);
+				
+				if (personChangeParameterListener == null)
+				{
+					personChangeParameterListener = new ChangeListener<String>() {
+	
+						@Override
+						public void changed(ObservableValue<? extends String> observed, String oldValue, String newValue)
+						{
+							log.debug("list cell value change from '{}' to '{}'", oldValue, newValue);
+							
+							if (!oldValue.equals(newValue))
+							{
+								setText(newValue);
+								//updateItem(item, empty);
+							}
+						}
+					};
+				}
+				
+				setText(item.getName());
+				item.getNameProperty().addListener(personChangeParameterListener);
+				
+				// fancy icon with animation
+				
+				Group icon = new Group();
+				Rectangle rect = new Rectangle(20, 20);
+				rect.setArcHeight(10);
+				rect.setArcWidth(10);
+				Circle circle = new Circle(10, 10, 5, Color.web("#0f4"));
+				
+				icon.getChildren().add(rect);
+				icon.getChildren().add(circle);
+				
+				Timeline animation = TimelineBuilder.create()
+					.keyFrames(new KeyFrame(new Duration(800), new KeyValue(circle.opacityProperty(), 0.5, Interpolator.SPLINE(0.3, 0, 0.7, 1))))
+					.cycleCount(Animation.INDEFINITE)
+					.autoReverse(true)
+					.build();
+				
+				setGraphic(icon);
+				animation.play();
+			}
+			else
+			{
+				setText(null);
+			}
+			
+			super.updateItem(item, empty);
+		}
+	}
+
+
 	private class SwitchMessageAction implements EventHandler<ActionEvent>
 	{
 		private Text console;
@@ -341,7 +421,6 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 		public void changed(ObservableValue<? extends Person> observed, Person oldPerson, Person newPerson)
 		{
 			log.debug("combobox selection changed to: {}", newPerson);
-			//consoleMediator.showMessage(ConsoleMessage.info(String.format("Editing person: %s", newPerson.getName())));
 			listMediator.updateSelectedPerson(newPerson);
 		}
 	}
