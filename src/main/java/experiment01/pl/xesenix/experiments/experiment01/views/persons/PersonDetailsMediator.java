@@ -178,6 +178,10 @@ public class PersonDetailsMediator implements IPersonDetailsMediator
 			// cannot do this outside of FX thread 
 			property.setValue(value);
 			
+			Person editedPerson = selectionModel.getSelectedPerson();
+			
+			view.updatePersonDetailsView(editedPerson);
+			
 			infoMessage(successMessage);
 		}
 	}

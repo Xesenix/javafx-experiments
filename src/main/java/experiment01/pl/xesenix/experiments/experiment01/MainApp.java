@@ -15,6 +15,7 @@ import java.util.List;
 import javafx.scene.SceneBuilder;
 import javafx.stage.Stage;
 import javafx.stage.StageBuilder;
+import javafx.stage.StageStyle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,7 @@ public class MainApp extends GuiceApplication
 			.resizable(true)
 			.applyTo(stage);
 		
+		stage.initStyle(StageStyle.UNDECORATED);
 		stage.show();
 	}
 

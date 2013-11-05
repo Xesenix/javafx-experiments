@@ -9,6 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.*?>
 <?scenebuilder-preview-i18n-resource ../translations/experiment00.properties?>
+<?scenebuilder-stylesheet ../styles/experiment01.css?>
 
 <AnchorPane fx:id="view" prefHeight="400.0" prefWidth="620.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="pl.xesenix.experiments.experiment01.Controller">
   <children>
@@ -52,7 +53,7 @@
         </GridPane>
       </content>
     </ScrollPane>
-    <StackPane id="StackPane" prefHeight="80.0" style="-fx-background-color: #000;&#10;&#10;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <StackPane id="StackPane" fx:id="titlebar" prefHeight="80.0" style="&#10;&#10;" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <children>
         <Text boundsType="VISUAL" fill="WHITE" fontSmoothingType="LCD" scaleX="1.0" scaleY="1.0" scaleZ="1.0" smooth="true" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="%app.name" textOrigin="TOP" x="0.0" StackPane.alignment="TOP_LEFT">
           <effect>
@@ -88,6 +89,22 @@
             <Insets bottom="5.0" left="20.0" />
           </StackPane.margin>
         </Text>
+        <HBox alignment="TOP_RIGHT" blendMode="ADD" fillHeight="false" focusTraversable="false" maxHeight="40.0" prefHeight="-1.0" prefWidth="-1.0" spacing="5.0" StackPane.alignment="TOP_RIGHT">
+          <children>
+            <Button cancelButton="false" defaultButton="false" mnemonicParsing="false" mouseTransparent="false" onMouseClicked="#minimizeApplication" prefHeight="32.0" prefWidth="32.0" style="" styleClass="icon-minimize" text="" textOverrun="CLIP" underline="false" />
+            <Button cancelButton="false" defaultButton="false" mnemonicParsing="false" mouseTransparent="false" onMouseClicked="#closeApplication" prefHeight="32.0" prefWidth="32.0" style="" styleClass="icon-close" text="" textOverrun="CLIP" underline="false" />
+          </children>
+          <effect>
+            <Reflection>
+              <input>
+                <Bloom />
+              </input>
+            </Reflection>
+          </effect>
+          <StackPane.margin>
+            <Insets right="10.0" top="10.0" />
+          </StackPane.margin>
+        </HBox>
       </children>
     </StackPane>
   </children>

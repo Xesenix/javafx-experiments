@@ -11,6 +11,7 @@
 package pl.xesenix.experiments.experiment01;
 
 import java.util.ResourceBundle;
+import java.util.Vector;
 
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
@@ -25,19 +26,25 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseDragEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
+import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,6 +116,10 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 
 
 	@FXML
+	private StackPane titlebar;
+
+
+	@FXML
 	private AnchorPane view;
 
 
@@ -116,6 +127,21 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 
 
 	private IMessage consoleUpdateMessage;
+	
+	
+	@FXML
+	public void closeApplication()
+	{
+		System.exit(0);
+	}
+	
+	
+	@FXML
+	public void minimizeApplication()
+	{
+		Stage stage = (Stage) getView().getScene().getWindow();
+		stage.setIconified(true);
+	}
 
 
 	public Controller()
@@ -137,6 +163,29 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 		assert name != null : "fx:id=\"name\" was not injected: check your FXML file 'experiment01.fxml'.";
 		assert view != null : "fx:id=\"view\" was not injected: check your FXML file 'experiment01.fxml'.";
 		assert console != null : "fx:id=\"message\" was not injected: check your FXML file 'experiment01.fxml'.";
+		assert titlebar != null : "fx:id=\"titlebar\" was not injected: check your FXML file 'experiment01.fxml'.";
+		
+		final double[] offset = new double[2];
+		
+		titlebar.setOnMousePressed(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event)
+			{
+				offset[0] = event.getSceneX();
+				offset[1] = event.getSceneY();
+			}
+		});
+		
+		titlebar.setOnMouseDragged(new EventHandler<MouseEvent>() {
+			
+			public void handle(MouseEvent event)
+			{
+				Stage stage = (Stage) getView().getScene().getWindow();
+				stage.setX(event.getScreenX() - offset[0]);
+				stage.setY(event.getScreenY() - offset[1]);
+			}
+		});
 
 		// people list aspect view setup
 		
