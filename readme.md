@@ -28,6 +28,7 @@ Application data is set of person Profiles.
 Tasks:
 
 - [x] styling undecorated window
+- [x] animated console messages for all actions
 - [x] advanced mediator pattern
 - [ ] command pattern
 - [x] binding combobox cells to person names
