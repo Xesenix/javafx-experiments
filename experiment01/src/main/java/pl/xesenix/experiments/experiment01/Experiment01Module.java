@@ -10,6 +10,7 @@
  ******************************************************************************/
 package pl.xesenix.experiments.experiment01;
 
+import javafx.scene.text.Font;
 import pl.xesenix.experiments.experiment01.application.translations.ITranslationProvider;
 import pl.xesenix.experiments.experiment01.application.translations.ResourceBundleTranslationProvider;
 import pl.xesenix.experiments.experiment01.commands.CommandProvider;
@@ -47,6 +48,14 @@ public class Experiment01Module extends AbstractModule
 		mapServices();
 		mapModels();
 		mapInfrastructure();
+		
+		loadFonts();
+	}
+
+
+	private void loadFonts()
+	{
+		Font.loadFont(getClass().getResource("/fonts/Michroma.ttf").toExternalForm(), 12);
 	}
 
 

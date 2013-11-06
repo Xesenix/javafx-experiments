@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.*?>
-<?scenebuilder-preview-i18n-resource ../translations/experiment00.properties?>
+<?scenebuilder-preview-i18n-resource ../translations/experiment01.properties?>
 <?scenebuilder-stylesheet ../styles/experiment01.css?>
 
 <AnchorPane fx:id="view" prefHeight="400.0" prefWidth="620.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="pl.xesenix.experiments.experiment01.Controller">
@@ -55,7 +55,7 @@
     </ScrollPane>
     <StackPane id="StackPane" fx:id="titlebar" prefHeight="80.0" style="&#10;&#10;" styleClass="header" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <children>
-        <Text boundsType="VISUAL" fill="WHITE" fontSmoothingType="LCD" scaleX="1.0" scaleY="1.0" scaleZ="1.0" smooth="true" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" text="%app.name" textOrigin="TOP" x="0.0" StackPane.alignment="TOP_LEFT">
+        <Text boundsType="VISUAL" fill="WHITE" fontSmoothingType="LCD" scaleX="1.0" scaleY="1.0" scaleZ="1.0" smooth="true" strikethrough="false" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="title" text="%app.name" textOrigin="TOP" x="0.0" StackPane.alignment="TOP_LEFT">
           <effect>
             <Glow level="0.2">
               <input>
@@ -89,10 +89,10 @@
             <Insets bottom="5.0" left="20.0" />
           </StackPane.margin>
         </Text>
-        <HBox alignment="TOP_RIGHT" blendMode="ADD" fillHeight="false" focusTraversable="false" maxHeight="40.0" prefHeight="-1.0" prefWidth="-1.0" spacing="5.0" StackPane.alignment="TOP_RIGHT">
+        <HBox alignment="TOP_RIGHT" blendMode="ADD" fillHeight="false" focusTraversable="false" maxHeight="32.0" prefHeight="-1.0" prefWidth="-1.0" spacing="5.0" StackPane.alignment="TOP_RIGHT">
           <children>
-            <Button cancelButton="false" defaultButton="false" mnemonicParsing="false" mouseTransparent="false" onMouseClicked="#minimizeApplication" prefHeight="32.0" prefWidth="32.0" style="" styleClass="icon-minimize" text="" textOverrun="CLIP" underline="false" />
-            <Button cancelButton="false" defaultButton="false" mnemonicParsing="false" mouseTransparent="false" onMouseClicked="#closeApplication" prefHeight="32.0" prefWidth="32.0" style="" styleClass="icon-close" text="" textOverrun="CLIP" underline="false" />
+            <Button cancelButton="false" defaultButton="false" mnemonicParsing="false" mouseTransparent="false" onMouseClicked="#minimizeApplication" prefHeight="32.0" prefWidth="32.0" style="" styleClass="icon-minimize" text="" textOverrun="CLIP" underline="false" HBox.hgrow="NEVER" />
+            <Button cancelButton="false" defaultButton="false" maxHeight="32.0" maxWidth="32.0" mnemonicParsing="false" mouseTransparent="false" onMouseClicked="#closeApplication" prefHeight="32.0" prefWidth="32.0" style="" styleClass="icon-close" text="" textOverrun="CLIP" underline="false" HBox.hgrow="NEVER" />
           </children>
           <effect>
             <Reflection>
