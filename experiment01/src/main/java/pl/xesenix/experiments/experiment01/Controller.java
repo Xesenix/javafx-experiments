@@ -11,7 +11,6 @@
 package pl.xesenix.experiments.experiment01;
 
 import java.util.ResourceBundle;
-import java.util.Vector;
 
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
@@ -26,13 +25,11 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -44,7 +41,6 @@ import javafx.stage.Stage;
 import javafx.util.Callback;
 import javafx.util.Duration;
 
-import org.apache.commons.math3.geometry.euclidean.twod.Vector2D;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>pl.xesenix.experiments</groupId>
+		<artifactId>experiments</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>experiment01</artifactId>
+	<name>experiment01</name>
+	<description>Binding application data to view with use of mediator pattern.</description>
+	
+	<build>
+		<finalName>experiment01</finalName>
+
+		<plugins>
+			<plugin>
+				<groupId>com.zenjava</groupId>
+				<artifactId>javafx-maven-plugin</artifactId>
+				<version>2.0</version>
+				<configuration>
+					<mainClass>pl.xesenix.experiments.experiment01.MainApp</mainClass>
+					<needShortcut>true</needShortcut>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
