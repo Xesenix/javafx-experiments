@@ -1,3 +1,5 @@
+![Experiment01 screen](/images/screen00.png "Experiment01")
+
 Experiment01
 ============
 
@@ -16,5 +18,3 @@ Tasks:
 - [x] binding person name to name field
 - [x] binding person age to age field
 - [ ] binding listview cells to person skills names
-
-![alt Experiment01 screen](/images/screen00.png "Experiment01")
