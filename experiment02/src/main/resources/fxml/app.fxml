@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane fx:id="view" prefHeight="400.0" prefWidth="620.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="pl.xesenix.experiments.experiment02.Controller">
+  <children>
+    <Circle fill="DODGERBLUE" layoutX="456.0" layoutY="255.0" radius="100.0" stroke="BLACK" strokeType="INSIDE" />
+  </children>
+</AnchorPane>
