@@ -1,30 +1,29 @@
 
 package pl.xesenix.experiments.experiment02;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-
 import javafx.animation.AnimationTimer;
+import javafx.beans.property.Property;
+import javafx.event.Event;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.Glow;
+import javafx.scene.effect.BoxBlur;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.ArcTo;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.CubicCurveTo;
-import javafx.scene.shape.FillRule;
-import javafx.scene.shape.LineTo;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.PathElement;
-import javafx.scene.shape.QuadCurveTo;
-import javafx.scene.shape.VLineTo;
-import javafx.stage.Stage;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.inject.Singleton;
 
 
 @Singleton
@@ -53,33 +52,24 @@ public class Controller
 	public void initialize()
 	{
 		log.debug("initializing");
+		
 
 		Canvas canvas = new Canvas(800, 600);
 
+		view.getChildren().add(canvas);
+
 		final GraphicsContext gc = canvas.getGraphicsContext2D();
-		int fps = 30;
+		int fps = 120;
 		
 		final Path path = new Path();
 		path.setSmooth(true);
+		path.setStroke(Color.web("#000"));
 		
-		double x = Math.random() * 800;
-		double y = Math.random() * 600;
-		double dir = Math.random() * Math.PI;
+		view.getChildren().add(path);
 		
-		path.getElements().add(new MoveTo(x, y));
-		
-		for (int i = 0; i < 100; i++)
-		{
-			dir = Math.random() * Math.PI;
-			
-			x = Math.random() * 800;
-			y = Math.random() * 600;
-			
-			path.getElements().add(new QuadCurveTo(x + 50 * Math.cos(dir), y - 50 * Math.sin(dir), x, y));
-		}
+		preparePath(path);
+		preparePathUI(path);
 
-		//gc.setEffect(new Glow());
-		
 		AnimationTimer animator = (new FixedStepAnimationTimer(fps) {
 			private FPS animationFps = new FPS();
 
@@ -105,9 +95,9 @@ public class Controller
 				
 				for (PathElement el : path.getElements())
 				{
-					if (el instanceof QuadCurveTo)
+					if (el instanceof CubicCurveTo)
 					{
-						QuadCurveTo point = (QuadCurveTo) el;
+						CubicCurveTo point = (CubicCurveTo) el;
 						point.setX(point.getX() + 2 - Math.random() * 4);
 						point.setY(point.getY() + 2 - Math.random() * 4);
 					}
@@ -158,11 +148,215 @@ public class Controller
 		});
 
 		animator.start();
-
-		view.getChildren().add(canvas);
-		view.getChildren().add(path);
 	}
 
+
+	private void preparePath(final Path path)
+	{
+		double x = Math.random() * 800;
+		double y = Math.random() * 600;
+		
+		MoveTo mt = new MoveTo(x, y);
+		
+		path.getElements().add(mt);
+		
+		for (int i = 0; i < 10; i++)
+		{
+			x = Math.random() * 800;
+			y = Math.random() * 600;
+			
+			CubicCurveTo cct = new CubicCurveTo(x, y, x, y, x, y);
+
+			path.getElements().add(cct);
+		}
+	}
+
+
+	private void preparePathUI(final Path path)
+	{
+		EventHandler<MouseEvent> dragHandler = new DragHandler();
+		EventHandler<MouseEvent> clickHandler = new ClickHandler();
+		
+		Property<Number> pointPropertyX = null;
+		Property<Number> pointPropertyY = null;
+		Property<Number> previousPointPropertyX = null;
+		Property<Number> previousPointPropertyY = null;
+		Property<Number> handleInPropertyX = null;
+		Property<Number> handleInPropertyY = null;
+		Property<Number> handleOutPropertyX = null;
+		Property<Number> handleOutPropertyY = null;
+		
+		Circle handle1 = null;
+		Circle handle2 = null;
+		Line line1 = null;
+		Line line2 = null;
+		
+		for (PathElement pathPoint : path.getElements())
+		{
+			previousPointPropertyX = pointPropertyX;
+			previousPointPropertyY = pointPropertyY;
+			
+			if (pathPoint instanceof MoveTo)
+			{
+				pointPropertyX = ((MoveTo) pathPoint).xProperty();
+				pointPropertyY = ((MoveTo) pathPoint).yProperty();
+			}
+			else if (pathPoint instanceof CubicCurveTo)
+			{
+				pointPropertyX = ((CubicCurveTo) pathPoint).xProperty();
+				pointPropertyY = ((CubicCurveTo) pathPoint).yProperty();
+				handleInPropertyX = ((CubicCurveTo) pathPoint).controlX1Property();
+				handleInPropertyY = ((CubicCurveTo) pathPoint).controlY1Property();
+				handleOutPropertyX = ((CubicCurveTo) pathPoint).controlX2Property();
+				handleOutPropertyY = ((CubicCurveTo) pathPoint).controlY2Property();
+			}
+			
+			Circle point = new Circle(20, Color.web("#f00"));
+			point.setOpacity(0.2);
+			point.setUserData(pathPoint);
+			
+			point.setOnMousePressed(dragHandler);
+			point.setOnMouseDragged(dragHandler);
+			point.setOnDragDetected(dragHandler);
+			point.setOnMouseClicked(clickHandler);
+			
+			point.centerXProperty().bindBidirectional(pointPropertyX);
+			point.centerYProperty().bindBidirectional(pointPropertyY);
+			
+			if (handleInPropertyX != null)
+			{
+				handle1 = new Circle(10, Color.web("#0f0"));
+				handle1.setOpacity(0.4);
+				
+				handle1.setOnMousePressed(dragHandler);
+				handle1.setOnMouseDragged(dragHandler);
+				handle1.setOnDragDetected(dragHandler);
+				
+				handle1.centerXProperty().bindBidirectional(handleInPropertyX);
+				handle1.centerYProperty().bindBidirectional(handleInPropertyY);
+			}
+			
+			if (handleOutPropertyX != null)
+			{
+				handle2 = new Circle(10, Color.web("#0f0"));
+				handle2.setOpacity(0.4);
+				
+				handle2.setOnMousePressed(dragHandler);
+				handle2.setOnMouseDragged(dragHandler);
+				handle2.setOnDragDetected(dragHandler);
+				
+				handle2.centerXProperty().bindBidirectional(handleOutPropertyX);
+				handle2.centerYProperty().bindBidirectional(handleOutPropertyY);
+			}
+			
+			if (previousPointPropertyX != null && handleInPropertyX != null)
+			{
+				line1 = new Line();
+				line1.setOpacity(0.2);
+				
+				line1.startXProperty().bind(previousPointPropertyX);
+				line1.startYProperty().bind(previousPointPropertyY);
+				line1.endXProperty().bind(handleInPropertyX);
+				line1.endYProperty().bind(handleInPropertyY);
+			}
+			
+			if (pointPropertyX != null && handleOutPropertyX != null)
+			{
+				line2 = new Line();
+				line2.setOpacity(0.2);
+				
+				line2.startXProperty().bind(pointPropertyX);
+				line2.startYProperty().bind(pointPropertyY);
+				line2.endXProperty().bind(handleOutPropertyX);
+				line2.endYProperty().bind(handleOutPropertyY);
+			}
+
+			if (line1 != null)
+			{
+				view.getChildren().add(line1);
+			}
+			
+			if (line2 != null)
+			{
+				view.getChildren().add(line2);
+			}
+			
+			view.getChildren().add(point);
+			
+			if (handle1 != null)
+			{
+				view.getChildren().add(handle1);
+			}
+			
+			if (handle2 != null)
+			{
+				view.getChildren().add(handle2);
+			}
+		}
+	}
+
+
+	public class ClickHandler implements EventHandler<MouseEvent>
+	{
+		@Override
+		public void handle(MouseEvent event)
+		{
+			EventType<? extends Event> eventType = event.getEventType();
+			
+			log.debug("{}", event);
+			
+			if (eventType.equals(MouseEvent.MOUSE_CLICKED) && event.getClickCount() == 2)
+			{
+				if (event.getTarget() instanceof Circle)
+				{
+					PathElement pathPoint = (PathElement) ((Circle) event.getTarget()).getUserData();
+					
+					if (pathPoint instanceof CubicCurveTo)
+					{
+						CubicCurveTo cct = (CubicCurveTo) pathPoint;
+						cct.controlX1Property().set(cct.getX());
+						cct.controlY1Property().set(cct.getY());
+						cct.controlX2Property().set(cct.getX());
+						cct.controlY2Property().set(cct.getY());
+					}
+				}
+			}
+		}
+	}
+
+	public class DragHandler implements EventHandler<MouseEvent>
+	{
+		private double offsetX;
+
+
+		private double offsetY;
+
+
+		@Override
+		public void handle(MouseEvent event)
+		{
+			EventType<? extends Event> eventType = event.getEventType();
+			
+			log.debug("{}", event);
+			
+			if (eventType.equals(MouseEvent.MOUSE_PRESSED))
+			{
+				if (event.getTarget() instanceof Circle)
+				{
+					offsetX = event.getScreenX() - ((Circle) event.getTarget()).getCenterX();
+					offsetY = event.getScreenY() - ((Circle) event.getTarget()).getCenterY();
+				}
+			}
+			else if (eventType.equals(MouseEvent.MOUSE_DRAGGED))
+			{
+				if (event.getTarget() instanceof Circle)
+				{
+					((Circle) event.getTarget()).setCenterX(event.getScreenX() - offsetX);
+					((Circle) event.getTarget()).setCenterY(event.getScreenY() - offsetY);
+				}
+			}
+		}
+	}
 
 	public abstract class FixedStepAnimationTimer extends AnimationTimer
 	{
