@@ -1,15 +1,16 @@
 
 package pl.xesenix.experiments.experiment02;
 
+import java.net.URL;
+import java.util.ResourceBundle;
+
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.Property;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.BoxBlur;
+import javafx.scene.control.ListView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -23,6 +24,10 @@ import javafx.scene.shape.PathElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pl.xesenix.experiments.experiment02.views.path.PathsEditor;
+
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Singleton;
 
 
@@ -30,6 +35,30 @@ import com.google.inject.Singleton;
 public class Controller
 {
 	private static final Logger log = LoggerFactory.getLogger(Controller.class);
+	
+	
+	@Inject
+	private Injector injector;
+	
+	
+	@FXML
+	private ResourceBundle resources;
+
+
+	@FXML
+	private URL location;
+
+
+	@FXML
+	private PathsEditor pathEditor;
+
+
+	@FXML
+	private ListView<?> pathsList;
+
+
+	@FXML
+	private ListView<?> pointsList;
 
 
 	@FXML
@@ -53,8 +82,14 @@ public class Controller
 	{
 		log.debug("initializing");
 		
+		assert pathEditor != null : "fx:id=\"pathEditor\" was not injected: check your FXML file 'app.fxml'.";
+		assert pathsList != null : "fx:id=\"pathsList\" was not injected: check your FXML file 'app.fxml'.";
+		assert pointsList != null : "fx:id=\"pointsList\" was not injected: check your FXML file 'app.fxml'.";
+		assert view != null : "fx:id=\"view\" was not injected: check your FXML file 'app.fxml'.";
+		
+		injector.injectMembers(pathEditor);
 
-		Canvas canvas = new Canvas(800, 600);
+		/*Canvas canvas = new Canvas(800, 600);
 
 		view.getChildren().add(canvas);
 
@@ -147,7 +182,7 @@ public class Controller
 			}
 		});
 
-		animator.start();
+		animator.start();*/
 	}
 
 
