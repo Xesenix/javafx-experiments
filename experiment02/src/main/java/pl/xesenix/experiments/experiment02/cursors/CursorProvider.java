@@ -2,9 +2,9 @@ package pl.xesenix.experiments.experiment02.cursors;
 
 import java.util.HashMap;
 
-import com.google.inject.Singleton;
-
 import javafx.scene.Cursor;
+
+import com.google.inject.Singleton;
 
 @Singleton
 public class CursorProvider

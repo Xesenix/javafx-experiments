@@ -1,10 +1,9 @@
-package pl.xesenix.experiments.experiment02.views.path;
+package pl.xesenix.experiments.experiment02.components.patheditor;
 
 import pl.xesenix.experiments.experiment02.vo.IPath;
 import pl.xesenix.experiments.experiment02.vo.IPathPoint;
-import pl.xesenix.experiments.experiment02.vo.PathPointVO;
 
-public interface IPathMediator
+public interface IPathEditorMediator
 {
 	void createPath();
 	
@@ -21,5 +20,8 @@ public interface IPathMediator
 	void removePoint(IPathPoint point);
 
 
-	void registerView(IPathView pathView);
+	void registerView(IPathEditorView pathView);
+
+
+	void smoothPath();
 }

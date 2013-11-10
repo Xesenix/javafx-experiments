@@ -1,17 +1,17 @@
 
-package pl.xesenix.experiments.experiment02.services;
+package pl.xesenix.experiments.experiment02.components.patheditor.services;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import pl.xesenix.experiments.experiment02.views.path.PathMediator;
 import pl.xesenix.experiments.experiment02.vo.IPath;
 import pl.xesenix.experiments.experiment02.vo.IPathPoint;
 import pl.xesenix.experiments.experiment02.vo.PathPointVO.PathPointBuilder;
-import pl.xesenix.experiments.experiment02.vo.PathVO;
 import pl.xesenix.experiments.experiment02.vo.PathVO.PathBuilder;
+import pl.xesenix.experiments.experiment02.vo.PathVO.SmoothPathBuilder;
 
 import com.google.inject.Singleton;
 
@@ -83,5 +83,13 @@ public class PathDrawingContext
 		path.removePoint(point);
 		
 		points.remove(point);
+	}
+
+
+	public void smoothPath()
+	{
+		log.debug("smoothing path [{}]", currentEditedPath);
+		
+		SmoothPathBuilder.create().applyTo(currentEditedPath);
 	}
 }

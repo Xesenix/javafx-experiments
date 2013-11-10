@@ -24,7 +24,7 @@ import javafx.scene.shape.PathElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pl.xesenix.experiments.experiment02.views.path.PathsEditor;
+import pl.xesenix.experiments.experiment02.components.patheditor.PathsEditor;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;

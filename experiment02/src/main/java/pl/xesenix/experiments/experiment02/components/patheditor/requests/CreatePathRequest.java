@@ -1,11 +1,11 @@
-package pl.xesenix.experiments.experiment02.requests;
+package pl.xesenix.experiments.experiment02.components.patheditor.requests;
 
-import com.google.inject.Inject;
-
-import pl.xesenix.experiments.experiment02.services.PathDrawingContext;
-import pl.xesenix.experiments.experiment02.vo.IPath;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import pl.xesenix.experiments.experiment02.components.patheditor.services.PathDrawingContext;
+import pl.xesenix.experiments.experiment02.vo.IPath;
+
+import com.google.inject.Inject;
 
 public class CreatePathRequest extends Service<IPath>
 {

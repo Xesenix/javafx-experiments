@@ -1,17 +1,19 @@
 
-package pl.xesenix.experiments.experiment02.views.path;
+package pl.xesenix.experiments.experiment02.components.patheditor;
+
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
-import pl.xesenix.experiments.experiment02.requests.AddPointToPathRequest;
-import pl.xesenix.experiments.experiment02.requests.CreatePathRequest;
-import pl.xesenix.experiments.experiment02.requests.CreatePointRequest;
+import pl.xesenix.experiments.experiment02.components.patheditor.requests.AddPointToPathRequest;
+import pl.xesenix.experiments.experiment02.components.patheditor.requests.CreatePathRequest;
+import pl.xesenix.experiments.experiment02.components.patheditor.requests.CreatePointRequest;
+import pl.xesenix.experiments.experiment02.components.patheditor.requests.RemovePointRequest;
+import pl.xesenix.experiments.experiment02.components.patheditor.requests.SelectPathRequest;
+import pl.xesenix.experiments.experiment02.components.patheditor.requests.SmoothPathRequest;
 import pl.xesenix.experiments.experiment02.requests.IRequestProvider;
-import pl.xesenix.experiments.experiment02.requests.RemovePointRequest;
-import pl.xesenix.experiments.experiment02.requests.SelectPathRequest;
 import pl.xesenix.experiments.experiment02.vo.IPath;
 import pl.xesenix.experiments.experiment02.vo.IPathPoint;
 
@@ -22,20 +24,20 @@ import com.google.inject.Inject;
  * 
  * @author Xesenix
  */
-public class PathMediator implements IPathMediator
+public class PathEditorMediator implements IPathEditorMediator
 {
-	private static final Logger log = LoggerFactory.getLogger(PathMediator.class);
+	private static final Logger log = LoggerFactory.getLogger(PathEditorMediator.class);
 	
 	
 	@Inject
 	private IRequestProvider requestProvider;
 
 
-	private IPathView view;
+	private IPathEditorView view;
 
 
 	@Override
-	public void registerView(IPathView pathView)
+	public void registerView(IPathEditorView pathView)
 	{
 		log.debug("registring view for path: [{}]", pathView);
 		
@@ -98,6 +100,17 @@ public class PathMediator implements IPathMediator
 		RemovePointRequest request = requestProvider.get(RemovePointRequest.class);
 		request.setOnSucceeded(new UpdateViewEventHandler());
 		request.point = point;
+		request.start();
+	}
+
+
+	@Override
+	public void smoothPath()
+	{
+		log.debug("requesting path smoothing");
+		
+		SmoothPathRequest request = requestProvider.get(SmoothPathRequest.class);
+		request.setOnSucceeded(new UpdatePathViewEventHandler());
 		request.start();
 	}
 

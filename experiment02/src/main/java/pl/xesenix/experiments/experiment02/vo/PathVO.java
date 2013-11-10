@@ -126,4 +126,116 @@ public class PathVO implements IPath
 			return path;
 		}
 	}
+	
+	
+	public static class SmoothPathBuilder extends PathBuilder
+	{
+		ArrayList<IPathPoint> points = new ArrayList<IPathPoint>();
+
+
+		public static SmoothPathBuilder create()
+		{
+			return new SmoothPathBuilder();
+		}
+		
+		
+		public void applyTo(IPath path)
+		{
+			ObservableList<IPathPoint> list = path.getPathPoints();
+			
+			IPathPoint first = list.get(0);
+			IPathPoint second = null;
+			
+			if (list.size() > 1)
+			{
+				second = list.get(1);
+				
+				IPathPoint previous = first;
+				IPathPoint point = second;
+				IPathPoint next = null;
+				
+				for (int i = 2; i < list.size(); i++)
+				{
+					next = list.get(i);
+					
+					smooth(point, previous, next);
+					
+					previous = point;
+					point = next;
+				}
+				
+				smooth(point, previous, null);
+			}
+			
+			smooth(first, null, second);
+		}
+
+
+		private void smooth(IPathPoint point, IPathPoint previousPoint, IPathPoint nextPoint)
+		{
+			double dx, dy, direction, weightIn, weightOut;
+			
+			if (previousPoint == null)
+			{
+				if (nextPoint == null)
+				{
+					return;
+				}
+				else
+				{
+					dx = nextPoint.getInX() + nextPoint.getX() - point.getX();
+					dy = nextPoint.getInY() + nextPoint.getY() - point.getY();
+					
+					direction = Math.atan2(dy, dx);
+					weightIn = weightOut = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)) / 2f;
+				}
+			}
+			else
+			{
+				if (nextPoint == null)
+				{
+					dx = point.getX() - (previousPoint.getOutX() + previousPoint.getX());
+					dy = point.getY() - (previousPoint.getOutY() + previousPoint.getY());
+					
+					direction = Math.atan2(dy, dx);
+					
+					weightIn = weightOut = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)) / 2f;
+				}
+				else
+				{
+					dx = nextPoint.getX() - previousPoint.getX();
+					dy = nextPoint.getY() - previousPoint.getY();
+					
+					direction = Math.atan2(dy, dx);
+					
+					dx = point.getX() - previousPoint.getX();
+					dy = point.getY() - previousPoint.getY();
+					
+					weightIn = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)) / 2f;
+					
+					dx = nextPoint.getX() - point.getX();
+					dy = nextPoint.getY() - point.getY();
+					
+					weightOut = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2)) / 2f;
+				}
+			}
+			
+			point.setInX(weightIn * Math.cos(direction + Math.PI));
+			point.setInY(weightIn * Math.sin(direction + Math.PI));
+			point.setOutX(weightOut * Math.cos(direction));
+			point.setOutY(weightOut * Math.sin(direction));
+		}
+
+
+		public IPath build()
+		{
+			IPath path = new PathVO();
+
+			path.addPathPoints(points);
+			
+			applyTo(path);
+
+			return path;
+		}
+	}
 }

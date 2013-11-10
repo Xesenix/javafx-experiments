@@ -1,10 +1,10 @@
 
-package pl.xesenix.experiments.experiment02.views.path;
+package pl.xesenix.experiments.experiment02.components.patheditor;
 
 import pl.xesenix.experiments.experiment02.vo.IPath;
 
 
-public interface IPathView
+public interface IPathEditorView
 {
 	void updatePath(IPath path);
 
