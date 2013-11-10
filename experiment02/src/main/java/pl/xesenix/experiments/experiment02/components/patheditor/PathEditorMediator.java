@@ -14,7 +14,7 @@ import pl.xesenix.experiments.experiment02.components.patheditor.requests.Remove
 import pl.xesenix.experiments.experiment02.components.patheditor.requests.SelectPathRequest;
 import pl.xesenix.experiments.experiment02.components.patheditor.requests.SelectPointRequest;
 import pl.xesenix.experiments.experiment02.components.patheditor.requests.SmoothPathRequest;
-import pl.xesenix.experiments.experiment02.components.patheditor.requests.UpdateSelectedPointPositionRequest;
+import pl.xesenix.experiments.experiment02.components.patheditor.requests.UpdateSelectedPointRequest;
 import pl.xesenix.experiments.experiment02.requests.IRequestProvider;
 import pl.xesenix.experiments.experiment02.vo.IPath;
 import pl.xesenix.experiments.experiment02.vo.IPathPoint;
@@ -130,14 +130,18 @@ public class PathEditorMediator implements IPathEditorMediator
 
 
 	@Override
-	public void updatePointPosition(double x, double y)
+	public void updatePoint(double x, double y, double inX, double inY, double outX, double outY)
 	{
-		log.debug("requesting update selected point position: ({}, {})", x, y);
+		log.debug("requesting update selected point: ({})", new double[] {x, y, inX, inY, outX, outY});
 		
-		UpdateSelectedPointPositionRequest request = requestProvider.get(UpdateSelectedPointPositionRequest.class);
+		UpdateSelectedPointRequest request = requestProvider.get(UpdateSelectedPointRequest.class);
 		request.setOnSucceeded(new UpdatePathViewEventHandler());
 		request.x = x;
 		request.y = y;
+		request.inX = inX;
+		request.inY = inY;
+		request.outX = outX;
+		request.outY = outY;
 		request.start();
 	}
 

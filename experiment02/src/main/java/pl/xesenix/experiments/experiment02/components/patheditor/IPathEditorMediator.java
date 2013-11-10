@@ -29,5 +29,5 @@ public interface IPathEditorMediator
 	void selectPoint(IPathPoint point);
 
 
-	void updatePointPosition(double x, double y);
+	void updatePoint(double x, double y, double inX, double inY, double outX, double outY);
 }

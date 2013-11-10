@@ -105,12 +105,16 @@ public class PathDrawingContext
 	}
 
 
-	public void updateSelectedPointPosition(double x, double y)
+	public void updateSelectedPoint(double x, double y, double inX, double inY, double outX, double outY)
 	{
 		if (currentSelectedPoint != null)
 		{
 			currentSelectedPoint.setX(x);
 			currentSelectedPoint.setY(y);
+			currentSelectedPoint.setInX(inX);
+			currentSelectedPoint.setInY(inY);
+			currentSelectedPoint.setOutX(outX);
+			currentSelectedPoint.setOutY(outY);
 		}
 	}
 

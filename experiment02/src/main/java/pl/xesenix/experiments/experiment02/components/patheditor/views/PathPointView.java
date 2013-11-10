@@ -19,6 +19,15 @@ import pl.xesenix.experiments.experiment02.vo.IPathPoint;
 
 public class PathPointView extends Group
 {
+	public static final String POINT_HANDLE = "pointHandle";
+
+
+	public static final String IN_HANDLE = "inHandle";
+	
+	
+	public static final String OUT_HANDLE = "outHandle";
+
+
 	@Inject
 	protected CursorProvider cursorProvider;
 
@@ -37,16 +46,19 @@ public class PathPointView extends Group
 		pointHandle = CircleBuilder.create()
 			.radius(15)
 			.fill(Color.web("#8fff00"))
+			.userData(POINT_HANDLE)
 			.build();
 		
 		inHandle = CircleBuilder.create()
 			.radius(5)
 			.fill(Color.web("#00f"))
+			.userData(IN_HANDLE)
 			.build();
 
 		outHandle = CircleBuilder.create()
 			.radius(5)
 			.fill(Color.web("#f00"))
+			.userData(OUT_HANDLE)
 			.build();
 		
 		Line inLine = LineBuilder.create()
@@ -92,6 +104,5 @@ public class PathPointView extends Group
 		setTranslateY(point.getY());
 		
 		setUserData(point);
-		pointHandle.setUserData(point);
 	}
 }
