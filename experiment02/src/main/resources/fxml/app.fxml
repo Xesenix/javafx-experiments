@@ -9,21 +9,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
-<?import pl.xesenix.experiments.experiment02.views.path.*?>
-<?import pl.xesenix.experiments.experiment02.views.path.* ?>
-<?import pl.xesenix.experiments.experiment02.views.path.PathsEditor?>
 <?scenebuilder-classpath-element ../../../../target/classes?>
 
 <AnchorPane fx:id="view" prefHeight="400.0" prefWidth="620.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="pl.xesenix.experiments.experiment02.Controller">
   <children>
     <SplitPane dividerPositions="0.7216828478964401" focusTraversable="true" prefHeight="400.0" prefWidth="620.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <items>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-          <children>
-            <PathsEditor fx:id="pathEditor" prefHeight="400.0" prefWidth="489.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-          </children>
-        </AnchorPane>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+        <AnchorPane fx:id="editorContainer" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
+        <AnchorPane maxWidth="220.0" minHeight="0.0" minWidth="120.0" prefHeight="160.0" prefWidth="220.0">
           <children>
             <Accordion AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <expandedPane>

@@ -41,17 +41,8 @@ public class PathView extends Pane
 		pathLayer = new Pane();
 		pointsLayer = new Pane();
 		
-		
-		pointsLayer.getChildren().add(CircleBuilder.create().centerX(0).centerY(0).radius(200).fill(Color.AZURE).build());
-		
 		getChildren().add(pathLayer);
 		getChildren().add(pointsLayer);
-		
-		getChildren().add(CircleBuilder.create().centerX(0).centerY(0).radius(50).fill(Color.RED).build());
-		
-		getChildren().add(CircleBuilder.create().centerX(-100).centerY(0).radius(40).fill(Color.BLUE).build());
-		
-		getChildren().add(CircleBuilder.create().centerX(100).centerY(0).radius(30).fill(Color.GOLD).build());
 		
 		update(pathModel);
 	}

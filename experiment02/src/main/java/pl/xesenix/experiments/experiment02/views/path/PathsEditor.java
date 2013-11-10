@@ -3,8 +3,10 @@ package pl.xesenix.experiments.experiment02.views.path;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 
+import javafx.beans.binding.ListExpression;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -13,6 +15,8 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBuilder;
 import javafx.scene.control.ToolBar;
@@ -24,6 +28,7 @@ import javafx.scene.layout.StackPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pl.xesenix.experiments.experiment02.cursors.CursorProvider;
 import pl.xesenix.experiments.experiment02.vo.IPath;
 
 import com.google.inject.Inject;
@@ -32,6 +37,10 @@ import com.google.inject.Inject;
 public class PathsEditor extends StackPane implements IPathView
 {
 	private static final Logger log = LoggerFactory.getLogger(PathsEditor.class);
+
+
+	@Inject
+	public CursorProvider cursorProvider;
 
 
 	private IPathMediator mediator;
@@ -80,9 +89,7 @@ public class PathsEditor extends StackPane implements IPathView
 		assert view != null : "fx:id=\"view\" was not injected: check your FXML file 'pathEditor.fxml'.";
 		
 		CanvasEventHandler canvasEventHandler = new CanvasEventHandler();
-		canvasContainer.setOnMousePressed(canvasEventHandler);
-		canvasContainer.setOnMouseDragged(canvasEventHandler);
-		canvasContainer.setOnMouseClicked(canvasEventHandler);
+		canvasContainer.addEventHandler(MouseEvent.ANY, canvasEventHandler);
 		
 		Button newPathButton = ButtonBuilder.create().text("new path").build();
 		newPathButton.setOnMouseClicked(new AddPathEventHandler());
@@ -167,6 +174,9 @@ public class PathsEditor extends StackPane implements IPathView
 		
 		
 		private double startDragY;
+
+
+		private Cursor mouseCursor;
 		
 		
 		@Override
@@ -177,16 +187,35 @@ public class PathsEditor extends StackPane implements IPathView
 				Point2D point = canvas.sceneToLocal(event.getSceneX(), event.getSceneY());
 				log.debug("=== REQUESTING CREATE POINT AT {} ===", point);
 				mediator.createPoint(point.getX(), point.getY());
+				event.consume();
 			}
-			else if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED) && event.getButton().equals(MouseButton.SECONDARY))
+			else if (event.getEventType().equals(MouseEvent.MOUSE_PRESSED))
 			{
 				startDragX = event.getSceneX() - canvas.getTranslateX();
 				startDragY = event.getSceneY() - canvas.getTranslateY();
+				mouseCursor = ((Node) event.getSource()).getCursor();
+				event.consume();
 			}
-			else if (event.getEventType().equals(MouseEvent.MOUSE_DRAGGED) && event.getButton().equals(MouseButton.SECONDARY))
+			else if (event.getButton().equals(MouseButton.SECONDARY))
 			{
-				canvas.setTranslateX(event.getSceneX() - startDragX);
-				canvas.setTranslateY(event.getSceneY() - startDragY);
+				if (event.getEventType().equals(MouseEvent.DRAG_DETECTED))
+				{
+					((Node) event.getSource()).setCursor(cursorProvider.get(Cursor.OPEN_HAND));
+					
+				}
+				else if (event.getEventType().equals(MouseEvent.MOUSE_RELEASED))
+				{
+					((Node) event.getSource()).setCursor(mouseCursor);
+				}
+				else if (event.getEventType().equals(MouseEvent.MOUSE_DRAGGED))
+				{
+					double x = event.getSceneX() - startDragX;
+					double y = event.getSceneY() - startDragY;
+					canvas.setTranslateX(x);
+					canvas.setTranslateY(y);
+					canvasContainer.setStyle("-fx-background-position:" + x + " " + y);
+					event.consume();
+				}
 			}
 		}
 	}

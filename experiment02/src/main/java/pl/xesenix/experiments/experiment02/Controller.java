@@ -41,6 +41,10 @@ public class Controller
 	private Injector injector;
 	
 	
+	@Inject
+	private PathsEditor editor;
+	
+	
 	@FXML
 	private ResourceBundle resources;
 
@@ -50,7 +54,7 @@ public class Controller
 
 
 	@FXML
-	private PathsEditor pathEditor;
+	private AnchorPane editorContainer;
 
 
 	@FXML
@@ -82,12 +86,20 @@ public class Controller
 	{
 		log.debug("initializing");
 		
-		assert pathEditor != null : "fx:id=\"pathEditor\" was not injected: check your FXML file 'app.fxml'.";
+		assert editorContainer != null : "fx:id=\"editorContainer\" was not injected: check your FXML file 'app.fxml'.";
 		assert pathsList != null : "fx:id=\"pathsList\" was not injected: check your FXML file 'app.fxml'.";
 		assert pointsList != null : "fx:id=\"pointsList\" was not injected: check your FXML file 'app.fxml'.";
 		assert view != null : "fx:id=\"view\" was not injected: check your FXML file 'app.fxml'.";
 		
-		injector.injectMembers(pathEditor);
+		//injector.injectMembers(pathEditor);
+		
+		editorContainer.getChildren().add(editor);
+		
+		AnchorPane.setTopAnchor(editor, (double) 0f);
+		AnchorPane.setBottomAnchor(editor, (double) 0f);
+		AnchorPane.setRightAnchor(editor, (double) 0f);
+		AnchorPane.setLeftAnchor(editor, (double) 0f);
+		
 
 		/*Canvas canvas = new Canvas(800, 600);
 
