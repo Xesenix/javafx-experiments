@@ -8,6 +8,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.CubicCurveTo;
@@ -18,13 +19,20 @@ import javafx.scene.shape.PathElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+
 import pl.xesenix.experiments.experiment02.vo.IPath;
 import pl.xesenix.experiments.experiment02.vo.IPathPoint;
 
 
-public class PathView extends Pane
+public class PathView extends Group
 {
 	private static final Logger log = LoggerFactory.getLogger(PathView.class);
+	
+	
+	@Inject
+	private Injector injector;
 
 
 	private ObjectProperty<Path> path = new SimpleObjectProperty(this, "path");
@@ -33,20 +41,21 @@ public class PathView extends Pane
 	private ListProperty<PathPointView> points = new SimpleListProperty(this, "points", FXCollections.<PathPointView> observableArrayList());
 
 
-	private ObservableMap<IPathPoint, PathPointView> pointsToViewMap = FXCollections
-		.<IPathPoint, PathPointView> observableHashMap();
+	private ObservableMap<IPathPoint, PathPointView> pointsToViewMap = FXCollections.<IPathPoint, PathPointView> observableHashMap();
 
 
-	private Pane pathLayer;
+	private Group pathLayer;
 
 
-	private Pane pointsLayer;
+	private Group pointsLayer;
 
 
-	public PathView(IPath pathModel)
+	public PathView()
 	{
-		pathLayer = new Pane();
-		pointsLayer = new Pane();
+		pathLayer = new Group();
+		pathLayer.setMouseTransparent(true);
+		pointsLayer = new Group();
+		pathLayer.setPickOnBounds(true);
 
 		Path path = new Path();
 		path.setStroke(Color.web("#fff"));
@@ -58,8 +67,6 @@ public class PathView extends Pane
 
 		getChildren().add(pathLayer);
 		getChildren().add(pointsLayer);
-
-		update(pathModel);
 	}
 
 
@@ -89,6 +96,10 @@ public class PathView extends Pane
 		}
 
 		pointsLayer.getChildren().addAll(points);
+		
+		setPickOnBounds(true);
+		
+		setUserData(pathModel);
 	}
 
 
@@ -106,7 +117,7 @@ public class PathView extends Pane
 		{
 			log.debug("adding point [{}]", point);
 
-			pathPointView = new PathPointView(point);
+			pathPointView = injector.getInstance(PathPointView.class);
 			
 			pointsToViewMap.put(point, pathPointView);
 		}

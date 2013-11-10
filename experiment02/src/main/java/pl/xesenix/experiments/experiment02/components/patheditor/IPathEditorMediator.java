@@ -24,4 +24,10 @@ public interface IPathEditorMediator
 
 
 	void smoothPath();
+
+
+	void selectPoint(IPathPoint point);
+
+
+	void updatePointPosition(double x, double y);
 }

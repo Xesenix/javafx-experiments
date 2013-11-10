@@ -171,7 +171,7 @@ public class PathVO implements IPath
 		}
 
 
-		private void smooth(IPathPoint point, IPathPoint previousPoint, IPathPoint nextPoint)
+		public void smooth(IPathPoint point, IPathPoint previousPoint, IPathPoint nextPoint)
 		{
 			double dx, dy, direction, weightIn, weightOut;
 			

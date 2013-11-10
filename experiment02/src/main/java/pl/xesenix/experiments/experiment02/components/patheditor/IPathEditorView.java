@@ -2,6 +2,7 @@
 package pl.xesenix.experiments.experiment02.components.patheditor;
 
 import pl.xesenix.experiments.experiment02.vo.IPath;
+import pl.xesenix.experiments.experiment02.vo.IPathPoint;
 
 
 public interface IPathEditorView
@@ -13,6 +14,9 @@ public interface IPathEditorView
 
 
 	void focusPath(IPath path);
+
+
+	void focusPoint(IPathPoint point);
 
 
 	void update();

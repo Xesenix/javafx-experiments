@@ -1,20 +1,38 @@
 package pl.xesenix.experiments.experiment02.components.patheditor.views;
 
+import com.google.inject.Inject;
+
+import javafx.event.EventHandler;
+import javafx.scene.Cursor;
+import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.CircleBuilder;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.LineBuilder;
+import pl.xesenix.experiments.experiment02.cursors.CursorProvider;
 import pl.xesenix.experiments.experiment02.vo.IPathPoint;
 
-public class PathPointView extends Pane
+public class PathPointView extends Group
 {
+	@Inject
+	protected CursorProvider cursorProvider;
+
+
 	private Circle pointHandle;
+
+
 	private Circle inHandle;
+
+
 	private Circle outHandle;
 
-	public PathPointView(IPathPoint point)
+	
+	public PathPointView()
 	{
 		pointHandle = CircleBuilder.create()
 			.radius(15)
@@ -50,18 +68,15 @@ public class PathPointView extends Pane
 		outLine.startYProperty().bind(pointHandle.centerYProperty());
 		outLine.endXProperty().bind(outHandle.centerXProperty());
 		outLine.endYProperty().bind(outHandle.centerYProperty());
-
+		
 		getChildren().add(inLine);
 		getChildren().add(outLine);
 		getChildren().add(pointHandle);
 		getChildren().add(inHandle);
 		getChildren().add(outHandle);
 		
-		setTranslateX(point.getX());
-		setTranslateY(point.getY());
-		
+		setPickOnBounds(true);
 		setOpacity(0.5f);
-		setUserData(point);
 		
 	}
 
@@ -72,5 +87,11 @@ public class PathPointView extends Pane
 		
 		outHandle.setCenterX(point.getOutX());
 		outHandle.setCenterY(point.getOutY());
+		
+		setTranslateX(point.getX());
+		setTranslateY(point.getY());
+		
+		setUserData(point);
+		pointHandle.setUserData(point);
 	}
 }

@@ -37,6 +37,7 @@ import pl.xesenix.experiments.experiment02.components.patheditor.views.PathPoint
 import pl.xesenix.experiments.experiment02.components.patheditor.views.PathView;
 import pl.xesenix.experiments.experiment02.cursors.CursorProvider;
 import pl.xesenix.experiments.experiment02.vo.IPath;
+import pl.xesenix.experiments.experiment02.vo.IPathPoint;
 
 import com.cathive.fx.guice.GuiceFXMLLoader;
 import com.google.inject.Inject;
@@ -60,6 +61,10 @@ public class PathsEditor extends StackPane implements IPathEditorView
 
 	@Inject
 	protected IPathEditorMediator mediator;
+	
+	
+	@Inject
+	protected Injector injector;
 	
 	
 	protected ListProperty<PathView> paths = new SimpleListProperty(this, "paths");
@@ -199,7 +204,8 @@ public class PathsEditor extends StackPane implements IPathEditorView
 	{
 		log.debug("creating pathView for path: [{}]", path);
 		
-		PathView pathView = new PathView(path);
+		PathView pathView = injector.getInstance(PathView.class);
+		pathView.update(path);
 		
 		pathToViewMap.put(path, pathView);
 		
@@ -213,6 +219,13 @@ public class PathsEditor extends StackPane implements IPathEditorView
 	public void focusPath(IPath path)
 	{
 		log.debug("focusing pathView for path: [{}]", path);
+	}
+
+
+	@Override
+	public void focusPoint(IPathPoint point)
+	{
+		log.debug("focusing pathPointView for point: [{}]", point);
 	}
 
 

@@ -12,7 +12,9 @@ import pl.xesenix.experiments.experiment02.components.patheditor.requests.Create
 import pl.xesenix.experiments.experiment02.components.patheditor.requests.CreatePointRequest;
 import pl.xesenix.experiments.experiment02.components.patheditor.requests.RemovePointRequest;
 import pl.xesenix.experiments.experiment02.components.patheditor.requests.SelectPathRequest;
+import pl.xesenix.experiments.experiment02.components.patheditor.requests.SelectPointRequest;
 import pl.xesenix.experiments.experiment02.components.patheditor.requests.SmoothPathRequest;
+import pl.xesenix.experiments.experiment02.components.patheditor.requests.UpdateSelectedPointPositionRequest;
 import pl.xesenix.experiments.experiment02.requests.IRequestProvider;
 import pl.xesenix.experiments.experiment02.vo.IPath;
 import pl.xesenix.experiments.experiment02.vo.IPathPoint;
@@ -115,6 +117,31 @@ public class PathEditorMediator implements IPathEditorMediator
 	}
 
 
+	@Override
+	public void selectPoint(IPathPoint point)
+	{
+		log.debug("requesting select point: [{}]", point);
+		
+		SelectPointRequest request = requestProvider.get(SelectPointRequest.class);
+		request.setOnSucceeded(new SelectPathPointEventHandler());
+		request.point = point;
+		request.start();
+	}
+
+
+	@Override
+	public void updatePointPosition(double x, double y)
+	{
+		log.debug("requesting update selected point position: ({}, {})", x, y);
+		
+		UpdateSelectedPointPositionRequest request = requestProvider.get(UpdateSelectedPointPositionRequest.class);
+		request.setOnSucceeded(new UpdatePathViewEventHandler());
+		request.x = x;
+		request.y = y;
+		request.start();
+	}
+
+
 	private class CreatePathEventHandler implements EventHandler<WorkerStateEvent>
 	{
 		@Override
@@ -139,6 +166,20 @@ public class PathEditorMediator implements IPathEditorMediator
 			log.debug("selected path: [{}]", path);
 			
 			view.focusPath(path);
+		}
+	}
+
+
+	private class SelectPathPointEventHandler implements EventHandler<WorkerStateEvent>
+	{
+		@Override
+		public void handle(WorkerStateEvent event)
+		{
+			IPathPoint point = (IPathPoint) event.getSource().getValue();
+			
+			log.debug("selected point: [{}]", point);
+			
+			view.focusPoint(point);
 		}
 	}
 

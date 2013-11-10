@@ -31,6 +31,9 @@ public class PathDrawingContext
 	private IPath currentEditedPath;
 
 
+	private IPathPoint currentSelectedPoint;
+
+
 	public IPath createPath()
 	{
 		log.debug("creating path");
@@ -51,7 +54,7 @@ public class PathDrawingContext
 
 	public void setEditedPath(IPath path)
 	{
-		log.debug("selecting for edit path [{}]", path);
+		log.debug("selecting for edit path: [{}]", path);
 		
 		currentEditedPath = path;
 	}
@@ -59,7 +62,7 @@ public class PathDrawingContext
 
 	public IPathPoint createPoint(double x, double y)
 	{
-		log.debug("creating point at ({}, {})", x, y);
+		log.debug("creating point at: ({}, {})", x, y);
 		
 		// TODO Check for current drawing state
 		// return currentDrawingState.createPoint(x, y); - state pattern
@@ -76,7 +79,7 @@ public class PathDrawingContext
 
 	public void removePoint(IPathPoint point)
 	{
-		log.debug("removing point at [{}]", point);
+		log.debug("removing point at: [{}]", point);
 		
 		IPath path = point.getPath();
 		
@@ -88,8 +91,32 @@ public class PathDrawingContext
 
 	public void smoothPath()
 	{
-		log.debug("smoothing path [{}]", currentEditedPath);
+		log.debug("smoothing path: [{}]", currentEditedPath);
 		
 		SmoothPathBuilder.create().applyTo(currentEditedPath);
+	}
+
+
+	public void selectPoint(IPathPoint point)
+	{
+		log.debug("selecting point: [{}]", point);
+		
+		currentSelectedPoint = point;
+	}
+
+
+	public void updateSelectedPointPosition(double x, double y)
+	{
+		if (currentSelectedPoint != null)
+		{
+			currentSelectedPoint.setX(x);
+			currentSelectedPoint.setY(y);
+		}
+	}
+
+
+	public IPathPoint getEditedPoint()
+	{
+		return currentSelectedPoint;
 	}
 }
