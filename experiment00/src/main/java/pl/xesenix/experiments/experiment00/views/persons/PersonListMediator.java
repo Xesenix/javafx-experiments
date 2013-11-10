@@ -13,9 +13,9 @@ package pl.xesenix.experiments.experiment00.views.persons;
 import javafx.beans.property.ListProperty;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
-import pl.xesenix.experiments.experiment00.commands.ICommandProvider;
-import pl.xesenix.experiments.experiment00.commands.LoadPersonsListPropertyCommand;
 import pl.xesenix.experiments.experiment00.model.persons.IPersonSelectionModel;
+import pl.xesenix.experiments.experiment00.requests.IRequestProvider;
+import pl.xesenix.experiments.experiment00.requests.LoadPersonsListPropertyRequest;
 import pl.xesenix.experiments.experiment00.vo.Person;
 
 import com.google.inject.Inject;
@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 public class PersonListMediator implements IPersonListMediator
 {
 	@Inject
-	private ICommandProvider commandProvider;
+	private IRequestProvider requestProvider;
 	
 	
 	@Inject
@@ -36,9 +36,9 @@ public class PersonListMediator implements IPersonListMediator
 	
 	public void loadPersons()
 	{
-		LoadPersonsListPropertyCommand command = commandProvider.get(LoadPersonsListPropertyCommand.class);
-		command.setOnSucceeded(new LoadPersonsSucceedHandler());
-		command.start();
+		LoadPersonsListPropertyRequest request = requestProvider.get(LoadPersonsListPropertyRequest.class);
+		request.setOnSucceeded(new LoadPersonsSucceedHandler());
+		request.start();
 	}
 
 	public void updateSelectedPerson(Person person)

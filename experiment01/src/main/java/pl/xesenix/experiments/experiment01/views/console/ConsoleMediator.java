@@ -13,9 +13,9 @@ package pl.xesenix.experiments.experiment01.views.console;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import pl.xesenix.experiments.experiment01.application.translations.ITranslationProvider;
-import pl.xesenix.experiments.experiment01.commands.ICommandProvider;
-import pl.xesenix.experiments.experiment01.commands.ShowMessageCommand;
 import pl.xesenix.experiments.experiment01.model.console.IMessage;
+import pl.xesenix.experiments.experiment01.requests.IRequestProvider;
+import pl.xesenix.experiments.experiment01.requests.ShowMessageRequest;
 
 import com.google.inject.Inject;
 
@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 public class ConsoleMediator implements IConsoleMediator
 {
 	@Inject
-	public ICommandProvider commandProvider;
+	public IRequestProvider commandProvider;
 
 
 	@Inject
@@ -36,7 +36,7 @@ public class ConsoleMediator implements IConsoleMediator
 
 	public void showMessage(IMessage message)
 	{
-		ShowMessageCommand command = commandProvider.get(ShowMessageCommand.class);
+		ShowMessageRequest command = commandProvider.get(ShowMessageRequest.class);
 		command.message = message;
 		command.setOnSucceeded(new LoadMessageHandler());
 		command.start();

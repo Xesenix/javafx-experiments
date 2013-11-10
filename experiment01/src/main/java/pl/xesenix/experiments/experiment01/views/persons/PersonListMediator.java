@@ -13,10 +13,10 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import pl.xesenix.experiments.experiment01.application.translations.ITranslationProvider;
-import pl.xesenix.experiments.experiment01.commands.ICommandProvider;
-import pl.xesenix.experiments.experiment01.commands.LoadPersonsListCommand;
 import pl.xesenix.experiments.experiment01.model.console.ConsoleMessage;
 import pl.xesenix.experiments.experiment01.model.persons.IPersonSelectionModel;
+import pl.xesenix.experiments.experiment01.requests.IRequestProvider;
+import pl.xesenix.experiments.experiment01.requests.LoadPersonsListRequest;
 import pl.xesenix.experiments.experiment01.views.console.IConsoleView;
 import pl.xesenix.experiments.experiment01.vo.Person;
 
@@ -26,7 +26,7 @@ import com.google.inject.Inject;
 public class PersonListMediator implements IPersonListMediator
 {
 	@Inject
-	private ICommandProvider commandProvider;
+	private IRequestProvider requestProvider;
 
 
 	@Inject
@@ -50,9 +50,9 @@ public class PersonListMediator implements IPersonListMediator
 	 */
 	public void loadPersons()
 	{
-		LoadPersonsListCommand command = commandProvider.get(LoadPersonsListCommand.class);
-		command.setOnSucceeded(new LoadPersonsSucceedHandler());
-		command.start();
+		LoadPersonsListRequest request = requestProvider.get(LoadPersonsListRequest.class);
+		request.setOnSucceeded(new LoadPersonsSucceedHandler());
+		request.start();
 	}
 
 

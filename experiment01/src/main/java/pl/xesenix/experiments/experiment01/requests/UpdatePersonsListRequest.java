@@ -8,7 +8,7 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment01.commands;
+package pl.xesenix.experiments.experiment01.requests;
 
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -19,7 +19,7 @@ import pl.xesenix.experiments.experiment01.vo.Person;
 import com.google.inject.Inject;
 
 
-public class LoadPersonsListCommand extends Service<ObservableList<Person>>
+public class UpdatePersonsListRequest extends Service<ObservableList<Person>>
 {
 	@Inject
 	public IPersonService personService;
@@ -33,8 +33,6 @@ public class LoadPersonsListCommand extends Service<ObservableList<Person>>
 			@Override
 			protected ObservableList<Person> call() throws Exception
 			{
-				personService.loadPersons();
-				
 				return personService.getPersons();
 			}
 		};

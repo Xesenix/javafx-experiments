@@ -14,9 +14,9 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
-import pl.xesenix.experiments.experiment00.commands.ICommandProvider;
-import pl.xesenix.experiments.experiment00.commands.LoadPersonDetailsCommand;
 import pl.xesenix.experiments.experiment00.model.persons.IPersonSelectionModel;
+import pl.xesenix.experiments.experiment00.requests.IRequestProvider;
+import pl.xesenix.experiments.experiment00.requests.LoadPersonDetailsRequest;
 import pl.xesenix.experiments.experiment00.vo.Person;
 
 import com.google.inject.Inject;
@@ -25,7 +25,7 @@ import com.google.inject.Inject;
 public class PersonOverviewMediator implements IPersonOverviewMediator
 {
 	@Inject
-	private ICommandProvider commandProvider;
+	private IRequestProvider requestProvider;
 
 
 	@Inject
@@ -47,10 +47,10 @@ public class PersonOverviewMediator implements IPersonOverviewMediator
 
 		public void changed(ObservableValue<? extends Person> observed, Person oldPerson, Person newPerson)
 		{
-			LoadPersonDetailsCommand command = commandProvider.get(LoadPersonDetailsCommand.class);
-			command.person = newPerson;
-			command.setOnSucceeded(new LoadPersonDetailsSucceedHandler());
-			command.start();
+			LoadPersonDetailsRequest request = requestProvider.get(LoadPersonDetailsRequest.class);
+			request.person = newPerson;
+			request.setOnSucceeded(new LoadPersonDetailsSucceedHandler());
+			request.start();
 		}
 
 	}

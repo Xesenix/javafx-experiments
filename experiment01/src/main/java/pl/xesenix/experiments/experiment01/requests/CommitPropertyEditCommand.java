@@ -8,7 +8,7 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment01.commands;
+package pl.xesenix.experiments.experiment01.requests;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;

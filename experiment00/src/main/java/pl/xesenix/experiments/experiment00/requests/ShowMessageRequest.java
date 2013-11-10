@@ -8,27 +8,34 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment01.commands;
+package pl.xesenix.experiments.experiment00.requests;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment00.application.translations.ITranslationProvider;
+import pl.xesenix.experiments.experiment00.model.console.IMessage;
 
+import com.google.inject.Inject;
 
-public class LoadPersonDetailsCommand extends Service<Person>
+public class ShowMessageRequest extends  Service<IMessage>
 {
-	public Person person;
-
-
+	@Inject
+	public ITranslationProvider translationProvider;
+	
+	
+	public IMessage message;
+	
+	
 	@Override
-	protected Task<Person> createTask()
+	protected Task<IMessage> createTask()
 	{
-		return new Task<Person>() {
+		return new Task<IMessage>() {
 
 			@Override
-			protected Person call() throws Exception
+			protected IMessage call() throws Exception
 			{
-				return person;
+				message.setMessage(translationProvider.getString(message.getMessage()));
+				return message;
 			}
 		};
 	}

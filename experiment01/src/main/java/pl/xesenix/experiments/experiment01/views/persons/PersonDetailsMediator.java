@@ -15,11 +15,11 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import pl.xesenix.experiments.experiment01.application.translations.ITranslationProvider;
-import pl.xesenix.experiments.experiment01.commands.CommitPropertyEditCommand;
-import pl.xesenix.experiments.experiment01.commands.ICommandProvider;
-import pl.xesenix.experiments.experiment01.commands.UpdatePersonsListCommand;
 import pl.xesenix.experiments.experiment01.model.console.ConsoleMessage;
 import pl.xesenix.experiments.experiment01.model.persons.IPersonSelectionModel;
+import pl.xesenix.experiments.experiment01.requests.CommitPropertyEditCommand;
+import pl.xesenix.experiments.experiment01.requests.IRequestProvider;
+import pl.xesenix.experiments.experiment01.requests.UpdatePersonsListRequest;
 import pl.xesenix.experiments.experiment01.views.console.IConsoleView;
 import pl.xesenix.experiments.experiment01.vo.Person;
 
@@ -29,7 +29,7 @@ import com.google.inject.Inject;
 public class PersonDetailsMediator implements IPersonDetailsMediator
 {
 	@Inject
-	private ICommandProvider commandProvider;
+	private IRequestProvider requestProvider;
 
 
 	@Inject
@@ -68,8 +68,8 @@ public class PersonDetailsMediator implements IPersonDetailsMediator
 			if (!editedPerson.getName().equals(name))
 			{
 				@SuppressWarnings("unchecked")
-				CommitPropertyEditCommand<String> command = commandProvider.get(CommitPropertyEditCommand.class);
-				command.setOnSucceeded(new PropertyCommitEventHandler<String>(
+				CommitPropertyEditCommand<String> request = requestProvider.get(CommitPropertyEditCommand.class);
+				request.setOnSucceeded(new PropertyCommitEventHandler<String>(
 					String.format(
 						translationProvider.getString("person.name_changed"),
 						editedPerson.getName(),
@@ -78,7 +78,7 @@ public class PersonDetailsMediator implements IPersonDetailsMediator
 					editedPerson.getNameProperty(),
 					name
 				));
-				command.start();
+				request.start();
 			}
 		}
 	}
@@ -100,8 +100,8 @@ public class PersonDetailsMediator implements IPersonDetailsMediator
 			if (!editedPerson.getAge().equals(age))
 			{
 				@SuppressWarnings("unchecked")
-				CommitPropertyEditCommand<Number> command = commandProvider.get(CommitPropertyEditCommand.class);
-				command.setOnSucceeded(new PropertyCommitEventHandler<Number>(
+				CommitPropertyEditCommand<Number> request = requestProvider.get(CommitPropertyEditCommand.class);
+				request.setOnSucceeded(new PropertyCommitEventHandler<Number>(
 					String.format(
 						translationProvider.getString("person.age_changed"),
 						editedPerson.getName(),
@@ -110,7 +110,7 @@ public class PersonDetailsMediator implements IPersonDetailsMediator
 					editedPerson.getAgeProperty(),
 					age
 				));
-				command.start();
+				request.start();
 			}
 		}
 	}
@@ -152,9 +152,9 @@ public class PersonDetailsMediator implements IPersonDetailsMediator
 	 */
 	public void updatePersons()
 	{
-		UpdatePersonsListCommand command = commandProvider.get(UpdatePersonsListCommand.class);
-		command.setOnSucceeded(new LoadPersonsSucceedHandler());
-		command.start();
+		UpdatePersonsListRequest request = requestProvider.get(UpdatePersonsListRequest.class);
+		request.setOnSucceeded(new LoadPersonsSucceedHandler());
+		request.start();
 	}
 
 

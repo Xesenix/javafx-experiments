@@ -8,7 +8,7 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment01.commands;
+package pl.xesenix.experiments.experiment01.requests;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -17,7 +17,7 @@ import pl.xesenix.experiments.experiment01.model.console.IMessage;
 
 import com.google.inject.Inject;
 
-public class ShowMessageCommand extends  Service<IMessage>
+public class ShowMessageRequest extends  Service<IMessage>
 {
 	@Inject
 	public ITranslationProvider translationProvider;

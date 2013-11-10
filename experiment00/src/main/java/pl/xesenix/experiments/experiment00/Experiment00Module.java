@@ -12,10 +12,10 @@ package pl.xesenix.experiments.experiment00;
 
 import pl.xesenix.experiments.experiment00.application.translations.ITranslationProvider;
 import pl.xesenix.experiments.experiment00.application.translations.ResourceBundleTranslationProvider;
-import pl.xesenix.experiments.experiment00.commands.CommandProvider;
-import pl.xesenix.experiments.experiment00.commands.ICommandProvider;
 import pl.xesenix.experiments.experiment00.model.persons.IPersonSelectionModel;
 import pl.xesenix.experiments.experiment00.model.persons.PersonSelectionModel;
+import pl.xesenix.experiments.experiment00.requests.RequestProvider;
+import pl.xesenix.experiments.experiment00.requests.IRequestProvider;
 import pl.xesenix.experiments.experiment00.service.IPersonService;
 import pl.xesenix.experiments.experiment00.service.StubPersonService;
 import pl.xesenix.experiments.experiment00.views.console.ConsoleMediator;
@@ -66,7 +66,7 @@ public class Experiment00Module extends AbstractModule
 
 	private void mapCommands()
 	{
-		bind(ICommandProvider.class).to(CommandProvider.class);
+		bind(IRequestProvider.class).to(RequestProvider.class);
 	}
 
 

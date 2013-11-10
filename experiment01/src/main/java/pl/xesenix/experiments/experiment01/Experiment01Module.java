@@ -13,10 +13,10 @@ package pl.xesenix.experiments.experiment01;
 import javafx.scene.text.Font;
 import pl.xesenix.experiments.experiment01.application.translations.ITranslationProvider;
 import pl.xesenix.experiments.experiment01.application.translations.ResourceBundleTranslationProvider;
-import pl.xesenix.experiments.experiment01.commands.CommandProvider;
-import pl.xesenix.experiments.experiment01.commands.ICommandProvider;
 import pl.xesenix.experiments.experiment01.model.persons.IPersonSelectionModel;
 import pl.xesenix.experiments.experiment01.model.persons.PersonSelectionModel;
+import pl.xesenix.experiments.experiment01.requests.RequestProvider;
+import pl.xesenix.experiments.experiment01.requests.IRequestProvider;
 import pl.xesenix.experiments.experiment01.service.IPersonService;
 import pl.xesenix.experiments.experiment01.service.StubPersonService;
 import pl.xesenix.experiments.experiment01.views.console.ConsoleMediator;
@@ -78,7 +78,7 @@ public class Experiment01Module extends AbstractModule
 
 	private void mapCommands()
 	{
-		bind(ICommandProvider.class).to(CommandProvider.class);
+		bind(IRequestProvider.class).to(RequestProvider.class);
 	}
 
 

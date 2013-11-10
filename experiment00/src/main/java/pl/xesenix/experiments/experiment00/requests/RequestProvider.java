@@ -8,12 +8,25 @@
  * Contributors:
  *     Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
-package pl.xesenix.experiments.experiment01.commands;
+package pl.xesenix.experiments.experiment00.requests;
 
 import javafx.concurrent.Service;
 
-public interface ICommandProvider
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Singleton;
+
+@Singleton
+public class RequestProvider implements IRequestProvider
 {
+	@Inject
+	public Injector injector;
+
+
 	@SuppressWarnings("rawtypes")
-	<T extends Service> T get(Class<T> type);
+	public <T extends Service> T get(Class<T> type)
+	{
+		 return injector.getInstance(type);
+	}
+
 }
