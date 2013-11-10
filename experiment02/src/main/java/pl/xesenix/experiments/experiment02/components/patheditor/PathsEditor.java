@@ -1,4 +1,13 @@
-
+/*******************************************************************************
+ * Copyright (c) 2013 Paweł Kapalla, Xessenix.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ * Contributors:
+ *     Paweł Kapalla, Xessenix - initial API and implementation
+ ******************************************************************************/
 package pl.xesenix.experiments.experiment02.components.patheditor;
 
 import java.io.IOException;
@@ -14,15 +23,11 @@ import javafx.collections.ObservableMap;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Point2D;
-import javafx.scene.Cursor;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBuilder;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleButtonBuilder;
 import javafx.scene.control.ToolBar;
-import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -35,11 +40,9 @@ import pl.xesenix.experiments.experiment02.components.patheditor.states.EditPath
 import pl.xesenix.experiments.experiment02.components.patheditor.states.IPathEditorState;
 import pl.xesenix.experiments.experiment02.components.patheditor.views.PathPointView;
 import pl.xesenix.experiments.experiment02.components.patheditor.views.PathView;
-import pl.xesenix.experiments.experiment02.cursors.CursorProvider;
 import pl.xesenix.experiments.experiment02.vo.IPath;
 import pl.xesenix.experiments.experiment02.vo.IPathPoint;
 
-import com.cathive.fx.guice.GuiceFXMLLoader;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;

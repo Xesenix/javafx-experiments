@@ -1,18 +1,27 @@
-
+/*******************************************************************************
+ * Copyright (c) 2013 Paweł Kapalla, Xessenix.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ * Contributors:
+ *     Paweł Kapalla, Xessenix - initial API and implementation
+ ******************************************************************************/
 package pl.xesenix.experiments.experiment02.components.patheditor.states;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.inject.Inject;
-
-import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import pl.xesenix.experiments.experiment02.components.patheditor.PathsEditor;
 import pl.xesenix.experiments.experiment02.cursors.CursorProvider;
+
+import com.google.inject.Inject;
 
 
 public class BaseState implements IPathEditorState

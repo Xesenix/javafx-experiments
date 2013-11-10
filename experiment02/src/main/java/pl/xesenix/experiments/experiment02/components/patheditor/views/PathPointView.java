@@ -1,14 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2013 Paweł Kapalla, Xessenix.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Public License v3.0
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/gpl.html
+ * 
+ * Contributors:
+ *     Paweł Kapalla, Xessenix - initial API and implementation
+ ******************************************************************************/
 package pl.xesenix.experiments.experiment02.components.patheditor.views;
 
-import com.google.inject.Inject;
-
-import javafx.event.EventHandler;
-import javafx.scene.Cursor;
 import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.CircleBuilder;
@@ -16,6 +18,8 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.LineBuilder;
 import pl.xesenix.experiments.experiment02.cursors.CursorProvider;
 import pl.xesenix.experiments.experiment02.vo.IPathPoint;
+
+import com.google.inject.Inject;
 
 public class PathPointView extends Group
 {

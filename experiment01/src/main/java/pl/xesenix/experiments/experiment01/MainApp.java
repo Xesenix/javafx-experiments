@@ -13,7 +13,6 @@ package pl.xesenix.experiments.experiment01;
 import java.util.List;
 
 import javafx.scene.SceneBuilder;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageBuilder;
 import javafx.stage.StageStyle;
