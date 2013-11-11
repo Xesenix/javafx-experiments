@@ -71,7 +71,7 @@ public interface IPathPoint
 	IPath getPath();
 	
 	
-	void addToPath(IPath path);
+	void setPath(IPath path);
 
 
 	void removeFromPath(IPath path);

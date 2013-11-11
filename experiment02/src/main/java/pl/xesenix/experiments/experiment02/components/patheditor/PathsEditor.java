@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ReadOnlyListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -28,6 +29,7 @@ import javafx.scene.control.ButtonBuilder;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleButtonBuilder;
 import javafx.scene.control.ToolBar;
+import javafx.scene.effect.Glow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -70,10 +72,10 @@ public class PathsEditor extends StackPane implements IPathEditorView
 	protected Injector injector;
 	
 	
-	protected ListProperty<PathView> paths = new SimpleListProperty(this, "paths");
+	private ListProperty<IPath> paths = new SimpleListProperty<IPath>(this, "paths", FXCollections.<IPath>observableArrayList());
 	
 	
-	protected ListProperty<PathPointView> points = new SimpleListProperty(this, "points");
+	private ListProperty<IPathPoint> points = new SimpleListProperty<IPathPoint>(this, "points", FXCollections.<IPathPoint>observableArrayList());
 	
 	
 	@Inject
@@ -197,8 +199,18 @@ public class PathsEditor extends StackPane implements IPathEditorView
 		log.debug("update pathView for path: [{}]", path);
 		
 		PathView pathView = pathToViewMap.get(path);
-		
 		pathView.update(path);
+		
+		// TODO: it`s stupid way to notify changes on observable list tell me if you know better way
+		
+		points.removeAll(path.getPathPoints());
+		points.addAll(path.getPathPoints());
+		
+		paths.removeAll(path);
+		paths.addAll(path);
+		
+		
+		log.debug("current points list: [{}]", points);
 	}
 
 
@@ -210,11 +222,14 @@ public class PathsEditor extends StackPane implements IPathEditorView
 		PathView pathView = injector.getInstance(PathView.class);
 		pathView.update(path);
 		
-		pathToViewMap.put(path, pathView);
-		
 		canvas.getChildren().add(pathView);
 		
+		pathToViewMap.put(path, pathView);
+		paths.add(path);
+		
 		mediator.setCurrentPath(path);
+		
+		log.debug("current paths list: [{}]", paths);
 	}
 
 
@@ -222,6 +237,7 @@ public class PathsEditor extends StackPane implements IPathEditorView
 	public void focusPath(IPath path)
 	{
 		log.debug("focusing pathView for path: [{}]", path);
+		pathToViewMap.get(path).setEffect(new Glow());
 	}
 
 
@@ -255,6 +271,18 @@ public class PathsEditor extends StackPane implements IPathEditorView
 	public IPathEditorMediator getMediator()
 	{
 		return mediator;
+	}
+
+
+	public ReadOnlyListProperty<IPath> pathsProperty()
+	{
+		return paths;
+	}
+
+
+	public ReadOnlyListProperty<IPathPoint> pointsProperty()
+	{
+		return points;
 	}
 
 

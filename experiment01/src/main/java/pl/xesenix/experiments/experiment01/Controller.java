@@ -381,7 +381,6 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 							if (!oldValue.equals(newValue))
 							{
 								setText(newValue);
-								//updateItem(item, empty);
 							}
 						}
 					};

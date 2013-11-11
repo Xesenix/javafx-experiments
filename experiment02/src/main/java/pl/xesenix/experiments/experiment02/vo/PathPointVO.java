@@ -11,7 +11,9 @@
 package pl.xesenix.experiments.experiment02.vo;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 
 
 public class PathPointVO implements IPathPoint
@@ -34,7 +36,7 @@ public class PathPointVO implements IPathPoint
 	private DoubleProperty outY = new SimpleDoubleProperty(this, "outY");
 
 
-	private IPath path;
+	private ObjectProperty<IPath> path = new SimpleObjectProperty<IPath>(this, "path");
 
 
 	public DoubleProperty xProperty()
@@ -139,6 +141,31 @@ public class PathPointVO implements IPathPoint
 	}
 
 
+	public void setPath(IPath path)
+	{
+		IPath oldPath = this.getPath();
+		
+		this.path.set(path);
+		
+		if (path != oldPath && oldPath != null)
+		{
+			oldPath.removePoint(this);
+		}
+	}
+	
+	
+	public ObjectProperty<IPath> pathProperty()
+	{
+		return path;
+	}
+
+
+	public IPath getPath()
+	{
+		return path.get();
+	}
+
+
 	public void setOutY(double value)
 	{
 		this.outY.setValue(value);
@@ -165,31 +192,19 @@ public class PathPointVO implements IPathPoint
 	}
 
 
-	@Override
-	public IPath getPath()
-	{
-		return path;
-	}
-
-
-	@Override
-	public void addToPath(IPath path)
-	{
-		this.path = path;
-	}
-
-
-	@Override
 	public void removeFromPath(IPath path)
 	{
-		this.path = null;
+		if (path != null && path == this.getPath())
+		{
+			this.path.set(null);
+		}
 	}
 	
 	
 	@Override
 	public String toString()
 	{
-		return "PathPointVO (" + getX() + ", " + getY() + ")";
+		return String.format("PathPointVO {point: (%.2f, %.2f); in: (%.2f, %.2f); out: (%.2f, %.2f)}", getX(), getY(), getInX(), getInY(), getOutX(), getOutY());
 	}
 
 

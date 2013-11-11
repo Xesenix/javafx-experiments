@@ -14,11 +14,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javafx.beans.property.ListProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 
+/**
+ * @author Xesenix
+ *
+ */
 public class PathVO implements IPath
 {
 	ListProperty<IPathPoint> pathPoints = new SimpleListProperty<IPathPoint>(this, "pathPoints", FXCollections.<IPathPoint>observableArrayList());
@@ -29,10 +34,9 @@ public class PathVO implements IPath
 	 * @see
 	 * pl.xesenix.experiments.experiment02.vo.IPath#addPathPoint(pl.xesenix.experiments.experiment02.vo.IPathPoint)
 	 */
-	@Override
 	public void addPathPoint(IPathPoint point)
 	{
-		point.addToPath(this);
+		point.setPath(this);
 		pathPoints.add(point);
 	}
 
@@ -42,7 +46,6 @@ public class PathVO implements IPath
 	 * @see
 	 * pl.xesenix.experiments.experiment02.vo.IPath#addPathPoints(pl.xesenix.experiments.experiment02.vo.IPathPoint)
 	 */
-	@Override
 	public void addPathPoints(IPathPoint... points)
 	{
 		for (IPathPoint point : points)
@@ -57,7 +60,6 @@ public class PathVO implements IPath
 	 * @see
 	 * pl.xesenix.experiments.experiment02.vo.IPath#addPathPoints(java.util.Collection)
 	 */
-	@Override
 	public void addPathPoints(Collection<? extends IPathPoint> points)
 	{
 		for (IPathPoint point : points)
@@ -82,17 +84,31 @@ public class PathVO implements IPath
 	 * (non-Javadoc)
 	 * @see pl.xesenix.experiments.experiment02.vo.IPath#getPathPoints()
 	 */
-	@Override
 	public ObservableList<IPathPoint> getPathPoints()
 	{
 		return pathPoints.get();
+	}
+
+
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPath#getPointsCount()
+	 */
+	public int getSize()
+	{
+		return pathPoints.getSize();
+	}
+	
+	
+	public ReadOnlyIntegerProperty size()
+	{
+		return pathPoints.sizeProperty();
 	}
 	
 	
 	@Override
 	public String toString()
 	{
-		return "PathVO {" + getPathPoints().toString() + "}";
+		return String.format("PathVO {size: %d}", getSize());
 	}
 
 

@@ -31,5 +31,7 @@ public interface IPath
 
 
 	void removePoint(IPathPoint point);
-
+	
+	
+	int getSize();
 }
