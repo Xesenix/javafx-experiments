@@ -6,9 +6,12 @@
  * http://www.gnu.org/licenses/gpl.html
  * 
  * Contributors:
- *     Paweł Kapalla, Xessenix - initial API and implementation
+ * Paweł Kapalla, Xessenix - initial API and implementation
  ******************************************************************************/
+
 package pl.xesenix.experiments.experiment02.vo;
+
+import org.apache.commons.lang3.mutable.MutableDouble;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
@@ -18,36 +21,30 @@ import javafx.beans.property.SimpleObjectProperty;
 
 public class PathPointVO implements IPathPoint
 {
-	private DoubleProperty x = new SimpleDoubleProperty(this, "x");
+	private MutableDouble x = new MutableDouble();
 
 
-	private DoubleProperty y = new SimpleDoubleProperty(this, "y");
+	private MutableDouble y = new MutableDouble();
 
 
-	private DoubleProperty inX = new SimpleDoubleProperty(this, "inX");
+	private MutableDouble inX = new MutableDouble();
 
 
-	private DoubleProperty inY = new SimpleDoubleProperty(this, "inY");
+	private MutableDouble inY = new MutableDouble();
 
 
-	private DoubleProperty outX = new SimpleDoubleProperty(this, "outX");
+	private MutableDouble outX = new MutableDouble();
 
 
-	private DoubleProperty outY = new SimpleDoubleProperty(this, "outY");
+	private MutableDouble outY = new MutableDouble();
 
 
-	private ObjectProperty<IPath> path = new SimpleObjectProperty<IPath>(this, "path");
-
-
-	public DoubleProperty xProperty()
-	{
-		return x;
-	}
+	private IPath path = null;
 
 
 	public double getX()
 	{
-		return x.get();
+		return x.getValue();
 	}
 
 
@@ -57,15 +54,9 @@ public class PathPointVO implements IPathPoint
 	}
 
 
-	public DoubleProperty yProperty()
-	{
-		return y;
-	}
-
-
 	public double getY()
 	{
-		return y.get();
+		return y.getValue();
 	}
 
 
@@ -75,15 +66,9 @@ public class PathPointVO implements IPathPoint
 	}
 
 
-	public DoubleProperty inXProperty()
-	{
-		return inX;
-	}
-
-
 	public double getInX()
 	{
-		return inX.get();
+		return inX.getValue();
 	}
 
 
@@ -93,15 +78,9 @@ public class PathPointVO implements IPathPoint
 	}
 
 
-	public DoubleProperty inYProperty()
-	{
-		return inY;
-	}
-
-
 	public double getInY()
 	{
-		return inY.get();
+		return inY.getValue();
 	}
 
 
@@ -111,15 +90,9 @@ public class PathPointVO implements IPathPoint
 	}
 
 
-	public DoubleProperty outXProperty()
-	{
-		return outX;
-	}
-
-
 	public double getOutX()
 	{
-		return outX.get();
+		return outX.getValue();
 	}
 
 
@@ -129,40 +102,28 @@ public class PathPointVO implements IPathPoint
 	}
 
 
-	public DoubleProperty outYProperty()
-	{
-		return outY;
-	}
-
-
 	public double getOutY()
 	{
-		return outY.get();
+		return outY.getValue();
 	}
 
 
 	public void setPath(IPath path)
 	{
 		IPath oldPath = this.getPath();
-		
-		this.path.set(path);
-		
+
+		this.path = path;
+
 		if (path != oldPath && oldPath != null)
 		{
 			oldPath.removePoint(this);
 		}
 	}
-	
-	
-	public ObjectProperty<IPath> pathProperty()
-	{
-		return path;
-	}
 
 
 	public IPath getPath()
 	{
-		return path.get();
+		return path;
 	}
 
 
@@ -184,11 +145,11 @@ public class PathPointVO implements IPathPoint
 	}
 
 
-	protected void setDirection(DoubleProperty xProperty, DoubleProperty yProperty, double direction)
+	protected void setDirection(MutableDouble x, MutableDouble y, double direction)
 	{
-		double weight = Math.sqrt(Math.pow(this.x.get(), 2) + Math.pow(this.y.get(), 2));
-		this.x.set(weight * Math.cos(direction));
-		this.y.set(weight * Math.sin(direction));
+		double weight = Math.sqrt(Math.pow(x.getValue(), 2) + Math.pow(y.getValue(), 2));
+		x.setValue(weight * Math.cos(direction));
+		y.setValue(weight * Math.sin(direction));
 	}
 
 
@@ -196,15 +157,21 @@ public class PathPointVO implements IPathPoint
 	{
 		if (path != null && path == this.getPath())
 		{
-			this.path.set(null);
+			this.path = null;
 		}
 	}
-	
-	
+
+
 	@Override
 	public String toString()
 	{
-		return String.format("PathPointVO {point: (%.2f, %.2f); in: (%.2f, %.2f); out: (%.2f, %.2f)}", getX(), getY(), getInX(), getInY(), getOutX(), getOutY());
+		return String.format("PathPointVO {point: (%.2f, %.2f); in: (%.2f, %.2f); out: (%.2f, %.2f)}",
+			getX(),
+			getY(),
+			getInX(),
+			getInY(),
+			getOutX(),
+			getOutY());
 	}
 
 

@@ -26,7 +26,7 @@ import javafx.collections.ObservableList;
  */
 public class PathVO implements IPath
 {
-	ListProperty<IPathPoint> pathPoints = new SimpleListProperty<IPathPoint>(this, "pathPoints", FXCollections.<IPathPoint>observableArrayList());
+	ArrayList<IPathPoint> pathPoints = new ArrayList<IPathPoint>();
 
 
 	/*
@@ -84,9 +84,9 @@ public class PathVO implements IPath
 	 * (non-Javadoc)
 	 * @see pl.xesenix.experiments.experiment02.vo.IPath#getPathPoints()
 	 */
-	public ObservableList<IPathPoint> getPathPoints()
+	public ArrayList<IPathPoint> getPathPoints()
 	{
-		return pathPoints.get();
+		return pathPoints;
 	}
 
 
@@ -95,13 +95,7 @@ public class PathVO implements IPath
 	 */
 	public int getSize()
 	{
-		return pathPoints.getSize();
-	}
-	
-	
-	public ReadOnlyIntegerProperty size()
-	{
-		return pathPoints.sizeProperty();
+		return pathPoints.size();
 	}
 	
 	
@@ -166,7 +160,7 @@ public class PathVO implements IPath
 		
 		public void applyTo(IPath path)
 		{
-			ObservableList<IPathPoint> list = path.getPathPoints();
+			ArrayList<IPathPoint> list = path.getPathPoints();
 			
 			IPathPoint first = list.get(0);
 			IPathPoint second = null;

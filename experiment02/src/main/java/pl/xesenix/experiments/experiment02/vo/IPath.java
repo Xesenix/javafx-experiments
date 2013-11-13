@@ -10,6 +10,7 @@
  ******************************************************************************/
 package pl.xesenix.experiments.experiment02.vo;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javafx.collections.ObservableList;
@@ -27,7 +28,7 @@ public interface IPath
 	void addPathPoints(Collection<? extends IPathPoint> points);
 
 
-	ObservableList<IPathPoint> getPathPoints();
+	ArrayList<IPathPoint> getPathPoints();
 
 
 	void removePoint(IPathPoint point);
