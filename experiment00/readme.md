@@ -12,3 +12,6 @@ Tasks:
 - [x] binding bidirectional person name to name field
 - [x] binding bidirectional person age to age field
 - [ ] binding listview cells to person skills names
+
+For more experiments:
+[Experiments project](/..)

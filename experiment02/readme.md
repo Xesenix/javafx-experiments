@@ -22,3 +22,6 @@ Tasks:
 	- [x] binding listview cells to existing path points list
 	- [ ] selecting paths listview item selects path for editing 
 	- [ ] selecting points listview item selects points for editing
+
+For more experiments:
+[Experiments project](/..)

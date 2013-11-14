@@ -3,6 +3,10 @@ Experiments
 
 Testing design patterns in combination with JavaFX.
 
+Compiled versions of experiments available at:
+
+https://sourceforge.net/projects/javafx-experiments
+
 Experiment00
 ------------
 
@@ -23,3 +27,5 @@ Experiment02
 ------------
 
 Animated editable path. Testing JavaFX node manipulation.
+
+[Experiment01 details](/experiment02)
