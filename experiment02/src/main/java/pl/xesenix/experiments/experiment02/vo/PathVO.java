@@ -36,6 +36,11 @@ public class PathVO implements IPath
 	 */
 	public void addPathPoint(IPathPoint point)
 	{
+		if (pathPoints.contains(point))
+		{
+			pathPoints.remove(point);
+		}
+		
 		point.setPath(this);
 		pathPoints.add(point);
 	}
@@ -75,8 +80,11 @@ public class PathVO implements IPath
 	 */
 	public void removePoint(IPathPoint point)
 	{
-		point.removeFromPath(this);
-		pathPoints.remove(point);
+		if (point != null)
+		{
+			point.removeFromPath(this);
+			pathPoints.remove(point);
+		}
 	}
 
 

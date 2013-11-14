@@ -179,17 +179,4 @@ public class PathPointVOTest
 		assertEquals("Changing angle should affect x coordinate", 4, pathPoint.getOutX(), precision);
 		assertEquals("Changing angle should affect y coordinate", -3, pathPoint.getOutY(), precision);
 	}
-
-
-	/**
-	 * Test method for
-	 * {@link pl.xesenix.experiments.experiment02.vo.PathPointVO#setDirection(org.apache.commons.lang3.mutable.MutableDouble, org.apache.commons.lang3.mutable.MutableDouble, double)}
-	 * .
-	 */
-	@Test
-	public void testSetDirection()
-	{
-		fail("Not yet implemented"); // TODO
-	}
-
 }
