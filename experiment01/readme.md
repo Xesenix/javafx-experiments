@@ -12,7 +12,7 @@ Tasks:
 - [x] styling undecorated window
 - [x] animated console messages for all actions
 - [x] advanced mediator pattern
-- [ ] command pattern
+- [ ] memento pattern for saving and retrieving states (undo/redo)
 - [x] binding combobox cells to person names
 - [x] binding listview cells to person names
 - [x] binding person name to name field
