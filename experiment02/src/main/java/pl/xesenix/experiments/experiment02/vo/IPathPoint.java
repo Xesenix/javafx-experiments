@@ -14,50 +14,60 @@ package pl.xesenix.experiments.experiment02.vo;
 import javafx.beans.property.DoubleProperty;
 
 
+
+
+
 public interface IPathPoint
 {
 
-	double getX();
+	public double getX();
 
 
-	void setX(double value);
+	public void setX(double value);
 
 
-	double getY();
+	public double getY();
 
 
-	void setY(double value);
+	public void setY(double value);
 
 
-	double getInX();
+	public double getInX();
 
 
-	void setInX(double value);
+	public void setInX(double value);
 
 
-	double getInY();
+	public double getInY();
 
 
-	void setInY(double value);
+	public void setInY(double value);
 
 
 	public double getOutX();
 
 
-	void setOutX(double value);
+	public void setOutX(double value);
 
 
-	double getOutY();
+	public double getOutY();
 
 
-	void setOutY(double value);
+	public void setOutY(double value);
 
 
-	IPath getPath();
+	public void setInDirection(double direction);
 
 
-	void setPath(IPath path);
+	public void setOutDirection(double direction);
 
 
-	void removeFromPath(IPath path);
+	public void setPath(IPath path);
+
+
+	public IPath getPath();
+
+
+	public void removeFromPath(IPath path);
+
 }

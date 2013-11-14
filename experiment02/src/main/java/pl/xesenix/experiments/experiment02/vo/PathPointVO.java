@@ -42,72 +42,108 @@ public class PathPointVO implements IPathPoint
 	private IPath path = null;
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#getX()
+	 */
 	public double getX()
 	{
 		return x.getValue();
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#setX(double)
+	 */
 	public void setX(double value)
 	{
 		this.x.setValue(value);
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#getY()
+	 */
 	public double getY()
 	{
 		return y.getValue();
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#setY(double)
+	 */
 	public void setY(double value)
 	{
 		this.y.setValue(value);
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#getInX()
+	 */
 	public double getInX()
 	{
 		return inX.getValue();
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#setInX(double)
+	 */
 	public void setInX(double value)
 	{
 		this.inX.setValue(value);
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#getInY()
+	 */
 	public double getInY()
 	{
 		return inY.getValue();
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#setInY(double)
+	 */
 	public void setInY(double value)
 	{
 		this.inY.setValue(value);
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#getOutX()
+	 */
 	public double getOutX()
 	{
 		return outX.getValue();
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#setOutX(double)
+	 */
 	public void setOutX(double value)
 	{
 		this.outX.setValue(value);
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#getOutY()
+	 */
 	public double getOutY()
 	{
 		return outY.getValue();
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#setPath(pl.xesenix.experiments.experiment02.vo.IPath)
+	 */
 	public void setPath(IPath path)
 	{
 		IPath oldPath = this.getPath();
@@ -121,24 +157,36 @@ public class PathPointVO implements IPathPoint
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#getPath()
+	 */
 	public IPath getPath()
 	{
 		return path;
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#setOutY(double)
+	 */
 	public void setOutY(double value)
 	{
 		this.outY.setValue(value);
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#setInDirection(double)
+	 */
 	public void setInDirection(double direction)
 	{
 		setDirection(this.inX, this.inY, direction);
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#setOutDirection(double)
+	 */
 	public void setOutDirection(double direction)
 	{
 		setDirection(this.outX, this.outY, direction);
@@ -153,6 +201,9 @@ public class PathPointVO implements IPathPoint
 	}
 
 
+	/* (non-Javadoc)
+	 * @see pl.xesenix.experiments.experiment02.vo.IPathPoint2#removeFromPath(pl.xesenix.experiments.experiment02.vo.IPath)
+	 */
 	public void removeFromPath(IPath path)
 	{
 		if (path != null && path == this.getPath())
@@ -214,7 +265,7 @@ public class PathPointVO implements IPathPoint
 		}
 
 
-		public PathPointVO build()
+		public IPathPoint build()
 		{
 			PathPointVO point = new PathPointVO();
 
@@ -331,7 +382,7 @@ public class PathPointVO implements IPathPoint
 		}
 
 
-		public PathPointVO build()
+		public IPathPoint build()
 		{
 			PathPointVO point = new PathPointVO();
 
