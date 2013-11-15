@@ -53,11 +53,11 @@ public class PathVOTest
 		
 		path.addPathPoint(pathPointA);
 		assertTrue("Added point should exist on path points list", path.getPathPoints().contains(pathPointA));
-		assertSame("Added point path property should be set to path that it was added to", pathPointA.getPath(), path);
+		assertSame("Added point path property should be set to path that it was added to", path, pathPointA.getPath());
 		
 		path.addPathPoint(pathPointB);
 		assertTrue("Added point should exist on path points list", path.getPathPoints().contains(pathPointB));
-		assertSame("Added point path property should be set to path that it was added to", pathPointB.getPath(), path);
+		assertSame("Added point path property should be set to path that it was added to", path, pathPointB.getPath());
 		assertTrue("Adding another point shouldn`t remove already exisitng ones", path.getPathPoints().contains(pathPointA));
 	}
 
@@ -73,9 +73,9 @@ public class PathVOTest
 		
 		path.addPathPoints(pathPointA, pathPointB);
 		assertTrue("Points added as multiple arguments should exist on path points list", path.getPathPoints().contains(pathPointA));
-		assertSame("Points added as multiple arguments path property should be set to path that they were added to", pathPointA.getPath(), path);
+		assertSame("Points added as multiple arguments path property should be set to path that they were added to", path, pathPointA.getPath());
 		assertTrue("Points added as multiple arguments should exist on path points list", path.getPathPoints().contains(pathPointB));
-		assertSame("Points added as multiple arguments path property should be set to path that they were added to", pathPointB.getPath(), path);
+		assertSame("Points added as multiple arguments path property should be set to path that they were added to", path, pathPointB.getPath());
 	}
 
 
@@ -94,9 +94,9 @@ public class PathVOTest
 		
 		path.addPathPoints(collection);
 		assertTrue("Points added as collection should exist on path points list", path.getPathPoints().contains(pathPointA));
-		assertSame("Points added as collection path property should be set to path that they were added to", pathPointA.getPath(), path);
+		assertSame("Points added as collection path property should be set to path that they were added to", path, pathPointA.getPath());
 		assertTrue("Points added as collection should exist on path points list", path.getPathPoints().contains(pathPointB));
-		assertSame("Points added as collection path property should be set to path that they were added to", pathPointB.getPath(), path);
+		assertSame("Points added as collection path property should be set to path that they were added to", path, pathPointB.getPath());
 	}
 
 
@@ -112,15 +112,15 @@ public class PathVOTest
 		path.addPathPoints(pathPointA, pathPointB);
 		path.removePoint(null);
 		assertTrue("Removing null shouldn`t affect any of path points", path.getPathPoints().contains(pathPointA));
-		assertSame("Removing null shouldn`t affect any of path points path property", pathPointA.getPath(), path);
+		assertSame("Removing null shouldn`t affect any of path points path property", path, pathPointA.getPath());
 		assertTrue("Removing null shouldn`t affect any of path points", path.getPathPoints().contains(pathPointB));
-		assertSame("Removing null shouldn`t affect any of path points path property", pathPointB.getPath(), path);
+		assertSame("Removing null shouldn`t affect any of path points path property", path, pathPointB.getPath());
 		
 		path.removePoint(pathPointA);
 		assertFalse("Removed point shouldn`t exist on path points list", path.getPathPoints().contains(pathPointA));
-		assertSame("Removed point path property should be set to null", pathPointA.getPath(), null);
+		assertSame("Removed point path property should be set to null", null, pathPointA.getPath());
 		assertTrue("Removing other point shouldn`t affect any other point", path.getPathPoints().contains(pathPointB));
-		assertSame("Removing other point shouldn`t affect any other point path property", pathPointB.getPath(), path);
+		assertSame("Removing other point shouldn`t affect any other point path property", path, pathPointB.getPath());
 	}
 
 
@@ -151,22 +151,22 @@ public class PathVOTest
 		PathPointVO pathPointA = new PathPointVO();
 		PathPointVO pathPointB = new PathPointVO();
 		
-		assertSame("Empty path size should be 0", path.getSize(), 0);
+		assertSame("Empty path size should be 0", 0, path.getSize());
 		
 		path.addPathPoint(pathPointA);
-		assertSame("Path size should be 1", path.getSize(), 1);
+		assertSame("Path size should be 1", 1, path.getSize());
 		
 		path.addPathPoint(pathPointA);
-		assertSame("Adding multiple times the same point should exist only once", path.getSize(), 1);
+		assertSame("Adding multiple times the same point should exist only once", 1, path.getSize());
 		
 		path.addPathPoint(pathPointB);
-		assertSame("Path size should be 2", path.getSize(), 2);
+		assertSame("Path size should be 2", 2, path.getSize());
 		
 		path.removePoint(pathPointA);
-		assertSame("Path size should be 1", path.getSize(), 1);
+		assertSame("Path size should be 1", 1, path.getSize());
 		
 		path.removePoint(pathPointB);
-		assertSame("Path size after removing all points should be 0", path.getSize(), 0);
+		assertSame("Path size after removing all points should be 0", 0, path.getSize());
 	}
 
 }

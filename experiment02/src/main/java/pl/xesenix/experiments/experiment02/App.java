@@ -16,6 +16,7 @@ import java.util.ResourceBundle;
 import javafx.scene.SceneBuilder;
 import javafx.stage.Stage;
 import javafx.stage.StageBuilder;
+import javafx.stage.StageStyle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,7 @@ public class App extends GuiceApplication
 			)
 			.resizable(true).applyTo(stage);
 
-		// stage.initStyle(StageStyle.UNDECORATED);
+		//stage.initStyle(StageStyle.DECORATED);
 		stage.show();
 	}
 

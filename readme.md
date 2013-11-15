@@ -26,6 +26,6 @@ Binding application data to view with use of mediator pattern.
 Experiment02
 ------------
 
-Animated editable path. Testing JavaFX node manipulation.
+Simple editor for bazier curve path.
 
-[Experiment01 details](/experiment02)
+[Experiment02 details](/experiment02)

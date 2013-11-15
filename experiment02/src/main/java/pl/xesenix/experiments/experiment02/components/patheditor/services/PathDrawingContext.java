@@ -69,18 +69,23 @@ public class PathDrawingContext
 	}
 
 
-	public IPathPoint createPoint(double x, double y)
+	public IPathPoint createPoint(double x, double y, double inX, double inY, double outX, double outY)
 	{
 		log.debug("creating point at: ({}, {})", x, y);
 		
 		// TODO Check for current drawing state
 		// return currentDrawingState.createPoint(x, y); - state pattern
 		
-		IPathPoint point = PathPointBuilder.create().setX(x).setY(y).build();
+		IPathPoint point = PathPointBuilder.create()
+			.setX(x)
+			.setY(y)
+			.setInX(inX)
+			.setInY(inY)
+			.setOutX(outX)
+			.setOutY(outY)
+			.build();
 		
 		points.add(point);
-		
-		currentEditedPath.addPathPoint(point);
 
 		return point;
 	}
@@ -131,5 +136,14 @@ public class PathDrawingContext
 	public IPathPoint getEditedPoint()
 	{
 		return currentSelectedPoint;
+	}
+
+
+	public void addPointToCurrentPath(IPathPoint point)
+	{
+		if (currentEditedPath != null)
+		{
+			currentEditedPath.addPathPoint(point);
+		}
 	}
 }

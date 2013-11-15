@@ -14,6 +14,7 @@ import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import pl.xesenix.experiments.experiment02.components.patheditor.services.PathDrawingContext;
 import pl.xesenix.experiments.experiment02.vo.IPath;
+import pl.xesenix.experiments.experiment02.vo.IPathPoint;
 
 import com.google.inject.Inject;
 
@@ -39,7 +40,8 @@ public class CreatePointRequest extends Service<IPath>
 			@Override
 			protected IPath call() throws Exception
 			{
-				context.createPoint(x, y);
+				IPathPoint point = context.createPoint(x, y, 0, 0, 0, 0);
+				context.addPointToCurrentPath(point);
 				
 				return context.getEditedPath();
 			}

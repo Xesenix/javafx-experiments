@@ -234,23 +234,67 @@ public class PathPointVO implements IPathPoint
 		private double y;
 
 
+		private double inX;
+
+
+		private double inY;
+
+
+		private double outX;
+
+
+		private double outY;
+
+
 		public static PathPointBuilder create()
 		{
 			return new PathPointBuilder();
 		}
 
 
-		public PathPointBuilder setX(double x)
+		public PathPointBuilder setX(double value)
 		{
-			this.x = x;
+			this.x = value;
 
 			return this;
 		}
 
 
-		public PathPointBuilder setY(double y)
+		public PathPointBuilder setY(double value)
 		{
-			this.y = y;
+			this.y = value;
+
+			return this;
+		}
+
+
+		public PathPointBuilder setInX(double value)
+		{
+			this.inX = value;
+
+			return this;
+		}
+
+
+		public PathPointBuilder setInY(double value)
+		{
+			this.inY = value;
+
+			return this;
+		}
+
+
+		public PathPointBuilder setOutX(double value)
+		{
+			this.outX = value;
+
+			return this;
+		}
+
+
+		public PathPointBuilder setOutY(double value)
+		{
+			this.outY = value;
 
 			return this;
 		}
@@ -260,6 +304,10 @@ public class PathPointVO implements IPathPoint
 		{
 			point.setX(x);
 			point.setY(y);
+			point.setInX(inX);
+			point.setInY(inY);
+			point.setOutX(outX);
+			point.setOutY(outY);
 
 			return this;
 		}
