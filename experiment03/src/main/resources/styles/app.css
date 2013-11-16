@@ -1,0 +1,4 @@
+.grid {
+	-fx-background-color: #111;
+	-fx-background-image: url("../images/grey_grid.png");
+}
