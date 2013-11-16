@@ -13,5 +13,8 @@ Tasks:
 - [x] binding bidirectional person age to age field
 - [ ] binding listview cells to person skills names
 
+Links
+-----
+
 For more experiments:
-[Experiments project](/..)
+[Experiments project](https://github.com/Xesenix/javafx-experiments)

@@ -17,15 +17,15 @@ Binding application data to view with use of JavaFx bean bindings.
 Experiment01
 ------------
 
-![Experiment01 screen](/experiment01/images/screen00.png "Experiment01")
+![Experiment01 screen](https://github.com/Xesenix/javafx-experiment01/blob/master/images/screen00.png?raw=true "Experiment01")
 
 Binding application data to view with use of mediator pattern.
 
-[Experiment01 details](/experiment01)
+[Experiment01 details](https://github.com/Xesenix/javafx-experiment01)
 
 Experiment02
 ------------
 
 Simple editor for bazier curve path.
 
-[Experiment02 details](/experiment02)
+[Experiment02 details](https://github.com/Xesenix/javafx-experiment02)
