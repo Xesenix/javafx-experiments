@@ -1,0 +1,6 @@
+[submodule "experiment01"]
+	path = experiment01
+	url = https://github.com/Xesenix/javafx-experiment01
+[submodule "experiment02"]
+	path = experiment02
+	url = https://github.com/Xesenix/javafx-experiment02
