@@ -12,21 +12,21 @@ package pl.xesenix.experiments.experiment01.requests;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
 
 
-public class LoadPersonDetailsRequest extends Service<Person>
+public class LoadPersonDetailsRequest extends Service<PersonVO>
 {
-	public Person person;
+	public PersonVO person;
 
 
 	@Override
-	protected Task<Person> createTask()
+	protected Task<PersonVO> createTask()
 	{
-		return new Task<Person>() {
+		return new Task<PersonVO>() {
 
 			@Override
-			protected Person call() throws Exception
+			protected PersonVO call() throws Exception
 			{
 				return person;
 			}

@@ -13,11 +13,11 @@ package pl.xesenix.experiments.experiment01.vo;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class Skill
+public class SkillVO
 {
 	private StringProperty name = new SimpleStringProperty(this, "name", "");
 
-	public Skill(String name)
+	public SkillVO(String name)
 	{
 		setName(name);
 	}
@@ -40,6 +40,6 @@ public class Skill
 	@Override
 	public String toString()
 	{
-		return "Skill: " + getName();
+		return "SkillVO: " + getName();
 	}
 }

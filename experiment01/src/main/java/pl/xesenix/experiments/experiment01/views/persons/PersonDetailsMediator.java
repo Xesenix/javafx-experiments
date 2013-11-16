@@ -21,7 +21,7 @@ import pl.xesenix.experiments.experiment01.requests.CommitPropertyEditCommand;
 import pl.xesenix.experiments.experiment01.requests.IRequestProvider;
 import pl.xesenix.experiments.experiment01.requests.UpdatePersonsListRequest;
 import pl.xesenix.experiments.experiment01.views.console.IConsoleView;
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
 
 import com.google.inject.Inject;
 
@@ -63,7 +63,7 @@ public class PersonDetailsMediator implements IPersonDetailsMediator
 		}
 		else
 		{
-			Person editedPerson = selectionModel.getSelectedPerson();
+			PersonVO editedPerson = selectionModel.getSelectedPerson();
 
 			if (!editedPerson.getName().equals(name))
 			{
@@ -95,7 +95,7 @@ public class PersonDetailsMediator implements IPersonDetailsMediator
 		}
 		else
 		{
-			Person editedPerson = selectionModel.getSelectedPerson();
+			PersonVO editedPerson = selectionModel.getSelectedPerson();
 
 			if (!editedPerson.getAge().equals(age))
 			{
@@ -141,7 +141,7 @@ public class PersonDetailsMediator implements IPersonDetailsMediator
 	{
 		errorMessage("error.person.invalid.age");
 		
-		Person editedPerson = selectionModel.getSelectedPerson();
+		PersonVO editedPerson = selectionModel.getSelectedPerson();
 		
 		view.updatePersonDetailsView(editedPerson);
 	}
@@ -178,7 +178,7 @@ public class PersonDetailsMediator implements IPersonDetailsMediator
 			// cannot do this outside of FX thread 
 			property.setValue(value);
 			
-			Person editedPerson = selectionModel.getSelectedPerson();
+			PersonVO editedPerson = selectionModel.getSelectedPerson();
 			
 			view.updatePersonDetailsView(editedPerson);
 			
@@ -192,7 +192,7 @@ public class PersonDetailsMediator implements IPersonDetailsMediator
 		@SuppressWarnings("unchecked")
 		public void handle(WorkerStateEvent workerStateEvent)
 		{
-			listView.updatePersonList((ObservableList<Person>) workerStateEvent.getSource().getValue());
+			listView.updatePersonList((ObservableList<PersonVO>) workerStateEvent.getSource().getValue());
 		}
 	}
 

@@ -10,12 +10,12 @@
  ******************************************************************************/
 package pl.xesenix.experiments.experiment01.views.persons;
 
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
 
 public interface IPersonListMediator
 {
 	void loadPersons();
 	
 	
-	void updateSelectedPerson(Person person);
+	void updateSelectedPerson(PersonVO person);
 }

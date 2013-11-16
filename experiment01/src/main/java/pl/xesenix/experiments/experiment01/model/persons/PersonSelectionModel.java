@@ -12,27 +12,27 @@ package pl.xesenix.experiments.experiment01.model.persons;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
 
 
 public class PersonSelectionModel implements IPersonSelectionModel
 {
-	private ObjectProperty<Person> selectedPerson = new SimpleObjectProperty<Person>(this, "selectedPerson");
+	private ObjectProperty<PersonVO> selectedPerson = new SimpleObjectProperty<PersonVO>(this, "selectedPerson");
 
 
-	public Person getSelectedPerson()
+	public PersonVO getSelectedPerson()
 	{
 		return selectedPerson.get();
 	}
 
 
-	public void setSelectedPerson(Person person)
+	public void setSelectedPerson(PersonVO person)
 	{
 		selectedPerson.set(person);
 	}
 
 
-	public ObjectProperty<Person> getSelectedPersonProperty()
+	public ObjectProperty<PersonVO> getSelectedPersonProperty()
 	{
 		return selectedPerson;
 	}

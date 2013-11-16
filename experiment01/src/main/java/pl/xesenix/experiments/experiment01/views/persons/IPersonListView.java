@@ -11,12 +11,12 @@
 package pl.xesenix.experiments.experiment01.views.persons;
 
 import javafx.collections.ObservableList;
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
 
 public interface IPersonListView
 {
-	void updatePersonList(ObservableList<Person> persons);
+	void updatePersonList(ObservableList<PersonVO> persons);
 
 
-	void updateSelectedPerson(Person person);
+	void updateSelectedPerson(PersonVO person);
 }

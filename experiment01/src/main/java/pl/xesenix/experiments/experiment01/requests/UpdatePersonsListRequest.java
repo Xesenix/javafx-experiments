@@ -14,24 +14,24 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import pl.xesenix.experiments.experiment01.service.IPersonService;
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
 
 import com.google.inject.Inject;
 
 
-public class UpdatePersonsListRequest extends Service<ObservableList<Person>>
+public class UpdatePersonsListRequest extends Service<ObservableList<PersonVO>>
 {
 	@Inject
 	public IPersonService personService;
 
 
 	@Override
-	protected Task<ObservableList<Person>> createTask()
+	protected Task<ObservableList<PersonVO>> createTask()
 	{
-		return new Task<ObservableList<Person>>() {
+		return new Task<ObservableList<PersonVO>>() {
 
 			@Override
-			protected ObservableList<Person> call() throws Exception
+			protected ObservableList<PersonVO> call() throws Exception
 			{
 				return personService.getPersons();
 			}

@@ -27,9 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class Person
+public class PersonVO
 {
-	private static Logger log = LoggerFactory.getLogger(Person.class);
+	private static Logger log = LoggerFactory.getLogger(PersonVO.class);
 	
 	
 	private StringProperty name = new SimpleStringProperty(this, "name", "");
@@ -38,10 +38,10 @@ public class Person
 	private IntegerProperty age = new SimpleIntegerProperty(this, "age", 0);
 
 
-	private ListProperty<Skill> skills = new SimpleListProperty<Skill>(this, "skills", FXCollections.observableList(new ArrayList<Skill>()));
+	private ListProperty<SkillVO> skills = new SimpleListProperty<SkillVO>(this, "skills", FXCollections.observableList(new ArrayList<SkillVO>()));
 
 
-	public Person(String name)
+	public PersonVO(String name)
 	{
 		setName(name);
 		getNameProperty().addListener(new ChangeListener<String>() {
@@ -97,17 +97,17 @@ public class Person
 		this.age.set(age);
 	}
 
-	public ListProperty<Skill> getSkillsProperty()
+	public ListProperty<SkillVO> getSkillsProperty()
 	{
 		return skills;
 	}
 	
-	public ObservableList<Skill> getSkills()
+	public ObservableList<SkillVO> getSkills()
 	{
 		return skills.get();
 	}
 
-	public void setSkills(ObservableList<Skill> skills)
+	public void setSkills(ObservableList<SkillVO> skills)
 	{
 		this.skills.set(skills);
 	}
@@ -115,6 +115,6 @@ public class Person
 	@Override
 	public String toString()
 	{
-		return "{Person: " + getName() + ", age: " + getAge() + "}(" + super.toString() + ")";
+		return "{PersonVO: " + getName() + ", age: " + getAge() + "}(" + super.toString() + ")";
 	}
 }

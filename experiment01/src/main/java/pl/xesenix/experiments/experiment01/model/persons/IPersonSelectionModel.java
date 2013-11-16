@@ -11,16 +11,16 @@
 package pl.xesenix.experiments.experiment01.model.persons;
 
 import javafx.beans.property.ObjectProperty;
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
 
 
 public interface IPersonSelectionModel
 {
-	Person getSelectedPerson();
+	PersonVO getSelectedPerson();
 
 
-	void setSelectedPerson(Person person);
+	void setSelectedPerson(PersonVO person);
 
 
-	ObjectProperty<Person> getSelectedPersonProperty();
+	ObjectProperty<PersonVO> getSelectedPersonProperty();
 }

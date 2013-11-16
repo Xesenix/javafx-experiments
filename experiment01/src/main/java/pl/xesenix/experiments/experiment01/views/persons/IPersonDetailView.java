@@ -10,9 +10,9 @@
  ******************************************************************************/
 package pl.xesenix.experiments.experiment01.views.persons;
 
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
 
 public interface IPersonDetailView
 {
-	void updatePersonDetailsView(Person person);
+	void updatePersonDetailsView(PersonVO person);
 }

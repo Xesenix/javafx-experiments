@@ -19,8 +19,8 @@ import javafx.collections.ObservableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import pl.xesenix.experiments.experiment01.vo.Person;
-import pl.xesenix.experiments.experiment01.vo.Skill;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
+import pl.xesenix.experiments.experiment01.vo.SkillVO;
 
 import com.google.inject.Singleton;
 
@@ -31,17 +31,17 @@ public class StubPersonService implements IPersonService
 	private static Logger log = LoggerFactory.getLogger(StubPersonService.class);
 
 
-	private ListProperty<Person> personsList = new SimpleListProperty<Person>(this,
+	private ListProperty<PersonVO> personsList = new SimpleListProperty<PersonVO>(this,
 		"personsList",
-		FXCollections.<Person> observableArrayList());
+		FXCollections.<PersonVO> observableArrayList());
 
 
 	public StubPersonService()
 	{
-		personsList.addListener(new ChangeListener<ObservableList<Person>>() {
+		personsList.addListener(new ChangeListener<ObservableList<PersonVO>>() {
 
-			public void changed(ObservableValue<? extends ObservableList<Person>> observable,
-				ObservableList<Person> oldValue, ObservableList<Person> newValue)
+			public void changed(ObservableValue<? extends ObservableList<PersonVO>> observable,
+				ObservableList<PersonVO> oldValue, ObservableList<PersonVO> newValue)
 			{
 				log.debug("old:{}\nnew: {}", oldValue, newValue);
 			}
@@ -49,33 +49,33 @@ public class StubPersonService implements IPersonService
 	}
 
 
-	public ObservableList<Person> getPersons()
+	public ObservableList<PersonVO> getPersons()
 	{
 		return personsList.get();
 	}
 
 
-	public ListProperty<Person> getPersonsListProperty()
+	public ListProperty<PersonVO> getPersonsListProperty()
 	{
 		return personsList;
 	}
 
 
-	public Person getPersonDetails(String name)
+	public PersonVO getPersonDetails(String name)
 	{
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 
-	public void commitPerson(Person person)
+	public void commitPerson(PersonVO person)
 	{
 		// TODO Auto-generated method stub
 
 	}
 
 
-	public void declinePerson(Person person, String Reason)
+	public void declinePerson(PersonVO person, String Reason)
 	{
 		// TODO Auto-generated method stub
 
@@ -84,24 +84,24 @@ public class StubPersonService implements IPersonService
 
 	public void loadPersons()
 	{
-		Skill karate = new Skill("karate");
-		Skill programming = new Skill("programming");
-		Skill walking = new Skill("walking");
+		SkillVO karate = new SkillVO("karate");
+		SkillVO programming = new SkillVO("programming");
+		SkillVO walking = new SkillVO("walking");
 
-		Person adam = new Person("Adam");
+		PersonVO adam = new PersonVO("Adam");
 		adam.setAge(12);
 		adam.getSkills().add(walking);
 		adam.getSkills().add(programming);
 
-		Person ewa = new Person("Ewa");
+		PersonVO ewa = new PersonVO("Ewa");
 		ewa.getSkills().add(karate);
 
-		Person pawel = new Person("Paweł");
+		PersonVO pawel = new PersonVO("Paweł");
 		pawel.getSkills().add(karate);
 		pawel.getSkills().add(programming);
 		pawel.getSkills().add(walking);
 
-		ObservableList<Person> list = getPersons();
+		ObservableList<PersonVO> list = getPersons();
 		list.add(adam);
 		list.add(ewa);
 		list.add(pawel);

@@ -18,7 +18,7 @@ import pl.xesenix.experiments.experiment01.model.persons.IPersonSelectionModel;
 import pl.xesenix.experiments.experiment01.requests.IRequestProvider;
 import pl.xesenix.experiments.experiment01.requests.LoadPersonsListRequest;
 import pl.xesenix.experiments.experiment01.views.console.IConsoleView;
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
 
 import com.google.inject.Inject;
 
@@ -59,9 +59,9 @@ public class PersonListMediator implements IPersonListMediator
 	/**
 	 * @interface IPersonListMediator
 	 */
-	public void updateSelectedPerson(Person person)
+	public void updateSelectedPerson(PersonVO person)
 	{
-		Person editedPerson = personSelectionModel.getSelectedPerson();
+		PersonVO editedPerson = personSelectionModel.getSelectedPerson();
 
 		if (editedPerson == null || !editedPerson.equals(person))
 		{
@@ -76,7 +76,7 @@ public class PersonListMediator implements IPersonListMediator
 		@SuppressWarnings("unchecked")
 		public void handle(WorkerStateEvent workerStateEvent)
 		{
-			view.updatePersonList((ObservableList<Person>) workerStateEvent.getSource().getValue());
+			view.updatePersonList((ObservableList<PersonVO>) workerStateEvent.getSource().getValue());
 		}
 	}
 

@@ -12,23 +12,23 @@ package pl.xesenix.experiments.experiment01.service;
 
 import javafx.beans.property.ListProperty;
 import javafx.collections.ObservableList;
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
 
 public interface IPersonService
 {
-	ObservableList<Person> getPersons();
+	ObservableList<PersonVO> getPersons();
 	
 	
-	Person getPersonDetails(String name);
+	PersonVO getPersonDetails(String name);
 	
 	
-	void commitPerson(Person person);
+	void commitPerson(PersonVO person);
 	
 	
-	void declinePerson(Person person, String Reason);
+	void declinePerson(PersonVO person, String Reason);
 
 
-	ListProperty<Person> getPersonsListProperty();
+	ListProperty<PersonVO> getPersonsListProperty();
 
 
 	void loadPersons();

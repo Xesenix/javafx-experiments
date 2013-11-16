@@ -16,7 +16,7 @@ import javafx.event.EventHandler;
 import pl.xesenix.experiments.experiment01.model.persons.IPersonSelectionModel;
 import pl.xesenix.experiments.experiment01.requests.IRequestProvider;
 import pl.xesenix.experiments.experiment01.requests.LoadPersonDetailsRequest;
-import pl.xesenix.experiments.experiment01.vo.Person;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
 
 import com.google.inject.Inject;
 
@@ -48,7 +48,7 @@ public class PersonOverviewMediator implements IPersonOverviewMediator
 	}
 
 
-	public void selectPerson(Person person)
+	public void selectPerson(PersonVO person)
 	{
 		LoadPersonDetailsRequest request = requestProvider.get(LoadPersonDetailsRequest.class);
 		request.setOnSucceeded(new LoadPersonDetailsSucceedHandler());
@@ -59,9 +59,9 @@ public class PersonOverviewMediator implements IPersonOverviewMediator
 	}
 
 
-	private class SelectedPersonChangeHandler implements ChangeListener<Person>
+	private class SelectedPersonChangeHandler implements ChangeListener<PersonVO>
 	{
-		public void changed(ObservableValue<? extends Person> observed, Person oldPerson, Person newPerson)
+		public void changed(ObservableValue<? extends PersonVO> observed, PersonVO oldPerson, PersonVO newPerson)
 		{
 			selectPerson(newPerson);
 		}
@@ -71,7 +71,7 @@ public class PersonOverviewMediator implements IPersonOverviewMediator
 	{
 		public void handle(WorkerStateEvent workerStateEvent)
 		{
-			detailsView.updatePersonDetailsView((Person) workerStateEvent.getSource().getValue());
+			detailsView.updatePersonDetailsView((PersonVO) workerStateEvent.getSource().getValue());
 		}
 	}
 }

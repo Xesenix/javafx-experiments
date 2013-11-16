@@ -54,8 +54,8 @@ import pl.xesenix.experiments.experiment01.views.persons.IPersonDetailsMediator;
 import pl.xesenix.experiments.experiment01.views.persons.IPersonListMediator;
 import pl.xesenix.experiments.experiment01.views.persons.IPersonListView;
 import pl.xesenix.experiments.experiment01.views.persons.IPersonOverviewMediator;
-import pl.xesenix.experiments.experiment01.vo.Person;
-import pl.xesenix.experiments.experiment01.vo.Skill;
+import pl.xesenix.experiments.experiment01.vo.PersonVO;
+import pl.xesenix.experiments.experiment01.vo.SkillVO;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -88,15 +88,15 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 
 
 	@FXML
-	private ComboBox<Person> combobox;
+	private ComboBox<PersonVO> combobox;
 
 
 	@FXML
-	private ListView<Person> peopleList;
+	private ListView<PersonVO> peopleList;
 
 
 	@FXML
-	private ListView<Skill> skillList;
+	private ListView<SkillVO> skillList;
 
 
 	@FXML
@@ -185,9 +185,9 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 
 		// people list aspect view setup
 		
-		Callback<ListView<Person>, ListCell<Person>> peopleCellFactory = new Callback<ListView<Person>, ListCell<Person>>() {
+		Callback<ListView<PersonVO>, ListCell<PersonVO>> peopleCellFactory = new Callback<ListView<PersonVO>, ListCell<PersonVO>>() {
 
-			public ListCell<Person> call(ListView<Person> param)
+			public ListCell<PersonVO> call(ListView<PersonVO> param)
 			{
 				return new PersonListCell();
 			}
@@ -287,7 +287,7 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 	/**
 	 * @interface IPersonListView
 	 */
-	public void updatePersonList(ObservableList<Person> persons)
+	public void updatePersonList(ObservableList<PersonVO> persons)
 	{
 		log.debug("updatePersonList: {}", persons);
 		
@@ -299,7 +299,7 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 	/**
 	 * @interface IPersonListView
 	 */
-	public void updateSelectedPerson(Person person)
+	public void updateSelectedPerson(PersonVO person)
 	{
 		combobox.getSelectionModel().select(person);
 		peopleList.getSelectionModel().select(person);
@@ -309,7 +309,7 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 	/**
 	 * @interface IPersonDetailView
 	 */
-	public void updatePersonDetailsView(Person person)
+	public void updatePersonDetailsView(PersonVO person)
 	{
 		log.debug("updatePersonDetails: {}", person);
 		
@@ -358,12 +358,12 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 	// view helpers
 
 
-	private class PersonListCell extends ListCell<Person>
+	private class PersonListCell extends ListCell<PersonVO>
 	{
 		private ChangeListener<String> personChangeParameterListener;
 
 		@Override
-		protected void updateItem(Person item, boolean empty)
+		protected void updateItem(PersonVO item, boolean empty)
 		{
 			if (!empty)
 			{
@@ -460,9 +460,9 @@ public class Controller implements IPersonListView, IPersonDetailView, IConsoleV
 	}
 
 
-	private class PersonsListSelectionChangedHandler implements ChangeListener<Person>
+	private class PersonsListSelectionChangedHandler implements ChangeListener<PersonVO>
 	{
-		public void changed(ObservableValue<? extends Person> observed, Person oldPerson, Person newPerson)
+		public void changed(ObservableValue<? extends PersonVO> observed, PersonVO oldPerson, PersonVO newPerson)
 		{
 			log.debug("combobox selection changed to: {}", newPerson);
 			listMediator.updateSelectedPerson(newPerson);
