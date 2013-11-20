@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.*?>
+<?import javafx.collections.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.effect.*?>
 <?import javafx.scene.layout.*?>
@@ -13,8 +14,16 @@
 <AnchorPane fx:id="view" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="pl.xesenix.experiments.experiment03.Controller">
   <!-- TODO Add Nodes -->
   <children>
-    <Viewport fx:id="viewport" prefHeight="600.0" prefWidth="800.0" style="" styleClass="grid" AnchorPane.bottomAnchor="160.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
-    </Viewport>
-    <TextArea fx:id="console" prefHeight="120.0" prefWidth="200.0" wrapText="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" />
+    <Viewport fx:id="viewport" prefHeight="600.0" prefWidth="800.0" style="" styleClass="grid" AnchorPane.bottomAnchor="160.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
+    <TextArea fx:id="console" prefHeight="120.0" prefWidth="600.0" wrapText="true" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="220.0" />
+    <ChoiceBox fx:id="layout" prefWidth="180.0" AnchorPane.bottomAnchor="119.0" AnchorPane.rightAnchor="20.0">
+      <items>
+        <FXCollections fx:factory="observableArrayList">
+          <String fx:value="Item 1" />
+          <String fx:value="Item 2" />
+          <String fx:value="Item 3" />
+        </FXCollections>
+      </items>
+    </ChoiceBox>
   </children>
 </AnchorPane>

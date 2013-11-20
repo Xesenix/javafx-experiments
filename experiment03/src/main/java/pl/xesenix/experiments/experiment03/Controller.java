@@ -8,10 +8,15 @@ import java.util.HashMap;
 import java.util.ResourceBundle;
 
 import javafx.beans.binding.DoubleBinding;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
@@ -28,13 +33,14 @@ import javafx.scene.shape.Rectangle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import pl.xesenix.experiments.experiment03.components.animation.FPSRendererAnimator;
 import pl.xesenix.experiments.experiment03.components.viewport.Viewport;
-import edu.uci.ics.jung.algorithms.layout.CircleLayout;
-import edu.uci.ics.jung.algorithms.layout.FRLayout;
+import edu.uci.ics.jung.algorithms.layout.DAGLayout;
+import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
-import edu.uci.ics.jung.algorithms.layout.RadialTreeLayout;
+import edu.uci.ics.jung.algorithms.layout.SpringLayout;
 import edu.uci.ics.jung.graph.DelegateTree;
-import edu.uci.ics.jung.graph.Forest;
+import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.Pair;
 
 
@@ -49,6 +55,10 @@ public class Controller
 
 	@FXML
 	private URL location;
+
+
+	@FXML
+	private ChoiceBox<Layout<Say, ICondition>> layout;
 
 
 	@FXML
@@ -75,8 +85,15 @@ public class Controller
 		log.debug("controller initializing");
 
 		assert console != null : "fx:id=\"console\" was not injected: check your FXML file 'app.fxml'.";
+		assert layout != null : "fx:id=\"layout\" was not injected: check your FXML file 'app.fxml'.";
 		assert view != null : "fx:id=\"view\" was not injected: check your FXML file 'app.fxml'.";
 		assert viewport != null : "fx:id=\"viewport\" was not injected: check your FXML file 'app.fxml'.";
+		
+		Group lineLayer = new Group();
+		Group pointLayer = new Group();
+		
+		viewport.addNodeToCanvas(lineLayer);
+		viewport.addNodeToCanvas(pointLayer);
 
 		Actor[] npcs = new Actor[] { new Actor("Sam", Color.web("#0f0")), new Actor("Tom", Color.web("#080")) };
 		Actor[] team = new Actor[] { new Actor("Xesenix", Color.web("#f00")), new Actor("Hordrak", Color.web("#00f")) };
@@ -111,20 +128,97 @@ public class Controller
 		addRelation(playerActions[4], npcActions[4]);
 
 		console.setText(graph.toString());
+		
+		prepareLayouts(graph);
 
-		Layout<Say, ICondition> layout = new RadialTreeLayout<Say, ICondition>((Forest<Say, ICondition>) graph);
-		layout.setSize(new Dimension(800, 600));
+		//KKLayout good for not crossing edges
+		
+		//DAGLayout 
 
 		for (Say action : graph.getVertices())
 		{
-			viewport.addNodeToCanvas(getNodeFor(action, layout));
+			pointLayer.getChildren().add(getNodeFor(action, null));
 		}
 		
 		for (ICondition condition : graph.getEdges())
 		{
-			Node node = getEdgeFor(condition, layout);
-			viewport.addNodeToCanvas(node);
+			lineLayer.getChildren().add(getEdgeFor(condition, null));
 		}
+		
+		Canvas canvas = new Canvas(200, 200);
+		canvas.setMouseTransparent(true);
+
+		viewport.getChildren().add(canvas);
+
+		final GraphicsContext gc = canvas.getGraphicsContext2D();
+		
+		(new FPSRendererAnimator(30, gc) {
+
+			public void dologic(long stepMiliseconds)
+			{
+				Layout<Say, ICondition> selection = layout.getSelectionModel().getSelectedItem();
+				
+				if (selection != null)
+				{
+					if (selection instanceof SpringLayout)
+					{
+						((SpringLayout<Say, ICondition>) selection).step();
+					}
+					else if (selection instanceof KKLayout)
+					{
+						((KKLayout<Say, ICondition>) selection).step();
+					}
+				}
+				
+				super.dologic(stepMiliseconds);
+			}
+
+			public void render(long stepMiliseconds)
+			{
+				Layout<Say, ICondition> selection = layout.getSelectionModel().getSelectedItem();
+				
+				if (selection != null)
+				{
+					for (Say action : graph.getVertices())
+					{
+						getNodeFor(action, selection);
+					}
+				}
+				
+				super.render(stepMiliseconds);
+			}
+		}).start();
+	}
+	
+	
+	private void prepareLayouts(Graph<Say, ICondition> graph)
+	{
+		ObservableList<Layout<Say, ICondition>> layouts = FXCollections.observableArrayList();
+		
+		layouts.add(prepareDAGLayout(graph));
+		layouts.add(prepareKKLayout(graph));
+		
+		layout.setItems(layouts);
+	}
+
+
+	private Layout<Say, ICondition> prepareDAGLayout(Graph<Say, ICondition> graph2)
+	{
+		DAGLayout<Say, ICondition> result = new DAGLayout<Say, ICondition>(graph);
+		result.setSize(new Dimension(800, 600));
+		result.initialize();
+		
+		return result;
+	}
+
+
+	private Layout<Say, ICondition> prepareKKLayout(Graph<Say, ICondition> graph)
+	{
+		KKLayout<Say, ICondition> result = new KKLayout<Say, ICondition>(graph);
+		result.setSize(new Dimension(800, 600));
+		result.initialize();
+		
+		return result;
 	}
 
 
@@ -157,13 +251,7 @@ public class Controller
 		arrow.setLayoutX(10);
 		arrow.layoutXProperty().bind(b.layoutXProperty());
 		arrow.layoutYProperty().bind(b.layoutYProperty());
-		arrow.rotateProperty().bind(new DoubleBinding() {
-
-			protected double computeValue()
-			{
-				return 180f * Math.atan2(b.layoutYProperty().get() - a.layoutYProperty().get(), b.layoutXProperty().get() - a.layoutXProperty().get()) / Math.PI;
-			}
-		});
+		arrow.rotateProperty().bind(new RotationBinding(b, a));
 		
 		move.xProperty().bind(a.layoutXProperty());
 		move.yProperty().bind(a.layoutYProperty());
@@ -189,7 +277,6 @@ public class Controller
 
 	private NodeView getNodeFor(Say vertice, Layout<Say, ICondition> layout)
 	{
-		Point2D point = layout.transform(vertice);
 		NodeView pane;
 
 		if (!map.containsKey(vertice))
@@ -203,12 +290,42 @@ public class Controller
 			pane = map.get(vertice);
 		}
 
-		pane.setLayoutX(point.getX());
-		pane.setLayoutY(point.getY());
+		if (layout != null)
+		{
+			Point2D point = layout.transform(vertice);
+			pane.setLayoutX(point.getX());
+			pane.setLayoutY(point.getY());
+		}
 
 		return pane;
 	}
 
+
+	public class RotationBinding extends DoubleBinding
+	{
+		private final NodeView b;
+
+
+		private final NodeView a;
+
+
+		public RotationBinding(NodeView b, NodeView a)
+		{
+			this.b = b;
+			this.a = a;
+			
+			this.bind(a.layoutXProperty());
+			this.bind(a.layoutYProperty());
+			this.bind(b.layoutXProperty());
+			this.bind(b.layoutYProperty());
+		}
+
+
+		protected double computeValue()
+		{
+			return 180f * Math.atan2(b.layoutYProperty().get() - a.layoutYProperty().get(), b.layoutXProperty().get() - a.layoutXProperty().get()) / Math.PI;
+		}
+	}
 
 	public class NodeView extends Pane
 	{
