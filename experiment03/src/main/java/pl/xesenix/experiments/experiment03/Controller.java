@@ -30,17 +30,24 @@ import javafx.scene.shape.Path;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 
+import org.apache.commons.collections15.Factory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import pl.xesenix.experiments.experiment03.components.animation.FPSRendererAnimator;
 import pl.xesenix.experiments.experiment03.components.viewport.Viewport;
 import edu.uci.ics.jung.algorithms.layout.DAGLayout;
+import edu.uci.ics.jung.algorithms.layout.FRLayout;
+import edu.uci.ics.jung.algorithms.layout.FRLayout2;
 import edu.uci.ics.jung.algorithms.layout.KKLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.algorithms.layout.SpringLayout;
+import edu.uci.ics.jung.algorithms.layout.SpringLayout2;
+import edu.uci.ics.jung.algorithms.shortestpath.PrimMinimumSpanningTree;
 import edu.uci.ics.jung.graph.DelegateTree;
+import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Graph;
+import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
 
 
@@ -58,7 +65,7 @@ public class Controller
 
 
 	@FXML
-	private ChoiceBox<Layout<Say, ICondition>> layout;
+	private ChoiceBox<Layout<IAction, ICondition>> layout;
 
 
 	@FXML
@@ -73,10 +80,10 @@ public class Controller
 	private TextArea console;
 
 
-	private HashMap<Say, NodeView> map = new HashMap<Say, NodeView>();
+	private HashMap<IAction, Node> map = new HashMap<IAction, Node>();
 
 
-	private DelegateTree<Say, ICondition> graph;
+	private DirectedSparseGraph<IAction, ICondition> graph;
 
 
 	@FXML
@@ -97,6 +104,8 @@ public class Controller
 
 		Actor[] npcs = new Actor[] { new Actor("Sam", Color.web("#0f0")), new Actor("Tom", Color.web("#080")) };
 		Actor[] team = new Actor[] { new Actor("Xesenix", Color.web("#f00")), new Actor("Hordrak", Color.web("#00f")) };
+		
+		EventAction enter = new EventAction("start");
 
 		Say[] npcActions = new Say[] {
 			new Say(npcs[0], "Welcome what do yo want to do?"),
@@ -110,12 +119,13 @@ public class Controller
 			new Say(team[1], "I want to go for an adventure"),
 			new Say(team[1], "I need some wolf leather"),
 			new Say(team[0], "Do you know where can i get some better equipment?"),
-			new Say(team[1], "Good idea i need some armor.")
+			new Say(team[1], "Good idea i need some armor."),
+			new Say(team[1], "back")
 		};
 
-		graph = new DelegateTree<Say, ICondition>();
-
-		graph.addVertex(npcActions[0]);
+		graph = new DirectedSparseGraph<IAction, ICondition>();
+		
+		addRelation(enter, npcActions[0]);
 		
 		addRelation(npcActions[0], playerActions[0]);
 		addRelation(npcActions[0], playerActions[1]);
@@ -127,6 +137,15 @@ public class Controller
 		addRelation(playerActions[3], playerActions[4]);
 		addRelation(playerActions[4], npcActions[4]);
 
+		addRelation(npcActions[1], playerActions[5]);
+		addRelation(npcActions[2], playerActions[5]);
+		addRelation(npcActions[3], playerActions[5]);
+		addRelation(npcActions[4], playerActions[5]);
+		
+		addRelation(playerActions[5], npcActions[0]);
+		
+		//addRelation(playerActions[5], npcActions[0]);
+
 		console.setText(graph.toString());
 		
 		prepareLayouts(graph);
@@ -135,14 +154,14 @@ public class Controller
 		
 		//DAGLayout 
 
-		for (Say action : graph.getVertices())
+		for (IAction action : graph.getVertices())
 		{
-			pointLayer.getChildren().add(getNodeFor(action, null));
+			pointLayer.getChildren().add(getNodeFor(action));
 		}
 		
 		for (ICondition condition : graph.getEdges())
 		{
-			lineLayer.getChildren().add(getEdgeFor(condition, null));
+			lineLayer.getChildren().add(getEdgeFor(condition));
 		}
 		
 		Canvas canvas = new Canvas(200, 200);
@@ -153,20 +172,44 @@ public class Controller
 		final GraphicsContext gc = canvas.getGraphicsContext2D();
 		
 		(new FPSRendererAnimator(30, gc) {
+			HashMap<Node, Point2D> velocity = new HashMap<Node, Point2D>();
+			
+			public void start() {
+				super.start();
+				
+				for (IAction action : graph.getVertices())
+				{
+					Node node = getNodeFor(action);
+					
+					velocity.put(node, new Point2D.Double());
+				}
+			};
 
 			public void dologic(long stepMiliseconds)
 			{
-				Layout<Say, ICondition> selection = layout.getSelectionModel().getSelectedItem();
+				Layout<IAction, ICondition> selection = layout.getSelectionModel().getSelectedItem();
 				
 				if (selection != null)
 				{
 					if (selection instanceof SpringLayout)
 					{
-						((SpringLayout<Say, ICondition>) selection).step();
+						((SpringLayout<IAction, ICondition>) selection).step();
+					}
+					else if (selection instanceof SpringLayout2)
+					{
+						((SpringLayout2<IAction, ICondition>) selection).step();
 					}
 					else if (selection instanceof KKLayout)
 					{
-						((KKLayout<Say, ICondition>) selection).step();
+						((KKLayout<IAction, ICondition>) selection).step();
+					}
+					else if (selection instanceof FRLayout)
+					{
+						((FRLayout<IAction, ICondition>) selection).step();
+					}
+					else if (selection instanceof FRLayout2)
+					{
+						((FRLayout2<IAction, ICondition>) selection).step();
 					}
 				}
 				
@@ -175,13 +218,34 @@ public class Controller
 
 			public void render(long stepMiliseconds)
 			{
-				Layout<Say, ICondition> selection = layout.getSelectionModel().getSelectedItem();
+				Layout<IAction, ICondition> selection = layout.getSelectionModel().getSelectedItem();
 				
 				if (selection != null)
 				{
-					for (Say action : graph.getVertices())
+					for (IAction action : graph.getVertices())
 					{
-						getNodeFor(action, selection);
+						Node node = getNodeFor(action);
+						Point2D target = selection.transform(action);
+						
+						Point2D v = velocity.get(node);
+						
+						double d = target.distance(node.getLayoutX(), node.getLayoutY());
+						double dx = target.getX() - node.getLayoutX();
+						double dy = target.getY() - node.getLayoutY();
+						double maxSpeed = Math.min(150, v.distance(0, 0) + 0.1);
+						double scale = 1;
+						
+						if (d != 0)
+						{
+							scale = Math.min(maxSpeed / d, 1);
+						}
+						
+						v.setLocation(dx * scale,dy * scale);
+						
+						node.setLayoutX(node.getLayoutX() + v.getX());
+						node.setLayoutY(node.getLayoutY() + v.getY());
+						
+						selection.setLocation(action, new Point2D.Double(node.getLayoutX(), node.getLayoutY()));
 					}
 				}
 				
@@ -191,20 +255,24 @@ public class Controller
 	}
 	
 	
-	private void prepareLayouts(Graph<Say, ICondition> graph)
+	private void prepareLayouts(Graph<IAction, ICondition> graph)
 	{
-		ObservableList<Layout<Say, ICondition>> layouts = FXCollections.observableArrayList();
+		ObservableList<Layout<IAction, ICondition>> layouts = FXCollections.observableArrayList();
 		
 		layouts.add(prepareDAGLayout(graph));
 		layouts.add(prepareKKLayout(graph));
+		layouts.add(prepareFRLayout(graph));
+		layouts.add(prepareFRLayout2(graph));
+		layouts.add(prepareSpringLayout(graph));
+		layouts.add(prepareSpringLayout2(graph));
 		
 		layout.setItems(layouts);
 	}
 
 
-	private Layout<Say, ICondition> prepareDAGLayout(Graph<Say, ICondition> graph2)
+	private Layout<IAction, ICondition> prepareSpringLayout2(Graph<IAction, ICondition> graph)
 	{
-		DAGLayout<Say, ICondition> result = new DAGLayout<Say, ICondition>(graph);
+		SpringLayout2<IAction, ICondition> result = new SpringLayout2<IAction, ICondition>(graph);
 		result.setSize(new Dimension(800, 600));
 		result.initialize();
 		
@@ -212,9 +280,9 @@ public class Controller
 	}
 
 
-	private Layout<Say, ICondition> prepareKKLayout(Graph<Say, ICondition> graph)
+	private Layout<IAction, ICondition> prepareSpringLayout(Graph<IAction, ICondition> graph)
 	{
-		KKLayout<Say, ICondition> result = new KKLayout<Say, ICondition>(graph);
+		SpringLayout<IAction, ICondition> result = new SpringLayout<IAction, ICondition>(graph);
 		result.setSize(new Dimension(800, 600));
 		result.initialize();
 		
@@ -222,12 +290,63 @@ public class Controller
 	}
 
 
-	private Node getEdgeFor(ICondition condition, Layout<Say, ICondition> layout)
+	private Layout<IAction, ICondition> prepareFRLayout2(Graph<IAction, ICondition> graph)
 	{
-		Pair<Say> pair = graph.getEndpoints(condition);
+		FRLayout2<IAction, ICondition> result = new FRLayout2<IAction, ICondition>(graph);
+		result.setSize(new Dimension(800, 600));
+		result.initialize();
 		
-		final NodeView a = getNodeFor(pair.getFirst(), layout);
-		final NodeView b = getNodeFor(pair.getSecond(), layout);
+		return result;
+	}
+
+
+	private Layout<IAction, ICondition> prepareFRLayout(Graph<IAction, ICondition> graph)
+	{
+		FRLayout<IAction, ICondition> result = new FRLayout<IAction, ICondition>(graph);
+		result.setSize(new Dimension(800, 600));
+		result.initialize();
+		
+		return result;
+	}
+
+
+	private Layout<IAction, ICondition> prepareDAGLayout(Graph<IAction, ICondition> graph)
+	{
+		PrimMinimumSpanningTree<IAction, ICondition> algorithm = new PrimMinimumSpanningTree<IAction, ICondition>(new Factory<Graph<IAction, ICondition>>() {
+
+			@Override
+			public Graph<IAction, ICondition> create()
+			{
+				return new DelegateTree<IAction, ICondition>();
+			}
+		});
+		
+		Graph<IAction, ICondition> tree = algorithm.transform(graph);
+		
+		DAGLayout<IAction, ICondition> result = new DAGLayout<IAction, ICondition>(tree);
+		result.setSize(new Dimension(800, 600));
+		result.initialize();
+		
+		return result;
+	}
+
+
+	private Layout<IAction, ICondition> prepareKKLayout(Graph<IAction, ICondition> graph)
+	{
+		KKLayout<IAction, ICondition> result = new KKLayout<IAction, ICondition>(graph);
+		result.setSize(new Dimension(800, 600));
+		result.initialize();
+		
+		return result;
+	}
+
+
+	private Node getEdgeFor(ICondition condition)
+	{
+		Pair<IAction> pair = graph.getEndpoints(condition);
+		
+		final Node a = getNodeFor(pair.getFirst());
+		final Node b = getNodeFor(pair.getSecond());
 		
 		Group group = new Group();
 		
@@ -269,47 +388,53 @@ public class Controller
 	}
 
 
-	private void addRelation(Say question, Say anwser)
+	private void addRelation(IAction question, IAction anwser)
 	{
-		graph.addChild(new ActorAvailable(anwser.getPerson()), question, anwser);
+		if (!graph.containsVertex(question))
+		{
+			graph.addVertex(question);
+		}
+		
+		if (!graph.containsVertex(anwser))
+		{
+			graph.addVertex(anwser);
+		}
+		
+		if (anwser instanceof Say)
+		{
+			graph.addEdge(new ActorAvailable(((Say) anwser).getPerson()), question, anwser, EdgeType.DIRECTED);
+		}
+		
 	}
 
 
-	private NodeView getNodeFor(Say vertice, Layout<Say, ICondition> layout)
+	private Node getNodeFor(IAction vertice)
 	{
-		NodeView pane;
-
 		if (!map.containsKey(vertice))
 		{
-			pane = new NodeView(vertice);
-
-			map.put(vertice, pane);
+			if (vertice instanceof Say)
+			{
+				map.put(vertice, new SayView((Say) vertice));
+			}
+			else if (vertice instanceof EventAction)
+			{
+				map.put(vertice, new EventView((EventAction) vertice));
+			}
 		}
-		else
-		{
-			pane = map.get(vertice);
-		}
-
-		if (layout != null)
-		{
-			Point2D point = layout.transform(vertice);
-			pane.setLayoutX(point.getX());
-			pane.setLayoutY(point.getY());
-		}
-
-		return pane;
+		
+		return map.get(vertice);
 	}
 
 
 	public class RotationBinding extends DoubleBinding
 	{
-		private final NodeView b;
+		private final Node b;
 
 
-		private final NodeView a;
+		private final Node a;
 
 
-		public RotationBinding(NodeView b, NodeView a)
+		public RotationBinding(Node b, Node a)
 		{
 			this.b = b;
 			this.a = a;
@@ -327,7 +452,8 @@ public class Controller
 		}
 	}
 
-	public class NodeView extends Pane
+
+	public class SayView extends Pane
 	{
 		private EventHandler<? super MouseEvent> mouseEventHandler;
 
@@ -335,7 +461,7 @@ public class Controller
 		private Tooltip tip;
 
 
-		public NodeView(Say action)
+		public SayView(Say action)
 		{
 			final Circle circle = new Circle(0, 0, 15, action.getPerson().getColor());
 			circle.setStroke(Color.web("#000"));
@@ -343,7 +469,7 @@ public class Controller
 			
 			getChildren().add(circle);
 			
-			tip = new Tooltip(action.say());
+			tip = new Tooltip(action.execute());
 
 			mouseEventHandler = new EventHandler<MouseEvent>() {
 
@@ -364,6 +490,63 @@ public class Controller
 		}
 	}
 
+
+	public class EventView extends Pane
+	{
+		private EventHandler<? super MouseEvent> mouseEventHandler;
+
+
+		private Tooltip tip;
+
+
+		public EventView(EventAction action)
+		{
+			final Circle circle = new Circle(0, 0, 15, Color.WHITE);
+			circle.setStroke(Color.web("#000"));
+			circle.setStrokeWidth(2f);
+			
+			getChildren().add(circle);
+			
+			double[] vertices = new double[20];
+			
+			for (int i = 0; i < 5; i++)
+			{
+				double a = 2 * Math.PI * ((double) i / 5);
+				double b = 2 * Math.PI * (((double) i + 0.5) / 5);
+				
+				vertices[i * 4] = 14 * Math.cos(a);
+				vertices[i * 4 + 1] = 14 * Math.sin(a);
+				vertices[i * 4 + 2] = 5 * Math.cos(b);
+				vertices[i * 4 + 3] = 5 * Math.sin(b);
+			}
+			
+			Polygon star = new Polygon(vertices);
+			star.setFill(Color.BLACK);
+			
+			getChildren().add(star);
+			
+			tip = new Tooltip(action.execute());
+
+			mouseEventHandler = new EventHandler<MouseEvent>() {
+
+				public void handle(MouseEvent event)
+				{
+					if (event.getEventType().equals(MouseEvent.MOUSE_MOVED))
+					{
+						tip.show(circle, event.getScreenX(), event.getScreenY());
+					}
+					else if (event.getEventType().equals(MouseEvent.MOUSE_EXITED))
+					{
+						tip.hide();
+					}
+				}
+			};
+
+			addEventHandler(MouseEvent.ANY, mouseEventHandler);
+		}
+	}
+
+	
 	class Actor
 	{
 		private String name;
@@ -408,9 +591,16 @@ public class Controller
 			return name;
 		}
 	}
-
+	
+	
+	public interface IAction
+	{
+		String execute();
+	}
+	
+	
 	// action
-	class Say
+	class Say implements IAction
 	{
 		private String text;
 
@@ -431,7 +621,7 @@ public class Controller
 		}
 
 
-		public String say()
+		public String execute()
 		{
 			return person.getName() + "\n" + text;
 		}
@@ -440,6 +630,31 @@ public class Controller
 		public String toString()
 		{
 			return text;
+		}
+	}
+	
+	
+	public class EventAction implements IAction
+	{
+		private String name;
+
+
+		public EventAction(String name)
+		{
+			this.name = name;
+		}
+		
+		
+		public String execute()
+		{
+			return "event: " + this.name;
+		}
+		
+		
+		@Override
+		public String toString()
+		{
+			return this.name;
 		}
 	}
 	

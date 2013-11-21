@@ -1,15 +1,15 @@
 
 package pl.xesenix.experiments.experiment03.components.viewport;
 
-import pl.xesenix.experiments.experiment03.components.viewport.states.SimpleViewportStateManager;
-import pl.xesenix.experiments.experiment03.components.viewport.states.IViewportState;
-import pl.xesenix.experiments.experiment03.components.viewport.states.IViewportStateManager;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
+import pl.xesenix.experiments.experiment03.components.viewport.states.IViewportState;
+import pl.xesenix.experiments.experiment03.components.viewport.states.IViewportStateManager;
+import pl.xesenix.experiments.experiment03.components.viewport.states.SimpleViewportStateManager;
 
 
 public class Viewport extends Pane

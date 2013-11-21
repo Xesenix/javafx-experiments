@@ -1,8 +1,8 @@
 package pl.xesenix.experiments.experiment03.components.viewport.states;
 
-import pl.xesenix.experiments.experiment03.components.viewport.Viewport;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
+import pl.xesenix.experiments.experiment03.components.viewport.Viewport;
 
 public interface IViewportState
 {
