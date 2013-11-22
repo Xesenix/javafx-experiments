@@ -107,20 +107,20 @@ public class Controller
 		
 		EventAction enter = new EventAction("start");
 
-		Say[] npcActions = new Say[] {
+		IAction[] npcActions = new IAction[] {
 			new Say(npcs[0], "Welcome what do yo want to do?"),
 			new Say(npcs[0], "I have nothing to sell."),
 			new Say(npcs[1], "I know someone who may help you. What do you want to do exacly?"),
 			new Say(npcs[0], "I know elven hunter should I arrange meeting?"),
 			new Say(npcs[0], "I heard rummors about ancient tomb deep in forest, maybe you want to check it?") };
 
-		Say[] playerActions = new Say[] {
+		IAction[] playerActions = new IAction[] {
 			new Say(team[0], "I want to buy some things"),
 			new Say(team[1], "I want to go for an adventure"),
 			new Say(team[1], "I need some wolf leather"),
 			new Say(team[0], "Do you know where can i get some better equipment?"),
 			new Say(team[1], "Good idea i need some armor."),
-			new Say(team[1], "back")
+			new EventAction("back")
 		};
 
 		graph = new DirectedSparseGraph<IAction, ICondition>();
@@ -404,7 +404,10 @@ public class Controller
 		{
 			graph.addEdge(new ActorAvailable(((Say) anwser).getPerson()), question, anwser, EdgeType.DIRECTED);
 		}
-		
+		else
+		{
+			graph.addEdge(new Tautology(), question, anwser, EdgeType.DIRECTED);
+		}
 	}
 
 
@@ -662,6 +665,15 @@ public class Controller
 	public interface ICondition
 	{
 		boolean check();
+	}
+	
+	
+	class Tautology implements ICondition
+	{
+		public boolean check()
+		{
+			return true;
+		}
 	}
 	
 	
