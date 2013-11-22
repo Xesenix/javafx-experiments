@@ -35,4 +35,4 @@ Experiment03
 
 Simple graph visualization.
 
-[Experiment00 details](/experiment03)
+[Experiment03 details](/experiment03)
