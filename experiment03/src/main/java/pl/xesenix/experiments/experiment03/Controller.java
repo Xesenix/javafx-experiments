@@ -3,6 +3,10 @@ package pl.xesenix.experiments.experiment03;
 
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -49,6 +53,7 @@ import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
+import edu.uci.ics.jung.io.GraphMLWriter;
 
 
 public class Controller
@@ -108,11 +113,11 @@ public class Controller
 		EventAction enter = new EventAction("start");
 
 		IAction[] npcActions = new IAction[] {
-			new Say(npcs[0], "Welcome what do yo want to do?"),
+			new Say(npcs[0], "Welcome what do you want to do?"),
 			new Say(npcs[0], "I have nothing to sell."),
-			new Say(npcs[1], "I know someone who may help you. What do you want to do exacly?"),
+			new Say(npcs[1], "I know someone who may help you. What do you want to do exactly?"),
 			new Say(npcs[0], "I know elven hunter should I arrange meeting?"),
-			new Say(npcs[0], "I heard rummors about ancient tomb deep in forest, maybe you want to check it?") };
+			new Say(npcs[0], "I heard rumors about ancient tomb deep in forest, maybe you want to check it?") };
 
 		IAction[] playerActions = new IAction[] {
 			new Say(team[0], "I want to buy some things"),
@@ -145,7 +150,22 @@ public class Controller
 		addRelation(playerActions[5], npcActions[0]);
 		
 		//addRelation(playerActions[5], npcActions[0]);
-
+		
+		PrintWriter out;
+		try
+		{
+			GraphMLWriter<IAction, ICondition> graphWriter = new GraphMLWriter<IAction, ICondition>();
+			
+			out = new PrintWriter(new BufferedWriter(new FileWriter("out.graphml")));
+			
+			graphWriter.save(graph, out);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		
 		console.setText(graph.toString());
 		
 		prepareLayouts(graph);
