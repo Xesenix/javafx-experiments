@@ -4,10 +4,22 @@ package pl.xesenix.experiments.experiment03;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectStreamException;
+import java.io.ObjectStreamField;
+import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Serializable;
+import java.io.StringWriter;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.ResourceBundle;
 
@@ -35,6 +47,8 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 
 import org.apache.commons.collections15.Factory;
+import org.apache.commons.collections15.Transformer;
+import org.eclipse.core.internal.preferences.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +67,7 @@ import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import edu.uci.ics.jung.graph.util.Pair;
+import edu.uci.ics.jung.io.GraphMLMetadata;
 import edu.uci.ics.jung.io.GraphMLWriter;
 
 
@@ -151,12 +166,73 @@ public class Controller
 		
 		//addRelation(playerActions[5], npcActions[0]);
 		
-		PrintWriter out;
+		Actor test = new Actor("Sam", Color.web("#0f0"));
+		
 		try
 		{
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			
+			ObjectOutputStream os = new ObjectOutputStream(baos);
+			os.writeObject(test);
+			os.close();
+			baos.close();
+			
+			String data = new String(Base64.encode(baos.toByteArray()));
+			
+			log.debug("{}", data);
+			
+			ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(data.getBytes()));
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			
+			log.debug("{}", ois.readObject());
+			
+			ois.close();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+		
+		try
+		{
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("out.xml")));
+			
 			GraphMLWriter<IAction, ICondition> graphWriter = new GraphMLWriter<IAction, ICondition>();
 			
-			out = new PrintWriter(new BufferedWriter(new FileWriter("out.graphml")));
+			HashMap<String, GraphMLMetadata<IAction>> map = new HashMap<String, GraphMLMetadata<IAction>>();
+			
+			map.put("action", new GraphMLMetadata<IAction>("some desc", "def", new Transformer<IAction, String>() {
+
+				public String transform(IAction input)
+				{
+					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					
+					ObjectOutputStream os;
+					
+					try
+					{
+						os = new ObjectOutputStream(baos);
+						os.writeObject(input);
+						os.close();
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+					finally
+					{
+						try { baos.close(); } catch (IOException e) { e.printStackTrace(); }
+					}
+					
+					return new String(Base64.encode(baos.toByteArray()));
+				}
+			}));
+			
+			graphWriter.setVertexData(map);
 			
 			graphWriter.save(graph, out);
 		}
@@ -570,8 +646,11 @@ public class Controller
 	}
 
 	
-	class Actor
+	public static class Actor implements Serializable
 	{
+		private static final long serialVersionUID = 1L;
+
+
 		private String name;
 
 
@@ -613,10 +692,47 @@ public class Controller
 		{
 			return name;
 		}
+		
+		
+		private static final ObjectStreamField[] serialPersistentFields = {
+			new ObjectStreamField("name", String.class),
+			new ObjectStreamField("color", String.class)
+		};
+		
+		
+		private void writeObject(ObjectOutputStream out) throws IOException
+		{
+			ObjectOutputStream.PutField fields = out.putFields();
+			fields.put("color", String.format("#%02X%02X%02X%02X",
+				(int) (255 * color.getRed()),
+				(int) (255 * color.getGreen()),
+				(int) (255 * color.getBlue()),
+				(int) (255 * color.getOpacity())
+			));
+			fields.put("name", name);
+			out.writeFields();
+		}
+		
+		
+		private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+		{
+			ObjectInputStream.GetField fields = in.readFields();
+			
+			String c = (String) fields.get("color", "#fff");
+			color = Color.web(c);
+			
+			name = (String) fields.get("name", "");
+		}
+		
+		
+		private void readObjectNoData() throws ObjectStreamException
+		{
+			
+		}
 	}
 	
 	
-	public interface IAction
+	public interface IAction extends Serializable
 	{
 		String execute();
 	}
@@ -625,6 +741,9 @@ public class Controller
 	// action
 	class Say implements IAction
 	{
+		private static final long serialVersionUID = 1L;
+
+
 		private String text;
 
 
@@ -654,11 +773,37 @@ public class Controller
 		{
 			return text;
 		}
+		
+		
+		private void writeObject(ObjectOutputStream out) throws IOException
+		{
+			ObjectOutputStream.PutField fields = out.putFields();
+			fields.put("text", text);
+			fields.put("person", person);
+			out.writeFields();
+		}
+		
+		
+		private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+		{
+			ObjectInputStream.GetField fields = in.readFields();
+			text = (String) fields.get("text", new String(""));
+			person = (Actor) fields.get("person", null);
+		}
+		
+		
+		private void readObjectNoData() throws ObjectStreamException
+		{
+			
+		}
 	}
 	
 	
 	public class EventAction implements IAction
 	{
+		private static final long serialVersionUID = 1L;
+		
+		
 		private String name;
 
 
@@ -674,10 +819,30 @@ public class Controller
 		}
 		
 		
-		@Override
 		public String toString()
 		{
 			return this.name;
+		}
+		
+		
+		private void writeObject(ObjectOutputStream out) throws IOException
+		{
+			ObjectOutputStream.PutField fields = out.putFields();
+			fields.put("name", name);
+			out.writeFields();
+		}
+		
+		
+		private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+		{
+			ObjectInputStream.GetField fields = in.readFields();
+			name = (String) fields.get("name", new String(""));
+		}
+		
+		
+		private void readObjectNoData() throws ObjectStreamException
+		{
+			
 		}
 	}
 	
