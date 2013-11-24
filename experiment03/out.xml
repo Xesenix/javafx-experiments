@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
+<key id="action" for="node">
+<desc>some desc</desc>
+<default>def</default>
+</key>
+<graph edgedefault="directed">
+<node id="I want to buy some things">
+<data key="action"><action>
+  <text><![CDATA[Xesenix
+I want to buy some things]]></text>
+</action></data>
+</node>
+<node id="Do you know where can i get some better equipment?">
+<data key="action"><action>
+  <text><![CDATA[Xesenix
+Do you know where can i get some better equipment?]]></text>
+</action></data>
+</node>
+<node id="I have nothing to sell.">
+<data key="action"><action>
+  <text><![CDATA[Sam
+I have nothing to sell.]]></text>
+</action></data>
+</node>
+<node id="back">
+<data key="action"><action>
+  <text><![CDATA[event: back]]></text>
+</action></data>
+</node>
+<node id="Good idea i need some armor.">
+<data key="action"><action>
+  <text><![CDATA[Hordrak
+Good idea i need some armor.]]></text>
+</action></data>
+</node>
+<node id="Welcome what do you want to do?">
+<data key="action"><action>
+  <text><![CDATA[Sam
+Welcome what do you want to do?]]></text>
+</action></data>
+</node>
+<node id="I need some wolf leather">
+<data key="action"><action>
+  <text><![CDATA[Hordrak
+I need some wolf leather]]></text>
+</action></data>
+</node>
+<node id="I know someone who may help you. What do you want to do exactly?">
+<data key="action"><action>
+  <text><![CDATA[Tom
+I know someone who may help you. What do you want to do exactly?]]></text>
+</action></data>
+</node>
+<node id="I want to go for an adventure">
+<data key="action"><action>
+  <text><![CDATA[Hordrak
+I want to go for an adventure]]></text>
+</action></data>
+</node>
+<node id="start">
+<data key="action"><action>
+  <text><![CDATA[event: start]]></text>
+</action></data>
+</node>
+<node id="I heard rumors about ancient tomb deep in forest, maybe you want to check it?">
+<data key="action"><action>
+  <text><![CDATA[Sam
+I heard rumors about ancient tomb deep in forest, maybe you want to check it?]]></text>
+</action></data>
+</node>
+<node id="I know elven hunter should I arrange meeting?">
+<data key="action"><action>
+  <text><![CDATA[Sam
+I know elven hunter should I arrange meeting?]]></text>
+</action></data>
+</node>
+<edge source="I know elven hunter should I arrange meeting?" target="back"/>
+<edge source="start" target="Welcome what do you want to do?"/>
+<edge source="I want to buy some things" target="I have nothing to sell."/>
+<edge source="I heard rumors about ancient tomb deep in forest, maybe you want to check it?" target="back"/>
+<edge source="Good idea i need some armor." target="I heard rumors about ancient tomb deep in forest, maybe you want to check it?"/>
+<edge source="I know someone who may help you. What do you want to do exactly?" target="back"/>
+<edge source="I know someone who may help you. What do you want to do exactly?" target="Do you know where can i get some better equipment?"/>
+<edge source="back" target="Welcome what do you want to do?"/>
+<edge source="Welcome what do you want to do?" target="I want to go for an adventure"/>
+<edge source="Do you know where can i get some better equipment?" target="Good idea i need some armor."/>
+<edge source="I know someone who may help you. What do you want to do exactly?" target="I need some wolf leather"/>
+<edge source="I have nothing to sell." target="back"/>
+<edge source="Welcome what do you want to do?" target="I want to buy some things"/>
+<edge source="I need some wolf leather" target="I know elven hunter should I arrange meeting?"/>
+<edge source="I want to go for an adventure" target="I know someone who may help you. What do you want to do exactly?"/>
+</graph>
+</graphml>

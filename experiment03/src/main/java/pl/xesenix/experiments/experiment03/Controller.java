@@ -6,22 +6,20 @@ import java.awt.geom.Point2D;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
 import java.io.ObjectStreamField;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.ResourceBundle;
+import java.util.Scanner;
 
 import javafx.beans.binding.DoubleBinding;
 import javafx.collections.FXCollections;
@@ -49,6 +47,11 @@ import javafx.scene.shape.Rectangle;
 import org.apache.commons.collections15.Factory;
 import org.apache.commons.collections15.Transformer;
 import org.eclipse.core.internal.preferences.Base64;
+import org.jdom2.CDATA;
+import org.jdom2.Element;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +107,12 @@ public class Controller
 
 
 	private DirectedSparseGraph<IAction, ICondition> graph;
+
+
+	private SAXBuilder builder;
+
+
+	private XMLOutputter xmlOutput;
 
 
 	@FXML
@@ -166,83 +175,58 @@ public class Controller
 		
 		//addRelation(playerActions[5], npcActions[0]);
 		
-		Actor test = new Actor("Sam", Color.web("#0f0"));
+		builder = new SAXBuilder();
+		
+		xmlOutput = new XMLOutputter(Format.getPrettyFormat());
 		
 		try
 		{
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			String filePath = "out.xml";
 			
-			ObjectOutputStream os = new ObjectOutputStream(baos);
-			os.writeObject(test);
-			os.close();
-			baos.close();
-			
-			String data = new String(Base64.encode(baos.toByteArray()));
-			
-			log.debug("{}", data);
-			
-			ByteArrayInputStream bais = new ByteArrayInputStream(Base64.decode(data.getBytes()));
-			ObjectInputStream ois = new ObjectInputStream(bais);
-			
-			log.debug("{}", ois.readObject());
-			
-			ois.close();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		catch (ClassNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		
-		try
-		{
-			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("out.xml")));
-			
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filePath)));
 			GraphMLWriter<IAction, ICondition> graphWriter = new GraphMLWriter<IAction, ICondition>();
-			
 			HashMap<String, GraphMLMetadata<IAction>> map = new HashMap<String, GraphMLMetadata<IAction>>();
 			
 			map.put("action", new GraphMLMetadata<IAction>("some desc", "def", new Transformer<IAction, String>() {
 
 				public String transform(IAction input)
 				{
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
+					Element actionNode = new Element("action");
 					
-					ObjectOutputStream os;
+					actionNode.addContent(new Element("text").setContent(new CDATA(input.execute())));
 					
-					try
-					{
-						os = new ObjectOutputStream(baos);
-						os.writeObject(input);
-						os.close();
-					}
-					catch (IOException e)
-					{
-						e.printStackTrace();
-					}
-					finally
-					{
-						try { baos.close(); } catch (IOException e) { e.printStackTrace(); }
-					}
-					
-					return new String(Base64.encode(baos.toByteArray()));
+					return xmlOutput.outputString(actionNode);
 				}
 			}));
 			
 			graphWriter.setVertexData(map);
-			
 			graphWriter.save(graph, out);
+			
+			//InputStream is = getClass().getResource("/out.xml").openStream();
+			
+			File file = new File(filePath);
+			
+			if (file.canRead())
+			{
+				FileInputStream fis = new FileInputStream(file);
+				
+				StringBuilder text = new StringBuilder();
+				
+				Scanner scanner = new Scanner(fis, "utf-8");
+				
+				while (scanner.hasNextLine())
+				{
+					text.append(scanner.nextLine() + "\n");
+				}
+				scanner.close();
+				
+				console.setText(text.toString());
+			}
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
-		
-		
-		console.setText(graph.toString());
 		
 		prepareLayouts(graph);
 
@@ -692,43 +676,6 @@ public class Controller
 		{
 			return name;
 		}
-		
-		
-		private static final ObjectStreamField[] serialPersistentFields = {
-			new ObjectStreamField("name", String.class),
-			new ObjectStreamField("color", String.class)
-		};
-		
-		
-		private void writeObject(ObjectOutputStream out) throws IOException
-		{
-			ObjectOutputStream.PutField fields = out.putFields();
-			fields.put("color", String.format("#%02X%02X%02X%02X",
-				(int) (255 * color.getRed()),
-				(int) (255 * color.getGreen()),
-				(int) (255 * color.getBlue()),
-				(int) (255 * color.getOpacity())
-			));
-			fields.put("name", name);
-			out.writeFields();
-		}
-		
-		
-		private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-		{
-			ObjectInputStream.GetField fields = in.readFields();
-			
-			String c = (String) fields.get("color", "#fff");
-			color = Color.web(c);
-			
-			name = (String) fields.get("name", "");
-		}
-		
-		
-		private void readObjectNoData() throws ObjectStreamException
-		{
-			
-		}
 	}
 	
 	
@@ -773,29 +720,6 @@ public class Controller
 		{
 			return text;
 		}
-		
-		
-		private void writeObject(ObjectOutputStream out) throws IOException
-		{
-			ObjectOutputStream.PutField fields = out.putFields();
-			fields.put("text", text);
-			fields.put("person", person);
-			out.writeFields();
-		}
-		
-		
-		private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-		{
-			ObjectInputStream.GetField fields = in.readFields();
-			text = (String) fields.get("text", new String(""));
-			person = (Actor) fields.get("person", null);
-		}
-		
-		
-		private void readObjectNoData() throws ObjectStreamException
-		{
-			
-		}
 	}
 	
 	
@@ -822,27 +746,6 @@ public class Controller
 		public String toString()
 		{
 			return this.name;
-		}
-		
-		
-		private void writeObject(ObjectOutputStream out) throws IOException
-		{
-			ObjectOutputStream.PutField fields = out.putFields();
-			fields.put("name", name);
-			out.writeFields();
-		}
-		
-		
-		private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-		{
-			ObjectInputStream.GetField fields = in.readFields();
-			name = (String) fields.get("name", new String(""));
-		}
-		
-		
-		private void readObjectNoData() throws ObjectStreamException
-		{
-			
 		}
 	}
 	

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<act>
+	<roles>
+		<role id="hero">
+			<description></description>
+		</role>
+		<role id="villager">
+			<description></description>
+		</role>
+		<role id="guard"/>
+		<role id="landlord"/>
+		<role id="Alan">
+			<extends>
+				<role id="landlord"/>
+				<role id="guard"/>
+			</extends>
+		</role>
+		<role id="Tom"/>
+	</roles>
+	<props>
+		<item id="wolf-leather"/>
+	</props>
+	<filters>
+		<test:any id="can-and-have-to-hunt-wolfs">
+			<test:in>
+				<subject>
+					<actorRace>
+						<actorForRole role="hero"/>
+					</actorRace>
+				</subject>
+				<target>
+					<race id="elf"/>
+					<race id="drow"/>
+				</<target>
+			</test:in>
+			<test:not>
+				<test:contains>
+					<subject>
+						<actorPosession>
+							<actorForRole role="landlord"/>
+						</actorPosession>
+					</subject>
+					<target>
+						<item type="wolf-leather" quantity="10"/>
+					</target>
+				</test:contains>
+			</test:not>
+		</test:any>
+	</filters>
+	<scene entry-point="speak-landlord">
+		<actions>
+			<verse id="1" role="landlord"><text><![CDATA[Welcome what do you want to do?]]></text></verse>
+			<selector id="2" ai="player"/>
+			<verse id="3" role="hero"><text><![CDATA[I want to buy some things, do you have anything for sell?]]></text></verse>
+			<verse id="4" role="landlord"><text><![CDATA[I have nothing for sell.]]></text></verse>
+			<verse id="5" role="hero"><text><![CDATA[I want to go for an adventure.]]></text></verse>
+			<verse id="6" role="landlord"><text><![CDATA[I know someone who may help you. What do you want to do exactly?]]></text></verse>
+			<selector id="7" ai="player"/>
+			<verse id="8" role="hero"><text><![CDATA[Do you know where can i get some better equipment?]]></text></verse>
+			<verse id="9" role="hero"><text><![CDATA[Good idea i need some armor.]]></text></verse>
+			<verse id="10" role="landlord"><text><![CDATA[I heard rumors about ancient tomb deep in forest, maybe you want to check it?]]></text></verse>
+			<verse id="11" role="hero"><text><![CDATA[I need some wolf leather]]></text></verse>
+			<selector id="12" ai="ai"/>
+			<filter id="13" type="can-and-have-to-hunt-wolfs"/>
+			<verse id="14" role="landlord"><text><![CDATA[I think you preatty well suited to get some for yourself in forest north from here.]]></text></verse>
+			<filter id="15">
+				<test:in>
+					<subject>
+						<actorRace>
+							<actorForRole role="hero"/>
+						</actorRace>
+					</subject>
+					<target>
+						<race id="elf"/>
+						<race id="drow"/>
+					</<target>
+				</test:in>
+			</filter>
+			<verse id="16" role="landlord"><text><![CDATA[Hmm, I think i have some in my stock.]]></text></verse>
+			<verse id="17" role="landlord"><text><![CDATA[I know elven hunter should I arrange meeting?]]></text></verse>
+		</actions>
+		<connections>
+			<flow source="1" target="2"/>
+			<flow source="2" target="3"/>
+			<flow source="3" target="4"/>
+			<flow source="2" target="5"/>
+			<flow source="5" target="6"/>
+			<flow source="6" target="7"/>
+			<flow source="7" target="8"/>
+			<flow source="8" target="9"/>
+			<flow source="9" target="10"/>
+			<flow source="7" target="11"/>
+			<flow source="11" target="12"/>
+			<flow source="12" target="13"/>
+			<flow source="13" target="14"/>
+			<flow source="12" target="15"/>
+			<flow source="15" target="16"/>
+			<flow source="12" target="17"/>
+		</connections>
+	</scene>
+</act>
