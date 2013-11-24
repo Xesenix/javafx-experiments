@@ -7,6 +7,14 @@ Compiled versions of experiments available at:
 
 https://sourceforge.net/projects/javafx-experiments
 
+See wiki for more information about experiments:
+
+https://github.com/Xesenix/javafx-experiments/wiki
+
+Basics
+------
+Simple implementations of basic java functionalities as object serialization/deserialization using of streams and others..
+
 Experiment00
 ------------
 
