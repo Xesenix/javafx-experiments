@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamException;
+import java.io.ObjectStreamField;
 import java.io.Serializable;
 
 import org.eclipse.core.internal.preferences.Base64;
@@ -97,6 +98,16 @@ public class ObjectSerializationTest
 	public static class AdvancedPropertiesClass implements Serializable
 	{
 		private static final long serialVersionUID = 1L;
+		
+		
+		/**
+		 * Contains names of serialized fields.
+		 */
+		private static final ObjectStreamField[] serialPersistentFields = {
+			new ObjectStreamField("text", String.class),
+			new ObjectStreamField("number", Integer.class),
+			new ObjectStreamField("objectSerialized", String.class)
+		};
 
 
 		public String text;
@@ -123,7 +134,7 @@ public class ObjectSerializationTest
 
 			fields.put("text", text);
 			fields.put("number", number);
-			fields.put("object", serializeObjectToString(object));
+			fields.put("objectSerialized", serializeObjectToString(object));
 
 			out.writeFields();
 		}
@@ -134,7 +145,7 @@ public class ObjectSerializationTest
 			ObjectInputStream.GetField fields = in.readFields();
 			text = (String) fields.get("text", new String());
 			number = (Integer) fields.get("number", new Integer(0));
-			object = (SimplePropertiesClass) deserializeStringObject((String) fields.get("object", null));
+			object = (SimplePropertiesClass) deserializeStringObject((String) fields.get("objectSerialized", null));
 		}
 
 
