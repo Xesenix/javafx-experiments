@@ -21,9 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 
 
-public class XmlSerializationTest
+public class XmlSerializationJDomTest
 {
-	private static final Logger log = LoggerFactory.getLogger(XmlSerializationTest.class);
+	private static final Logger log = LoggerFactory.getLogger(XmlSerializationJDomTest.class);
 
 
 	public static void main(String args[]) throws Exception
