@@ -1,16 +1,14 @@
 
 package experiments;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Map;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.jexl2.Expression;
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
-import org.apache.commons.jexl2.MapContext;
+import org.apache.commons.jexl2.ObjectContext;
+import org.apache.commons.jexl2.Script;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.jdom2.CDATA;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -31,6 +29,7 @@ public class XmlSerializationTest
 		
 		Any<Context> alternative = new Any<Context>();
 		All<Context> coniunction = new All<Context>();
+		alternative.add(new ScriptCondition<Context>("var p = new (\"java.awt.geom.Point2D$Double\", x, y); return p.distance(0, 0) < 10"));
 		coniunction.add(new True());
 		coniunction.add(new True());
 		coniunction.add(new Equal<Context>(new PropertyGetter<Context>("x"), new PropertyGetter<Context>("y")));
@@ -43,9 +42,10 @@ public class XmlSerializationTest
 		alternative.setContext(context);
 		
 		log.debug("condition: {}", StringEscapeUtils.unescapeHtml4(alternative.toString()));
-		log.debug("condition evaluation: {}", alternative.check());
-		
+		log.debug("condition evaluation: {}", alternative.check());		
 		log.debug("condition as xml:\n{}", serializeObjectToXmlString(alternative));
+		
+		
 	}
 	
 	
@@ -69,17 +69,20 @@ public class XmlSerializationTest
 	
 	public static class Context
 	{
-		private Double x = (double) 10f;
-
-
-		public Double getY() {
-			return (double) 15f;
-		}
-
+		private Double x = 30 * Math.random();
+		
+		
+		private Double y = 30 * Math.random();
+		
 
 		public Double getX()
 		{
 			return x;
+		}
+
+
+		public Double getY() {
+			return y;
 		}
 
 
@@ -110,16 +113,6 @@ public class XmlSerializationTest
 		}
 		
 		
-		public Element toXml()
-		{
-			Element root = new Element("property");
-			
-			root.setAttribute("selector", selector);
-			
-			return root;
-		}
-		
-		
 		public Object get()
 		{
 			JexlEngine jexl = new JexlEngine();
@@ -138,9 +131,85 @@ public class XmlSerializationTest
 		}
 		
 		
+		public Element toXml()
+		{
+			Element root = new Element("property");
+			
+			root.setAttribute("selector", selector);
+			
+			return root;
+		}
+		
+		
 		public String toString()
 		{
 			return String.format("%s", get());
+		}
+	}
+	
+	
+	public static class ScriptCondition<T> implements ICondition, IContextDependant<T>
+	{
+		private T context;
+		
+		
+		private String script;
+		
+		
+		public ScriptCondition(String script)
+		{
+			this.script = script;
+		}
+
+
+		public void setContext(T context)
+		{
+			this.context = context;
+		}
+		
+		
+		public Boolean check()
+		{
+			JexlEngine jexl = new JexlEngine();
+			
+			try {
+				if (context != null)
+				{
+					Script s = jexl.createScript(script);
+					
+					JexlContext jexlContext = new ObjectContext<T>(jexl, context);
+						
+					Object result = s.execute(jexlContext);
+					
+					log.debug("script: [{}] result: {}", script, result);
+					
+					if (result != null)
+					{
+						return (Boolean) result;
+					}
+				}
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			return false;
+		}
+		
+		
+		public Element toXml()
+		{
+			Element root = new Element("condition");
+			
+			root.addContent(new CDATA(script));
+			
+			return root;
+		}
+		
+		
+		public String toString()
+		{
+			return String.format("function() {%s}", script);
 		}
 	}
 	
@@ -251,7 +320,7 @@ public class XmlSerializationTest
 		
 		public String toString()
 		{
-			return this.subject.toString() + " = " + this.target.toString();
+			return this.subject.toString() + " == " + this.target.toString();
 		}
 	}
 
@@ -324,7 +393,7 @@ public class XmlSerializationTest
 			for (ICondition condition : conditions)
 			{
 				builder.append(delim + condition.toString());
-				delim = " &or; ";
+				delim = " or ";
 			}
 			
 			return "( " + builder.toString() + " )";
@@ -400,7 +469,7 @@ public class XmlSerializationTest
 			for (ICondition condition : conditions)
 			{
 				builder.append(delim + condition.toString());
-				delim = " &and; ";
+				delim = " and ";
 			}
 			
 			return "( " + builder.toString() + " )";
