@@ -3,17 +3,15 @@ package experiments;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -42,6 +40,10 @@ public class XmlSerializationJAXBTest
 				.setName("action")
 				.setData("say('Hello world')")
 				.addChild(root)
+				.addChild(new Leaf()
+					.setName("script")
+					.setData("take('coins', 550)")
+				)
 			)
 		);
 		
@@ -57,17 +59,17 @@ public class XmlSerializationJAXBTest
 		StringWriter xmlWriter = null;
 		
 		try {
-			jaxbContext = JAXBContext.newInstance(Nodes.class);
+			jaxbContext = JAXBContext.newInstance(Graph.class);
 			xmlWriter = new StringWriter();
 			
 			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
 			
 			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-			jaxbMarshaller.marshal(new Nodes(), xmlWriter);
+			jaxbMarshaller.marshal(new Graph(), xmlWriter);
 			
 			log.debug("{}", xmlWriter);
 			
-			Nodes copy = (Nodes) jaxbContext.createUnmarshaller().unmarshal(new StringReader(xmlWriter.toString()));
+			Graph copy = (Graph) jaxbContext.createUnmarshaller().unmarshal(new StringReader(xmlWriter.toString()));
 			
 			log.debug("graph: {}", copy.getNodes().get(0));
 		} catch (JAXBException ex) {
@@ -76,29 +78,32 @@ public class XmlSerializationJAXBTest
 	}
 	
 	@XmlRootElement(name="graph")
-	public static class Nodes
+	public static class Graph
 	{
 		private static Integer counter = 0;
 		
 		
-		@XmlElement(name = "vertex")
-		private static List<Node> nodes = new ArrayList<Node>();
+		@XmlElements({ 
+			@XmlElement(name="leaf", type=Leaf.class),
+			@XmlElement(name="node", type=Node.class)
+		})
+		private static List<? extends Leaf> nodes = new ArrayList<Leaf>();
 		
 		
-		public static List<Node> getNodes()
+		public static List<Leaf> getNodes()
 		{
-			return (List<Node>) nodes;
+			return (List<Leaf>) nodes;
 		}
 		
-		public static void setNodes(List<Node> nodes)
+		public static void setNodes(List<? extends Leaf> nodes)
 		{
-			Nodes.nodes = nodes;
+			Graph.nodes = nodes;
 		}
 	}
 	
 	
-	@XmlRootElement(name="node")
-	public static class Node
+	@XmlRootElement(name="leaf")
+	public static class Leaf
 	{
 		private Integer id;
 		
@@ -112,28 +117,22 @@ public class XmlSerializationJAXBTest
 		private Node parent = null;
 		
 		
-		private ArrayList<Node> children = new ArrayList<Node>();
-
-
-		private boolean rendering = false;
-		
-		
-		public Node()
+		public Leaf()
 		{
-			id = Nodes.counter++;
-			Nodes.nodes.add(this);
+			id = Graph.counter++;
+			Graph.getNodes().add(this);
 		}
 
 
 		@XmlID
-		@XmlAttribute
+		@XmlAttribute(name="node-id")
 		public String getId()
 		{
 			return id.toString();
 		}
 		
 		
-		public Node setId(String id)
+		public Leaf setId(String id)
 		{
 			this.id = Integer.valueOf(id);
 			
@@ -148,7 +147,7 @@ public class XmlSerializationJAXBTest
 		}
 
 
-		public Node setName(String name)
+		public Leaf setName(String name)
 		{
 			this.name = name;
 			
@@ -162,7 +161,7 @@ public class XmlSerializationJAXBTest
 		}
 
 
-		public Node setData(String data)
+		public Leaf setData(String data)
 		{
 			this.data = data;
 			
@@ -179,7 +178,7 @@ public class XmlSerializationJAXBTest
 		}
 
 
-		public Node setParent(Node parent)
+		public Leaf setParent(Node parent)
 		{
 			this.parent = parent;
 			
@@ -192,7 +191,23 @@ public class XmlSerializationJAXBTest
 		}
 		
 		
-		public Node addChild(Node node)
+		public String toString()
+		{
+			return String.format("{id:%s; name: %s; data:%s;}", getId(), getName(), getData());
+		}
+	}
+	
+	
+	@XmlRootElement(name="node")
+	public static class Node extends Leaf
+	{
+		private boolean rendering = false;
+		
+		
+		private ArrayList<Leaf> children = new ArrayList<Leaf>();
+		
+		
+		public Node addChild(Leaf node)
 		{
 			if (!children.contains(node))
 			{
@@ -208,7 +223,7 @@ public class XmlSerializationJAXBTest
 		}
 		
 		
-		public Node removeChild(Node node)
+		public Node removeChild(Leaf node)
 		{
 			children.remove(node);
 			node.setParent(null);
@@ -217,16 +232,16 @@ public class XmlSerializationJAXBTest
 		}
 		
 		
+		@XmlElementWrapper(name="children")
 		@XmlElement(name="child")
 		@XmlIDREF
-		@XmlElementWrapper(name="children")
-		public ArrayList<Node> getChildren()
+		public ArrayList<Leaf> getChildren()
 		{
 			return children;
 		}
 		
 		
-		public Node setChildren(ArrayList<Node> children)
+		public Node setChildren(ArrayList<Leaf> children)
 		{
 			this.children = children;
 			
@@ -240,16 +255,40 @@ public class XmlSerializationJAXBTest
 			
 			if (rendering)
 			{
-				result = String.format("{id:%d; name: %s;}", id, name);
+				result = String.format("{id:%s; name: %s;}", getId(), getName());
 			}
 			else
 			{
 				rendering  = true;
-				result = String.format("{id:%d; name: %s; data:%s; children:%s}", id, name, data, children);
+				result = String.format("{id:%s; name: %s; data:%s; children:%s}", getId(), getName(), getData(), getChildren());
 				rendering  = false;
 			}
 			
 			return result;
+		}
+		
+		
+		public Node setId(String id)
+		{
+			return (Node) super.setId(id);
+		}
+		
+		
+		public Node setName(String name)
+		{
+			return (Node) super.setName(name);
+		}
+		
+		
+		public Node setData(String data)
+		{
+			return (Node) super.setData(data);
+		}
+		
+		
+		public Node setParent(Node parent)
+		{
+			return (Node) super.setParent(parent);
 		}
 	}
 }
