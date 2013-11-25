@@ -1,19 +1,24 @@
 
 package experiments;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.commons.jexl2.JexlContext;
 import org.apache.commons.jexl2.JexlEngine;
 import org.apache.commons.jexl2.ObjectContext;
 import org.apache.commons.jexl2.Script;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.jdom2.CDATA;
+import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 
 
 public class XmlSerializationTest
@@ -41,14 +46,21 @@ public class XmlSerializationTest
 		
 		alternative.setContext(context);
 		
-		log.debug("condition: {}", StringEscapeUtils.unescapeHtml4(alternative.toString()));
-		log.debug("condition evaluation: {}", alternative.check());		
-		log.debug("condition as xml:\n{}", serializeObjectToXmlString(alternative));
+		log.debug("condition: {}", alternative.toString());
+		log.debug("condition evaluation: {}", alternative.check());
 		
+		String xmlCondition = serializeObjectToXmlString(alternative);
 		
+		log.debug("condition as xml:\n{}", xmlCondition);
+		
+		IContextDependant<Context> condition = (IContextDependant<Context>) deserializeXmlStringObject(xmlCondition);
+		
+		condition.setContext(context);
+		log.debug("condition: {}", condition);
+		log.debug("condition evaluation: {}", ((ICondition) condition).check());
 	}
-	
-	
+
+
 	public static String serializeObjectToXmlString(Object object)
 	{
 		XMLOutputter xmlOutput = new XMLOutputter(Format.getPrettyFormat());
@@ -67,6 +79,55 @@ public class XmlSerializationTest
 	}
 	
 	
+	public static Object deserializeXmlStringObject(String xmlCondition)
+	{
+		ByteArrayInputStream bais = new ByteArrayInputStream(xmlCondition.getBytes());
+		
+		InputSource in = new InputSource(bais);
+		
+		SAXBuilder builder = new SAXBuilder();
+		
+		try
+		{
+			Document document = builder.build(in);
+			
+			Element root = document.getRootElement();
+			
+			return transformXmlToObject(root);
+		}
+		catch (JDOMException | IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	
+	public static Object transformXmlToObject(Element root)
+	{
+		switch (root.getName())
+		{
+			case "any":
+				return Any.buildFromXml(root);
+			case "all":
+				return All.buildFromXml(root);
+			case "true":
+				return new True();
+			case "false":
+				return new False();
+			case "equal":
+				return Equal.buildFromXml(root);
+			case "condition":
+				return ScriptCondition.buildFromXml(root);
+			case "property":
+				return PropertyGetter.buildFromXml(root);
+		}
+		
+		return null;
+	}
+
+
 	public static class Context
 	{
 		private Double x = 30 * Math.random();
@@ -95,6 +156,16 @@ public class XmlSerializationTest
 
 	public static class PropertyGetter<T> implements IGetter<T>
 	{
+		public static <T> PropertyGetter<T> buildFromXml(Element root)
+		{
+			String selector = root.getAttributeValue("selector");
+			
+			PropertyGetter<T> result = new PropertyGetter<T>(selector);
+			
+			return result;
+		}
+		
+		
 		private T bean;
 		
 		
@@ -150,6 +221,16 @@ public class XmlSerializationTest
 	
 	public static class ScriptCondition<T> implements ICondition, IContextDependant<T>
 	{
+		public static <T> ScriptCondition<T> buildFromXml(Element root)
+		{
+			String script = root.getText();
+			
+			ScriptCondition<T> result = new ScriptCondition<T>(script);
+			
+			return result;
+		}
+		
+		
 		private T context;
 		
 		
@@ -262,6 +343,51 @@ public class XmlSerializationTest
 	
 	public static class Equal<T> implements ICondition, IContextDependant<T>
 	{
+		public static <T> Equal<T> buildFromXml(Element root)
+		{
+			IGetter<T> subject = null;
+			IGetter<T> target = null;
+			
+			Element subjectsXml = root.getChild("subject");
+			
+			if (subjectsXml != null)
+			{
+				Object result = null;
+				
+				for (Element subjectXml : subjectsXml.getChildren())
+				{
+					result = transformXmlToObject(subjectXml);
+					
+					if (result instanceof IGetter)
+					{
+						subject = (IGetter<T>) result;
+					}
+				}
+			}
+			
+			Element targetsXml = root.getChild("target");
+			
+			if (targetsXml != null)
+			{
+				Object result = null;
+				
+				for (Element targetXml : targetsXml.getChildren())
+				{
+					result = transformXmlToObject(targetXml);
+					
+					if (result instanceof IGetter)
+					{
+						target = (IGetter<T>) result;
+					}
+				}
+			}
+			
+			Equal<T> result = new Equal<T>(subject, target);
+			
+			return result;
+		}
+		
+		
 		private IGetter<T> subject;
 		
 		
@@ -276,14 +402,21 @@ public class XmlSerializationTest
 			this.subject = subject;
 			this.target = target;
 		}
-		
-		
+
+
 		public void setContext(T context)
 		{
 			this.context = context;
 			
-			subject.setContext(context);
-			target.setContext(context);
+			if (subject != null)
+			{
+				subject.setContext(context);
+			}
+			
+			if (target != null)
+			{
+				target.setContext(context);
+			}
 		}
 		
 		
@@ -320,13 +453,31 @@ public class XmlSerializationTest
 		
 		public String toString()
 		{
-			return this.subject.toString() + " == " + this.target.toString();
+			return String.format("%s == %s", this.subject, this.target);
 		}
 	}
 
 
 	public static class Any<T> implements ICompositeCondition, IContextDependant<T>
 	{
+		public static <T> Any<T> buildFromXml(Element root)
+		{
+			Any<T> result = new Any<T>();
+			
+			for (Element conditionXml : root.getChildren())
+			{
+				Object part = transformXmlToObject(conditionXml);
+				
+				if (part instanceof ICondition)
+				{
+					result.add((ICondition) part);
+				}
+			}
+			
+			return result;
+		}
+		
+		
 		ArrayList<ICondition> conditions = new ArrayList<ICondition>();
 		
 		
@@ -337,8 +488,8 @@ public class XmlSerializationTest
 		{
 			conditions.add(condition);
 		}
-		
-		
+
+
 		public void setContext(T context)
 		{
 			this.context = context;
@@ -403,6 +554,23 @@ public class XmlSerializationTest
 	
 	public static class All<T> implements ICompositeCondition, IContextDependant<T>
 	{
+		public static <T> All<T> buildFromXml(Element root)
+		{
+			All<T> result = new All<T>();
+			
+			for (Element conditionXml : root.getChildren())
+			{
+				Object part = transformXmlToObject(conditionXml);
+				
+				if (part instanceof ICondition)
+				{
+					result.add((ICondition) part);
+				}
+			}
+			
+			return result;
+		}
+		
 		ArrayList<ICondition> conditions = new ArrayList<ICondition>();
 		
 		
@@ -413,8 +581,8 @@ public class XmlSerializationTest
 		{
 			conditions.add(condition);
 		}
-		
-		
+
+
 		public void setContext(T context)
 		{
 			this.context = context;

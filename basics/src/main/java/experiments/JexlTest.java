@@ -39,7 +39,7 @@ public class JexlTest
 	}
 
 
-	private static void queryProperty(Context context, String query)
+	private static void queryProperty(Object context, String query)
 	{
 		JexlEngine jexl = new JexlEngine();
 		
