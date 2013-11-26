@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<lists>
+<star name="ADAM" refId="0"/>
+<star name="damin" refId="1"/>
+<say><actor>0</actor></say>
+<say><actor>1</actor></say>
+</lists>

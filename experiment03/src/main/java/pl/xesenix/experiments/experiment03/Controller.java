@@ -4,16 +4,10 @@ package pl.xesenix.experiments.experiment03;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamException;
-import java.io.ObjectStreamField;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.net.URL;
@@ -46,10 +40,8 @@ import javafx.scene.shape.Rectangle;
 
 import org.apache.commons.collections15.Factory;
 import org.apache.commons.collections15.Transformer;
-import org.eclipse.core.internal.preferences.Base64;
 import org.jdom2.CDATA;
 import org.jdom2.Element;
-import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
@@ -107,12 +99,6 @@ public class Controller
 
 
 	private DirectedSparseGraph<IAction, ICondition> graph;
-
-
-	private SAXBuilder builder;
-
-
-	private XMLOutputter xmlOutput;
 
 
 	@FXML
@@ -175,10 +161,6 @@ public class Controller
 		
 		//addRelation(playerActions[5], npcActions[0]);
 		
-		builder = new SAXBuilder();
-		
-		xmlOutput = new XMLOutputter(Format.getPrettyFormat());
-		
 		try
 		{
 			String filePath = "out.xml";
@@ -191,6 +173,8 @@ public class Controller
 
 				public String transform(IAction input)
 				{
+					XMLOutputter xmlOutput = new XMLOutputter(Format.getPrettyFormat());
+					
 					Element actionNode = new Element("action");
 					
 					actionNode.addContent(new Element("text").setContent(new CDATA(input.execute())));
