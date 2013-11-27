@@ -38,7 +38,6 @@ public class App extends GuiceApplication
 	}
 
 
-	@Override
 	public void start(Stage stage) throws Exception
 	{
 		log.debug("application start");
@@ -54,7 +53,6 @@ public class App extends GuiceApplication
 	}
 
 
-	@Override
 	public void init(List<Module> modules) throws Exception
 	{
 		modules.add(new AppModule());

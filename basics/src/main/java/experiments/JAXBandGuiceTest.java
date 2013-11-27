@@ -1,16 +1,9 @@
 
 package experiments;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringBufferInputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -19,8 +12,6 @@ import java.util.List;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlID;
@@ -61,7 +52,7 @@ public class JAXBandGuiceTest
 		IAction action = injector.getInstance(IAction.class);
 		action.setActor(adam);
 		action.execute();
-		
+
 		IActor robert = injector.getInstance(IActor.class);
 		robert.setName("Robert");
 
@@ -78,7 +69,7 @@ public class JAXBandGuiceTest
 		deserializeXml(injector, jaxbContext, new StringReader(xml));
 
 		log.debug("{}", JAXBandGuiceTest.class.getResource("/test.xml").toExternalForm());
-		
+
 		InputStreamReader isr = new InputStreamReader(JAXBandGuiceTest.class.getResourceAsStream("/test.xml"));
 		BufferedReader br = new BufferedReader(isr);
 
