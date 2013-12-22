@@ -14,6 +14,7 @@
 }
 
 .tree-cell:selected {
+	-fx-text-fill: #fff;
 	-fx-background-color: #060;
 }
 
@@ -24,4 +25,16 @@
 .tree-disclosure-node .arrow {
 	-fx-alignment: top-left;
 	-fx-translate-x: -6px;
+}
+
+.xml-element {
+	-fx-text-fill: #aaa;
+}
+
+.xml-attribute {
+	-fx-text-fill: #8f8;
+}
+
+.xml-text {
+	-fx-text-fill: #8f8;
 }

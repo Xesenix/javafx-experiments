@@ -13,10 +13,13 @@ import java.util.Scanner;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.OverrunStyle;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.layout.AnchorPane;
+import javafx.util.Callback;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -78,10 +81,16 @@ public class Controller
 		assert treeView != null : "fx:id=\"treeView\" was not injected: check your FXML file 'app.fxml'.";
 		assert view != null : "fx:id=\"view\" was not injected: check your FXML file 'app.fxml'.";
 
+		treeView.setCellFactory(new Callback<TreeView<Object>, TreeCell<Object>>() {
+
+			public TreeCell<Object> call(TreeView<Object> param)
+			{
+				return new XmlTreeCell();
+			}
+		});
+
 		InputStream in = getClass().getResourceAsStream("/test.xml");
-		
 		console.setText(IOUtil.toString(in));
-		
 		in.close();
 	}
 
@@ -138,5 +147,84 @@ public class Controller
 		}
 
 		return rootNode;
+	}
+
+
+	public static class XmlTreeCell extends TreeCell<Object>
+	{
+		public XmlTreeCell()
+		{
+			super();
+		}
+
+
+		protected void updateItem(Object item, boolean empty)
+		{
+			getStyleClass().removeAll("xml-element", "xml-attribute", "xml-text");
+			
+			if (empty)
+			{
+				setText(null);
+				setGraphic(null);
+			}
+			else
+			{
+				if (item instanceof Element)
+				{
+					Element element = (Element) item;
+					
+					StringBuilder attributes = new StringBuilder();
+					
+					for (Object obj : element.getAttributes())
+					{
+						Attribute attribute = (Attribute) obj;
+						
+						attributes.append(" ");
+						attributes.append(attribute.getName());
+						attributes.append(" = \"");
+						attributes.append(attribute.getValue());
+						attributes.append("\"");
+					}
+					
+					if (element.getContent().isEmpty())
+					{
+						setText(String.format("<%s%s/>", element.getName(), attributes));
+					}
+					else
+					{
+						setText(String.format("<%s%s>...</%s>", element.getName(), attributes, element.getName()));
+					}
+					
+					getStyleClass().add("xml-element");
+				}
+				else if (item instanceof Attribute)
+				{
+					Attribute attribute = (Attribute) item;
+					
+					setText(String.format("%s = %s", attribute.getName(), attribute.getValue()));
+					
+					getStyleClass().add("xml-attribute");
+				}
+				else
+				{
+					Text text = (Text) item;
+					
+					setText(text.getTextNormalize());
+					
+					getStyleClass().add("xml-text");
+				}
+			}
+			
+			super.updateItem(item, empty);
+		}
+		
+		
+		public void resize(double width, double height)
+		{
+			super.resize(width, height);
+			
+			
+			
+		}
 	}
 }
