@@ -304,7 +304,7 @@ public class Controller
 							scale = Math.min(maxSpeed / d, 1);
 						}
 						
-						v.setLocation(dx * scale,dy * scale);
+						v.setLocation(dx * scale, dy * scale);
 						
 						node.setLayoutX(node.getLayoutX() + v.getX());
 						node.setLayoutY(node.getLayoutY() + v.getY());

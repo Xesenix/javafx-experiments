@@ -152,5 +152,6 @@
 		<module>experiment02</module>
 		<module>experiment03</module>
 		<module>basics</module>
+		<module>experiment04</module>
 	</modules>
 </project>

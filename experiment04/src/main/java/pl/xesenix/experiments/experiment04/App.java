@@ -1,5 +1,4 @@
-
-package pl.xesenix.experiments.experiment03;
+package pl.xesenix.experiments.experiment04;
 
 import java.util.List;
 import java.util.ResourceBundle;
@@ -17,7 +16,6 @@ import com.cathive.fx.guice.GuiceFXMLLoader;
 import com.cathive.fx.guice.GuiceFXMLLoader.Result;
 import com.google.inject.Inject;
 import com.google.inject.Module;
-
 
 public class App extends GuiceApplication
 {
@@ -59,8 +57,8 @@ public class App extends GuiceApplication
 		// stage.initStyle(StageStyle.DECORATED);
 		stage.show();
 	}
-
-
+	
+	
 	public void init(List<Module> modules) throws Exception
 	{
 		modules.add(new AppModule());
