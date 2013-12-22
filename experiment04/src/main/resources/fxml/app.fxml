@@ -17,7 +17,16 @@
       <items>
         <AnchorPane minHeight="-1.0" minWidth="-1.0" prefHeight="400.0" prefWidth="400.0">
           <children>
-            <TextArea fx:id="console" prefHeight="400.0" prefWidth="400.0" wrapText="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+              <children>
+                <TextArea fx:id="console" prefHeight="598.0" prefWidth="396.0" wrapText="false" VBox.vgrow="ALWAYS" />
+                <ToolBar>
+                  <items>
+                    <Button mnemonicParsing="false" onAction="#loadXml" text="%button.load" />
+                  </items>
+                </ToolBar>
+              </children>
+            </VBox>
           </children>
         </AnchorPane>
         <AnchorPane minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0">

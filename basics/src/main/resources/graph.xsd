@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+            jxb:version="2.0">
+ 
+  <xs:element name="employee" type="employee"/>
+ 
+  <xs:complexType name="employee">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="salary" type="xs:double"/>
+      <xs:element name="designation" type="xs:string" minOccurs="0"/>
+      <xs:element name="address" type="script" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:int" use="required"/>
+  </xs:complexType>
+ 
+  <xs:complexType name="script">
+    <xs:sequence>
+      <xs:element name="city" type="xs:CDATA" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

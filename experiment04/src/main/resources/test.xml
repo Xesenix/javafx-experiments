@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ai>
+    <behaviors>
+        <behavior name="limiter test">
+            <sequenceSelector>
+                <limiter limit="1">
+                    <navigationTask name="get target A">
+                        <nearPositionGoal precision="20.0">
+                            <position x="50.0" y="50.0"/>
+                        </nearPositionGoal>
+                    </navigationTask>
+                </limiter>
+                <limiter limit="2">
+                    <navigationTask name="get target B">
+                        <nearPositionGoal precision="20.0">
+                            <position x="175.0" y="25.0"/>
+                        </nearPositionGoal>
+                    </navigationTask>
+                </limiter>
+                <navigationTask name="get target C">
+                    <nearPositionGoal precision="20.0">
+                        <position x="20.0" y="180.0"/>
+                    </nearPositionGoal>
+                </navigationTask>
+                <navigationTask name="get target D">
+                    <nearPositionGoal precision="20.0">
+                        <position x="300.0" y="300.0"/>
+                    </nearPositionGoal>
+                </navigationTask>
+            </sequenceSelector>
+        </behavior>
+        <behavior name="simple">
+            <navigationTask name="A">
+                <nearPositionGoal precision="10.0">
+                    <position x="100.0" y="50.0"/>
+                </nearPositionGoal>
+            </navigationTask>
+        </behavior>
+        <behavior name="sequence test">
+            <sequenceSelector>
+                <prioritySelector>
+                    <sequenceSelector>
+                        <messageTask name="sequence 1 started">
+                            <messageGoal message="Let`s see if i can do it"/>
+                        </messageTask>
+                        <navigationTask name="A">
+                            <nearPositionGoal precision="10.0">
+                                <position x="100.0" y="50.0"/>
+                            </nearPositionGoal>
+                        </navigationTask>
+                        <navigationTask name="B">
+                            <nearPositionGoal precision="20.0">
+                                <position x="100.0" y="200.0"/>
+                            </nearPositionGoal>
+                        </navigationTask>
+                        <navigationTask name="A">
+                            <nearPositionGoal precision="10.0">
+                                <position x="100.0" y="50.0"/>
+                            </nearPositionGoal>
+                        </navigationTask>
+                        <messageTask name="sequence 1 almost">
+                            <messageGoal message="One more and i`ve done it"/>
+                        </messageTask>
+                        <navigationTask name="B">
+                            <nearPositionGoal precision="20.0">
+                                <position x="100.0" y="200.0"/>
+                            </nearPositionGoal>
+                        </navigationTask>
+                        <messageTask name="sequence 1 completed">
+                            <messageGoal message="I have done it!!!"/>
+                        </messageTask>
+                    </sequenceSelector>
+                    <messageTask name="sequence 1 fail">
+                        <messageGoal message="Wrrr why why buehehehee!!!"/>
+                    </messageTask>
+                </prioritySelector>
+                <messageTask name="main line 1">
+                    <messageGoal message="To the next big task"/>
+                </messageTask>
+                <succeeder>
+                    <prioritySelector>
+                        <sequenceSelector>
+                            <navigationTask name="C">
+                                <nearPositionGoal precision="60.0">
+                                    <position x="300.0" y="100.0"/>
+                                </nearPositionGoal>
+                            </navigationTask>
+                            <navigationTask name="D">
+                                <nearPositionGoal precision="5.0">
+                                    <position x="400.0" y="100.0"/>
+                                </nearPositionGoal>
+                            </navigationTask>
+                            <navigationTask name="C">
+                                <nearPositionGoal precision="60.0">
+                                    <position x="300.0" y="100.0"/>
+                                </nearPositionGoal>
+                            </navigationTask>
+                            <navigationTask name="D">
+                                <nearPositionGoal precision="5.0">
+                                    <position x="400.0" y="100.0"/>
+                                </nearPositionGoal>
+                            </navigationTask>
+                        </sequenceSelector>
+                        <messageTask name="sequence 1 fail">
+                            <messageGoal message="Nooooo why why buehehehee!!!"/>
+                        </messageTask>
+                    </prioritySelector>
+                </succeeder>
+                <messageTask name="main line 2">
+                    <messageGoal message="Few little ones and i can rest"/>
+                </messageTask>
+                <navigationTask name="B">
+                    <nearPositionGoal precision="20.0">
+                        <position x="100.0" y="200.0"/>
+                    </nearPositionGoal>
+                </navigationTask>
+                <inverter>
+                    <navigationTask name="near 2 points">
+                        <positionGoal>
+                            <nearPositionGoal precision="80.0">
+                                <position x="300.0" y="200.0"/>
+                            </nearPositionGoal>
+                            <nearPositionGoal precision="60.0">
+                                <position x="300.0" y="100.0"/>
+                            </nearPositionGoal>
+                        </positionGoal>
+                    </navigationTask>
+                </inverter>
+            </sequenceSelector>
+        </behavior>
+        <behavior name="priority test">
+            <prioritySelector>
+                <sequenceSelector>
+                    <not name="not in area">
+                        <keepInAreaGoal>
+                            <polygon vertices="0.0 0.0 200.0 0.0 300.0 300.0 0.0 200.0"/>
+                        </keepInAreaGoal>
+                    </not>
+                    <navigationTask name="back to area">
+                        <keepInAreaGoal>
+                            <polygon vertices="0.0 0.0 200.0 0.0 200.0 200.0 0.0 200.0"/>
+                        </keepInAreaGoal>
+                    </navigationTask>
+                </sequenceSelector>
+                <sequenceSelector>
+                    <navigationTask name="get target A">
+                        <nearPositionGoal precision="20.0">
+                            <position x="50.0" y="50.0"/>
+                        </nearPositionGoal>
+                    </navigationTask>
+                    <navigationTask name="get target B">
+                        <nearPositionGoal precision="20.0">
+                            <position x="175.0" y="25.0"/>
+                        </nearPositionGoal>
+                    </navigationTask>
+                    <navigationTask name="get target C">
+                        <nearPositionGoal precision="20.0">
+                            <position x="20.0" y="180.0"/>
+                        </nearPositionGoal>
+                    </navigationTask>
+                    <navigationTask name="get target D">
+                        <nearPositionGoal precision="20.0">
+                            <position x="300.0" y="300.0"/>
+                        </nearPositionGoal>
+                    </navigationTask>
+                </sequenceSelector>
+            </prioritySelector>
+        </behavior>
+        <behavior name="crowd">
+            <prioritySelector>
+                <limiter limit="2">
+                    <sequenceSelector>
+                        <not name="not in area">
+                            <keepInAreaGoal>
+                                <polygon vertices="0.0 0.0 300.0 0.0 500.0 300.0 0.0 500.0"/>
+                            </keepInAreaGoal>
+                        </not>
+                        <navigationTask name="keep in area">
+                            <keepInAreaGoal>
+                                <polygon vertices="0.0 0.0 300.0 0.0 500.0 300.0 0.0 500.0"/>
+                            </keepInAreaGoal>
+                        </navigationTask>
+                    </sequenceSelector>
+                </limiter>
+                <sequenceSelector>
+                    <succeeder>
+                        <limiter limit="3">
+                            <navigationTask name="A">
+                                <nearPositionGoal precision="10.0">
+                                    <position x="100.0" y="50.0"/>
+                                </nearPositionGoal>
+                            </navigationTask>
+                        </limiter>
+                    </succeeder>
+                    <navigationTask name="B">
+                        <nearPositionGoal precision="20.0">
+                            <position x="100.0" y="200.0"/>
+                        </nearPositionGoal>
+                    </navigationTask>
+                    <navigationTask name="C">
+                        <nearPositionGoal precision="60.0">
+                            <position x="300.0" y="100.0"/>
+                        </nearPositionGoal>
+                    </navigationTask>
+                    <limiter limit="2">
+                        <navigationTask name="D">
+                            <nearPositionGoal precision="5.0">
+                                <position x="400.0" y="100.0"/>
+                            </nearPositionGoal>
+                        </navigationTask>
+                    </limiter>
+                    <limiter limit="4">
+                        <navigationTask name="near 2 points">
+                            <positionGoal>
+                                <nearPositionGoal precision="80.0">
+                                    <position x="300.0" y="200.0"/>
+                                </nearPositionGoal>
+                                <nearPositionGoal precision="60.0">
+                                    <position x="300.0" y="100.0"/>
+                                </nearPositionGoal>
+                            </positionGoal>
+                        </navigationTask>
+                    </limiter>
+                </sequenceSelector>
+            </prioritySelector>
+        </behavior>
+    </behaviors>
+</ai>

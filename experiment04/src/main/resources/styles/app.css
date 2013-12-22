@@ -3,7 +3,7 @@
 }
 
 .tree-cell {
-	/*-fx-indent: 0;*/
+	-fx-indent: 20px;
 	-fx-text-fill: #fff;
 	-fx-font-family: Consolas;
 	-fx-background-color: #000;
@@ -15,4 +15,13 @@
 
 .tree-cell:selected {
 	-fx-background-color: #060;
+}
+
+.tree-cell .text {
+	-fx-translate-y: 2px;
+}
+
+.tree-disclosure-node .arrow {
+	-fx-alignment: top-left;
+	-fx-translate-x: -6px;
 }

@@ -6,8 +6,6 @@ import java.util.ResourceBundle;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
-import pl.xesenix.experiments.experiment04.Controller.Project;
-
 import com.google.inject.AbstractModule;
 
 public class AppModule extends AbstractModule
@@ -18,16 +16,5 @@ public class AppModule extends AbstractModule
 		
 		Locale locale = new Locale("pl", "PL");
 		bind(ResourceBundle.class).toInstance(ResourceBundle.getBundle("bundles.app", locale));
-		
-		try
-		{
-			bind(JAXBContext.class).toInstance(JAXBContext.newInstance(
-				Project.class
-			));
-		}
-		catch (JAXBException e)
-		{
-			e.printStackTrace();
-		}
 	}
 }
