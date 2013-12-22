@@ -1,0 +1,18 @@
+.tree-view {
+	-fx-background-color: #000;
+}
+
+.tree-cell {
+	/*-fx-indent: 0;*/
+	-fx-text-fill: #fff;
+	-fx-font-family: Consolas;
+	-fx-background-color: #000;
+}
+
+.tree-cell:expanded {
+	-fx-background-color: #222;
+}
+
+.tree-cell:selected {
+	-fx-background-color: #060;
+}

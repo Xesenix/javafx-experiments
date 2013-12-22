@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.layout.AnchorPane;
 
 import javax.xml.bind.JAXBContext;
@@ -28,8 +28,8 @@ import com.google.inject.Inject;
 public class Controller
 {
 	private static final Logger log = LoggerFactory.getLogger(Controller.class);
-	
-	
+
+
 	@FXML
 	private ResourceBundle resources;
 
@@ -40,6 +40,10 @@ public class Controller
 
 	@FXML
 	private TreeView<Object> treeView;
+
+
+	@FXML
+	private TextArea console;
 
 
 	@FXML
@@ -56,11 +60,14 @@ public class Controller
 	@FXML
 	void initialize()
 	{
+		assert console != null : "fx:id=\"console\" was not injected: check your FXML file 'app.fxml'.";
 		assert treeView != null : "fx:id=\"treeView\" was not injected: check your FXML file 'app.fxml'.";
 		assert view != null : "fx:id=\"view\" was not injected: check your FXML file 'app.fxml'.";
 
 		project = new Project();
+		
 		List<Entity> entties = project.getEntities();
+		
 		String[] types = new String[] {
 			"Health",
 			"Mana",
@@ -95,8 +102,8 @@ public class Controller
 				c.getProperties().add(max);
 			}
 		}
-		
-		getProjectAsXmlString();
+
+		console.setText(getProjectAsXmlString());
 
 		TreeItem<Object> rootNode = new TreeItem<Object>(entties);
 
@@ -121,12 +128,18 @@ public class Controller
 			rootNode.getChildren().add(entityNode);
 		}
 
-		treeView.setCellFactory(CheckBoxTreeCell.<Object> forTreeView());
+		/*treeView.setCellFactory(new Callback<TreeView<Object>, TreeCell<Object>>() {
+			
+			public TreeCell<Object> call(TreeView<Object> root)
+			{
+				return root.getRoot().getValue();
+			}
+		});*/
 
 		treeView.setRoot(rootNode);
 	}
-	
-	
+
+
 	public String getProjectAsXmlString()
 	{
 		StringWriter xmlWriter = new StringWriter();
@@ -151,22 +164,26 @@ public class Controller
 	}
 	
 	
+	//public static TreeCell
+
+
 	@XmlRootElement
 	public static class Project
 	{
 		private List<Entity> entities = new ArrayList<Entity>();
+
 
 		public List<Entity> getEntities()
 		{
 			return entities;
 		}
 
+
 		public void setEntities(List<Entity> entities)
 		{
 			this.entities = entities;
 		}
 	}
-
 
 	@XmlRootElement
 	public static class Entity
@@ -217,7 +234,6 @@ public class Controller
 		}
 	}
 
-	
 	@XmlRootElement
 	public static class Component
 	{
@@ -225,8 +241,8 @@ public class Controller
 
 
 		private String type;
-		
-		
+
+
 		public Component()
 		{
 		}
@@ -256,7 +272,6 @@ public class Controller
 		}
 	}
 
-	
 	@XmlRootElement
 	public static class Property
 	{
@@ -267,8 +282,8 @@ public class Controller
 
 
 		private String name;
-		
-		
+
+
 		public Property()
 		{
 			// TODO Auto-generated constructor stub
