@@ -6,6 +6,7 @@
 <?import javafx.scene.effect.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.*?>
 <?scenebuilder-classpath-element ../../../../target/classes?>
 <?scenebuilder-stylesheet ../../../../target/classes/styles/app.css?>
 <?scenebuilder-stylesheet ../styles/app.css?>
@@ -22,7 +23,11 @@
                 <TextArea fx:id="console" prefHeight="598.0" prefWidth="396.0" wrapText="false" VBox.vgrow="ALWAYS" />
                 <ToolBar>
                   <items>
-                    <Button mnemonicParsing="false" onAction="#loadXml" text="%button.load" />
+                    <Button cancelButton="false" defaultButton="false" mnemonicParsing="false" onAction="#loadXml" text="%button.load" underline="false">
+                      <font>
+                        <Font name="Consolas" size="12.0" />
+                      </font>
+                    </Button>
                   </items>
                 </ToolBar>
               </children>
@@ -31,7 +36,7 @@
         </AnchorPane>
         <AnchorPane minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0">
           <children>
-            <TreeView fx:id="treeView" cache="false" cacheHint="DEFAULT" depthTest="ENABLE" prefHeight="598.0" prefWidth="396.0" showRoot="false" style="" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <TreeView fx:id="treeView" cache="false" cacheHint="DEFAULT" depthTest="ENABLE" disable="false" editable="true" prefHeight="598.0" prefWidth="396.0" showRoot="false" style="" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
           </children>
         </AnchorPane>
       </items>
