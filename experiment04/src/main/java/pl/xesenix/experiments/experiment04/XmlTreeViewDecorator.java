@@ -3,7 +3,10 @@ package pl.xesenix.experiments.experiment04;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jdom.Document;
@@ -44,16 +47,34 @@ public class XmlTreeViewDecorator
 		private final XmlTreeViewDecorator helper;
 
 
-		private KeyCodeCombination expandAllKeyCombination = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.SHIFT_DOWN);
+		private KeyCodeCombination editKeyCombination = new KeyCodeCombination(KeyCode.ENTER);
 
 
-		private KeyCodeCombination collapseAllKeyCombination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.SHIFT_DOWN);
+		private KeyCodeCombination clearSelectionKeyCombination = new KeyCodeCombination(KeyCode.ESCAPE);
 
 
-		private KeyCodeCombination prevNodeKeyCombination = new KeyCodeCombination(KeyCode.UP, KeyCombination.SHIFT_DOWN);
+		private KeyCodeCombination expandAllKeyCombination = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.CONTROL_DOWN);
 
 
-		private KeyCodeCombination nextNodeKeyCombination = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.SHIFT_DOWN);
+		private KeyCodeCombination collapseAllKeyCombination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
+
+
+		private KeyCodeCombination expandKeyCombination = new KeyCodeCombination(KeyCode.RIGHT);
+
+
+		private KeyCodeCombination collapseKeyCombination = new KeyCodeCombination(KeyCode.LEFT);
+
+
+		private KeyCodeCombination prevSiblingKeyCombination = new KeyCodeCombination(KeyCode.UP, KeyCombination.ALT_DOWN);
+
+
+		private KeyCodeCombination nextSiblingKeyCombination = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.ALT_DOWN);
+
+
+		private KeyCodeCombination prevRowKeyCombination = new KeyCodeCombination(KeyCode.UP);
+
+
+		private KeyCodeCombination nextRowKeyCombination = new KeyCodeCombination(KeyCode.DOWN);
 
 
 		private KeyCodeCombination copyKeyCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
@@ -73,35 +94,78 @@ public class XmlTreeViewDecorator
 		{
 			if (event.getEventType().equals(KeyEvent.KEY_PRESSED))
 			{
-				if (prevNodeKeyCombination.match(event))
+				if (prevSiblingKeyCombination.match(event))
 				{
-					log.debug("prev");
-					helper.selectPrevSibling();
+					log.debug("prev-sibling");
+					helper.focusPrevSibling();
 					
 					event.consume();
 				}
-				else if (nextNodeKeyCombination.match(event))
+				else if (nextSiblingKeyCombination.match(event))
 				{
-					log.debug("next");
-					helper.selectNextSibling();
+					log.debug("next-sibling");
+					helper.focusNextSibling();
 					
 					event.consume();
-				}	
+				}
+				else if (prevRowKeyCombination.match(event))
+				{
+					log.debug("prev");
+					helper.focusPrevRow();
+					
+					event.consume();
+				}
+				else if (nextRowKeyCombination.match(event))
+				{
+					log.debug("next");
+					helper.focusNextRow();
+					
+					event.consume();
+				}
+				else if (expandKeyCombination.match(event))
+				{
+					log.debug("expand");
+					helper.expandFocused();
+					
+					event.consume();
+				}
+				else if (collapseKeyCombination.match(event))
+				{
+					log.debug("collapse");
+					helper.collapseFocused();
+					
+					event.consume();
+				}
+				else if (editKeyCombination.match(event))
+				{
+					log.debug("edit");
+					
+					if (helper.editFocused())
+					{
+						event.consume();
+					}
+				}
+				else if (clearSelectionKeyCombination.match(event))
+				{
+					log.debug("clear-selection");
+					
+					helper.clearSelection();
+				}
 			}
 			else if (event.getEventType().equals(KeyEvent.KEY_RELEASED))
 			{
 				if (expandAllKeyCombination.match(event))
 				{
-					log.debug("expand");
-					helper.expandAll(treeView.getSelectionModel().getSelectedItem());
+					log.debug("expand-all");
+					helper.expandAllSelected();
 					
 					// treeView.getSelectionModel().select(index);
 					// treeView.scrollTo(index);
 				}
 				else if (collapseAllKeyCombination.match(event))
 				{
-					log.debug("collapse");
-					helper.collapseAll(treeView.getSelectionModel().getSelectedItem());
+					log.debug("collapse-all");
+					helper.collapseAllSelected();
 					
 					// treeView.getSelectionModel().select(index);
 					// treeView.scrollTo(index);
@@ -138,7 +202,6 @@ public class XmlTreeViewDecorator
 	{
 		this.treeView = treeView;
 	}
-
 
 	public XmlTreeViewDecorator(final TreeView<Object> treeView)
 	{
@@ -178,54 +241,186 @@ public class XmlTreeViewDecorator
 			
 		});
 	}
-	
-	
-	protected void selectNextSibling()
+
+
+	public void clearSelection()
 	{
-		TreeItem<Object> root = getTreeView().getSelectionModel().getSelectedItem();
+		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
 		
+		treeView.getSelectionModel().clearSelection();
+		treeView.getFocusModel().focus(focusedItemIndex);
+	}
+
+
+	public boolean editFocused()
+	{
+		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
+		
+		if (focusedItem != null && !focusedItem.equals(treeView.getEditingItem()))
+		{
+			treeView.edit(focusedItem);
+			
+			return true;
+		}
+		
+		return false;
+	}
+
+
+	public void focusNextRow()
+	{
+		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
+		
+		treeView.getFocusModel().focus(focusedItemIndex + 1);
+		
+		if (treeView.getFocusModel().getFocusedIndex() == -1)
+		{
+			treeView.getFocusModel().focus(focusedItemIndex);
+		}
+		
+		treeView.scrollTo(treeView.getFocusModel().getFocusedIndex());
+	}
+
+
+	public void focusPrevRow()
+	{
+		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
+		
+		treeView.getFocusModel().focus(focusedItemIndex - 1);
+		
+		if (treeView.getFocusModel().getFocusedIndex() == -1)
+		{
+			treeView.getFocusModel().focus(focusedItemIndex);
+		}
+		
+		treeView.scrollTo(treeView.getFocusModel().getFocusedIndex());
+	}
+	
+	
+	protected void focusNextSibling()
+	{
+		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
+		
+		if (focusedItem != null)
+		{
+			TreeItem<Object> next = focusedItem.nextSibling();
+			
+			if (next != null)
+			{
+				int nextIndex = treeView.getRow(next);
+				
+				treeView.getFocusModel().focus(nextIndex);
+				treeView.scrollTo(nextIndex);
+			}
+		}
+	}
+
+
+	protected void focusPrevSibling()
+	{
+		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
+		
+		if (focusedItem != null)
+		{
+			TreeItem<Object> prev = focusedItem.previousSibling();
+			
+			if (prev != null)
+			{
+				int prevIndex = treeView.getRow(prev);
+				
+				treeView.getFocusModel().focus(prevIndex);
+				treeView.scrollTo(prevIndex);
+			}
+		}
+	}
+
+
+	public void expandFocused()
+	{
+		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
+		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
+		
+		if (focusedItem != null)
+		{
+			expandLevel(focusedItem);
+			treeView.getFocusModel().focus(focusedItemIndex);
+		}
+	}
+	
+	
+	public void expandLevel(TreeItem<Object> root)
+	{
 		if (root != null)
 		{
-			TreeItem<Object> parent = (TreeItem<Object>) root.getParent();
-			
-			if (parent != null)
+			if (!root.isExpanded())
 			{
-				int index = parent.getChildren().indexOf(root);
-				
-				if (index < parent.getChildren().size() - 1)
+				root.setExpanded(true);
+			}
+			else
+			{
+				for (TreeItem<Object> child : root.getChildren())
 				{
-					TreeItem<Object> next = parent.getChildren().get(index + 1);
-					int nextIndex = getTreeView().getRow(next);
-					
-					getTreeView().getSelectionModel().select(nextIndex);
-					getTreeView().scrollTo(nextIndex);
+					expandLevel(child);
 				}
 			}
 		}
 	}
 
 
-	protected void selectPrevSibling()
+	public void collapseFocused()
 	{
-		TreeItem<Object> root = getTreeView().getSelectionModel().getSelectedItem();
+		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
+		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
 		
+		if (focusedItem != null)
+		{
+			collapseLevel(focusedItem);
+			treeView.getFocusModel().focus(focusedItemIndex);
+		}
+	}
+	
+	
+	public void collapseLevel(TreeItem<Object> root)
+	{
 		if (root != null)
 		{
-			TreeItem<Object> parent = (TreeItem<Object>) root.getParent();
+			boolean anyExpanded = false;
 			
-			if (parent != null)
+			for (TreeItem<Object> child : root.getChildren())
 			{
-				int index = parent.getChildren().indexOf(root);
-				
-				if (index > 0)
+				anyExpanded |= child.isExpanded();
+			}
+			
+			if (anyExpanded)
+			{
+				for (TreeItem<Object> child : root.getChildren())
 				{
-					TreeItem<Object> prev = parent.getChildren().get(index - 1);
-					int prevIndex = getTreeView().getRow(prev);
-					
-					getTreeView().getSelectionModel().select(prevIndex);
-					getTreeView().scrollTo(prevIndex);
+					collapseLevel(child);
 				}
 			}
+			else
+			{
+				root.setExpanded(false);
+			}
+		}
+	}
+
+
+	public void expandAllSelected()
+	{
+		List<TreeItem<Object>> selected = new ArrayList<TreeItem<Object>>(treeView.getSelectionModel().getSelectedItems());
+		
+		log.debug("selected {}", selected);
+		log.debug("selected {}", treeView.getSelectionModel().getSelectedIndex());
+		
+		for (TreeItem<Object> selectedItem : selected)
+		{
+			expandAll(selectedItem);
+		}
+		
+		for (TreeItem<Object> selectedItem : selected)
+		{
+			treeView.getSelectionModel().select(selectedItem);
 		}
 	}
 
@@ -240,6 +435,27 @@ public class XmlTreeViewDecorator
 			}
 			
 			root.setExpanded(true);
+		}
+	}
+
+
+	public void collapseAllSelected()
+	{
+		List<TreeItem<Object>> selected = new ArrayList<TreeItem<Object>>(treeView.getSelectionModel().getSelectedItems());
+		
+		log.debug("selected {}", selected);
+		
+		for (TreeItem<Object> selectedItem : selected)
+		{
+			collapseAll(selectedItem);
+		}
+		
+		log.debug("selected {}", selected);
+		
+		for (TreeItem<Object> selectedItem : selected)
+		{
+			treeView.getSelectionModel().select(selectedItem);
+			//selectedItem.setExpanded(false);
 		}
 	}
 	

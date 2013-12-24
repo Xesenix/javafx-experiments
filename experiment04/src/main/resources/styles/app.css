@@ -13,10 +13,17 @@
 	-fx-background-color: #222;
 }
 
-.tree-cell:focused,
+.tree-cell:focused {
+	-fx-background-color: #030;
+}
+
 .tree-cell:selected {
 	-fx-text-fill: #fff;
 	-fx-background-color: #060;
+}
+
+.tree-cell:focused {
+	-fx-text-fill: #ff8;
 }
 
 .tree-cell .tree-disclosure-node .arrow {
