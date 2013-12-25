@@ -76,25 +76,21 @@ public class XmlTreeCell extends TreeCell<Object>
 	{
 		super.startEdit();
 		
-		editField.getStyleClass().removeAll("xml-element", "xml-attribute", "xml-text");
+		editLine.getStyleClass().removeAll("xml-element", "xml-attribute", "xml-text");
 		
 		Object data = getItem();
 		
 		if (data instanceof Element)
 		{
-			prefixLabel.setText("<");
 			editField.setText(((Element) data).getName());
-			postfixLabel.setText("/>");
-			
-			editField.getStyleClass().add("xml-element");
+			editLine.getStyleClass().add("xml-element");
 		}
 		else if (data instanceof Attribute)
 		{
-			prefixLabel.setText(((Attribute) data).getName() + " = ");
 			editField.setText(((Attribute) data).getValue());
 			postfixLabel.setText("");
 			
-			editField.getStyleClass().add("xml-attribute");
+			editLine.getStyleClass().add("xml-attribute");
 		}
 		else
 		{
@@ -102,7 +98,7 @@ public class XmlTreeCell extends TreeCell<Object>
 			editField.setText(((Text) data).getText());
 			postfixLabel.setText(null);
 			
-			editField.getStyleClass().add("xml-text");
+			editLine.getStyleClass().add("xml-text");
 		}
 		
 		setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -193,10 +189,18 @@ public class XmlTreeCell extends TreeCell<Object>
 			if (element.getContent().isEmpty())
 			{
 				setText(String.format("<%s%s/>", element.getName(), attributes));
+				
+				prefixLabel.setText("<");
+				editField.setText(element.getName());
+				postfixLabel.setText(String.format("%s", attributes));
 			}
 			else
 			{
 				setText(String.format("<%s%s>...</%s>", element.getName(), attributes, element.getName()));
+
+				prefixLabel.setText("<");
+				editField.setText(element.getName());
+				postfixLabel.setText(String.format("%s>...</%s>", attributes, element.getName()));
 			}
 			
 			setContextMenu(getElementMenu());
@@ -209,6 +213,10 @@ public class XmlTreeCell extends TreeCell<Object>
 			
 			setText(String.format("%s = %s", attribute.getName(), attribute.getValue()));
 			
+			prefixLabel.setText(attribute.getName() + " = ");
+			editField.setText(attribute.getValue());
+			postfixLabel.setText("// attribute");
+			
 			setContextMenu(getAttributeMenu());
 			
 			getStyleClass().add("xml-attribute");
@@ -218,6 +226,10 @@ public class XmlTreeCell extends TreeCell<Object>
 			Text text = (Text) data;
 			
 			setText(text.getTextNormalize());
+			
+			prefixLabel.setText(null);
+			editField.setText(text.getTextNormalize());
+			postfixLabel.setText("// text");
 			
 			setContextMenu(getTextMenu());
 			

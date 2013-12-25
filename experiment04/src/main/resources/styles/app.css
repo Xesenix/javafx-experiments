@@ -1,3 +1,11 @@
+.text-area {
+	-fx-accent: #080;
+	-fx-text-fill: #fff;
+	-fx-font-family: Consolas;
+	-fx-background-color: #000;
+}
+
+
 .tree-view {
 	-fx-background-color: #000;
 }
@@ -52,11 +60,15 @@
 	-fx-translate-y: -1px;
 }
 
-.xml-element {
+.xml-element,
+.xml-element .prefix-text,
+.xml-element .postfix-text {
 	-fx-text-fill: #aaa;
 }
 
-.xml-attribute {
+.xml-attribute,
+.xml-attribute .prefix-text,
+.xml-attribute .postfix-text {
 	-fx-text-fill: #8f8;
 }
 
@@ -64,6 +76,6 @@
 	-fx-text-fill: #8f8;
 }
 
-.tree-cell .text-field.xml-attribute {
-	-fx-width: 100%;
+.xml-attribute .xml-text {
+	-fx-width: 500px;
 }

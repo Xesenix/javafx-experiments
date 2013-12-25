@@ -57,7 +57,7 @@ public class Controller
 	private AnchorPane view;
 
 
-	private XmlTreeViewDecorator xmlTreeViewDecorator;
+	private XmlTreeViewMediator xmlTreeViewDecorator;
 
 
 	@FXML
@@ -77,7 +77,7 @@ public class Controller
 		assert treeView != null : "fx:id=\"treeView\" was not injected: check your FXML file 'app.fxml'.";
 		assert view != null : "fx:id=\"view\" was not injected: check your FXML file 'app.fxml'.";
 		
-		xmlTreeViewDecorator = new XmlTreeViewDecorator(treeView);
+		xmlTreeViewDecorator = new XmlTreeViewMediator(treeView);
 		
 		InputStream in = getClass().getResourceAsStream("/test.xml");
 		console.setText(IOUtil.toString(in));
