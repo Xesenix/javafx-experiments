@@ -14,6 +14,9 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 	private KeyCodeCombination editKeyCombination = new KeyCodeCombination(KeyCode.ENTER);
 
 
+	private KeyCodeCombination deleteKeyCombination = new KeyCodeCombination(KeyCode.DELETE);
+
+
 	private KeyCodeCombination clearSelectionKeyCombination = new KeyCodeCombination(KeyCode.ESCAPE);
 
 
@@ -64,6 +67,12 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 
 	public void handle(KeyEvent event)
 	{
+		// if something is editing leave keyboard handling to tree cell
+		if (mediator.getTreeView().getEditingItem() != null)
+		{
+			return;
+		}
+		
 		if (event.getEventType().equals(KeyEvent.KEY_PRESSED))
 		{
 			if (prevSiblingKeyCombination.match(event))
@@ -120,7 +129,6 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 			else if (clearSelectionKeyCombination.match(event))
 			{
 				XmlTreeViewMediator.log.debug("clear-selection");
-				
 				mediator.clearSelection();
 			}
 		}
@@ -150,6 +158,11 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 			{
 				XmlTreeViewMediator.log.debug("deselect");
 				mediator.deselectFocussed();
+			}
+			else if (deleteKeyCombination.match(event))
+			{
+				XmlTreeViewMediator.log.debug("delete");
+				mediator.deleteSelected();
 			}
 			else if (copyKeyCombination.match(event))
 			{

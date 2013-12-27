@@ -3,7 +3,9 @@ package pl.xesenix.experiments.experiment04;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javafx.event.EventHandler;
@@ -11,6 +13,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.TreeView.EditEvent;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
@@ -64,6 +67,16 @@ public class XmlTreeViewMediator
 			}
 		});
 		
+		treeView.setOnEditCommit(new EventHandler<TreeView.EditEvent<Object>>() {
+
+			public void handle(TreeView.EditEvent<Object> event)
+			{
+				log.debug("new {}", event.getNewValue());
+				log.debug("old {}", event.getOldValue());
+			}
+			
+		});
+		
 		treeView.addEventFilter(KeyEvent.ANY, new XmlTreeViewKeyboardController(this));
 		treeView.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
 
@@ -114,36 +127,17 @@ public class XmlTreeViewMediator
 
 	public void selectFocussed()
 	{
-		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
+		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
 		
-		if (focusedItem != null)
-		{
-			treeView.getSelectionModel().select(focusedItem);
-		}
+		treeView.getSelectionModel().select(focusedItemIndex);
 	}
 
 
 	public void deselectFocussed()
 	{
 		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
-		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
 		
-		if (focusedItem != null)
-		{
-			Object[] selected = treeView.getSelectionModel().getSelectedItems().toArray();
-			
-			treeView.getSelectionModel().clearSelection();
-			
-			for (int i = 0; i < selected.length; i++)
-			{
-				if (!focusedItem.equals(selected[i]))
-				{
-					treeView.getSelectionModel().select((TreeItem<Object>) selected[i]);
-				}
-			}
-			
-			treeView.getFocusModel().focus(focusedItemIndex);
-		}
+		treeView.getSelectionModel().clearSelection(focusedItemIndex);
 	}
 
 
@@ -372,6 +366,27 @@ public class XmlTreeViewMediator
 			treeView.getFocusModel().focus(focusedItemIndex);
 		}
 	}
+	
+	
+	public void deleteSelected()
+	{
+		List<TreeItem<Object>> itemsToRemove = new ArrayList<TreeItem<Object>>();
+		
+		for (TreeItem<Object> selectedItem : treeView.getSelectionModel().getSelectedItems())
+		{
+			itemsToRemove.add(selectedItem);
+		}
+		
+		for (TreeItem<Object> item : itemsToRemove)
+		{
+			TreeItem<Object> parent = item.getParent();
+			
+			if (parent != null)
+			{
+				parent.getChildren().remove(item);
+			}
+		}
+	}
 
 
 	public void copySelectedItemToClipboard()
@@ -401,6 +416,21 @@ public class XmlTreeViewMediator
 			Clipboard clipboard = Clipboard.getSystemClipboard();
 			clipboard.setContent(map);
 		}
+	}
+	
+	
+	public String copyElementToString()
+	{
+		String result = "";
+		
+		/*if (data instanceof Element)
+		{
+			XMLOutputter xmlOut = new XMLOutputter();
+			String xml = xmlOut.outputString((Element) data);
+		
+		}*/
+		
+		return result;
 	}
 
 
@@ -459,7 +489,7 @@ public class XmlTreeViewMediator
 			e.printStackTrace();
 		}
 		
-		return new TreeItem<Object>(new Text(source));
+		return new XmlTreeItem(new Text(source));
 	}
 
 
@@ -468,11 +498,11 @@ public class XmlTreeViewMediator
 	 */
 	public TreeItem<Object> converToTreeItem(Element xmlNode)
 	{
-		TreeItem<Object> rootNode = new TreeItem<Object>(xmlNode);
+		TreeItem<Object> rootNode = new XmlTreeItem(xmlNode);
 
 		for (Object obj : xmlNode.getAttributes())
 		{
-			rootNode.getChildren().add(new TreeItem<Object>(obj));
+			rootNode.getChildren().add(new XmlTreeItem(obj));
 		}
 
 		for (Object obj : xmlNode.getContent())
@@ -481,7 +511,7 @@ public class XmlTreeViewMediator
 			{
 				if (!((Text) obj).getTextTrim().isEmpty())
 				{
-					rootNode.getChildren().add(new TreeItem<Object>(obj));
+					rootNode.getChildren().add(new XmlTreeItem(obj));
 				}
 			}
 			else if (obj instanceof Element)

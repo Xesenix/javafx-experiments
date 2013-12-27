@@ -1,6 +1,8 @@
 package pl.xesenix.experiments.experiment04;
 
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContentDisplay;
@@ -18,9 +20,14 @@ import javafx.scene.layout.VBox;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class XmlTreeCell extends TreeCell<Object>
 {
+	static final Logger log = LoggerFactory.getLogger(XmlTreeCell.class);
+	
+	
 	private HBox editLine = new HBox();
 	
 	
@@ -61,7 +68,7 @@ public class XmlTreeCell extends TreeCell<Object>
 			{
 				if (event.getCode() == KeyCode.ENTER)
 				{
-					commitEdit(editField.getText());
+					commitEdit(collectNewValue());
 				}
 				else if (event.getCode() == KeyCode.ESCAPE || event.getCode() == KeyCode.UP || event.getCode() == KeyCode.DOWN)
 				{
@@ -114,26 +121,38 @@ public class XmlTreeCell extends TreeCell<Object>
 			}
 		});
 	}
-
-
-	public void commitEdit(Object newValue)
+	
+	
+	private Object collectNewValue()
 	{
 		Object data = getItem();
 		
 		if (data instanceof Element)
 		{
-			((Element) data).setName((String) newValue);
+			Element element = (Element) ((Element) data).clone();
+			Element parent = (Element) ((Element) data).getParent();
+			
+			element.setName(editField.getText());
+			
+			// update in parent
+			parent.setContent(parent.indexOf((Element) data), element);
+			
+			return element;
 		}
 		else if (data instanceof Attribute)
 		{
-			((Attribute) data).setValue((String) newValue);
-		}
-		else
-		{
-			((Text) data).setText((String) newValue);
+			Attribute attribute = (Attribute) ((Attribute) data).clone();
+			Element parent = (Element) ((Attribute) data).getParent();
+			
+			attribute.setValue(editField.getText());
+			
+			// update in parent
+			parent.setAttribute(attribute.getName(), attribute.getValue());
+			
+			return attribute;
 		}
 		
-		super.commitEdit(data);
+		return new Text(editField.getText());
 	}
 
 
