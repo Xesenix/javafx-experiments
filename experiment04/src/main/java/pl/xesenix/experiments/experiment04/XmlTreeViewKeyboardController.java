@@ -23,7 +23,10 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 	private KeyCodeCombination selectCurrentKeyCombination = new KeyCodeCombination(KeyCode.SPACE);
 
 
-	private KeyCodeCombination addToSelectionCurrentKeyCombination = new KeyCodeCombination(KeyCode.SPACE, KeyCombination.CONTROL_DOWN);
+	// private KeyCodeCombination toggleSelectionOnFocussedKeyCombination = new KeyCodeCombination(KeyCode.SPACE, KeyCombination.CONTROL_DOWN);
+
+
+	// private KeyCodeCombination addToSelectionCurrentFocussedKeyCombination = new KeyCodeCombination(KeyCode.SPACE, KeyCombination.CONTROL_DOWN);
 
 
 	private KeyCodeCombination deselectCurrentKeyCombination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
@@ -73,6 +76,9 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 			return;
 		}
 		
+		// to override any native control uncomment
+		// event.consume();
+		
 		if (event.getEventType().equals(KeyEvent.KEY_PRESSED))
 		{
 			if (prevSiblingKeyCombination.match(event))
@@ -117,6 +123,11 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 				
 				event.consume();
 			}
+			else if (clearSelectionKeyCombination.match(event))
+			{
+				XmlTreeViewMediator.log.debug("clear-selection");
+				mediator.clearSelection();
+			}
 			else if (editKeyCombination.match(event))
 			{
 				XmlTreeViewMediator.log.debug("edit");
@@ -125,11 +136,6 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 				{
 					event.consume();
 				}
-			}
-			else if (clearSelectionKeyCombination.match(event))
-			{
-				XmlTreeViewMediator.log.debug("clear-selection");
-				mediator.clearSelection();
 			}
 		}
 		else if (event.getEventType().equals(KeyEvent.KEY_RELEASED))
@@ -148,17 +154,24 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 			{
 				XmlTreeViewMediator.log.debug("select");
 				mediator.setFocussedAsSelection();
+				
+				event.consume();
 			}
-			else if (addToSelectionCurrentKeyCombination.match(event))
+			/* 
+			else if (addToSelectionCurrentFocussedKeyCombination.match(event))
 			{
 				XmlTreeViewMediator.log.debug("add-to-selection");
 				mediator.selectFocussed();
+				
+				event.consume();
 			}
 			else if (deselectCurrentKeyCombination.match(event))
 			{
 				XmlTreeViewMediator.log.debug("deselect");
 				mediator.deselectFocussed();
-			}
+				
+				event.consume();
+			}*/
 			else if (deleteKeyCombination.match(event))
 			{
 				XmlTreeViewMediator.log.debug("delete");

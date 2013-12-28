@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ContextMenu;
@@ -186,6 +187,7 @@ public class XmlTreeCell extends TreeCell<Object>
 	{
 		setContextMenu(null);
 		setContentDisplay(ContentDisplay.LEFT);
+		// to remove in 1.8
 		setGraphic(getTreeItem().getGraphic());
 		
 		if (data instanceof Element)

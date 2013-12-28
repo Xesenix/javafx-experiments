@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javafx.collections.ListChangeListener;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeCell;
@@ -29,15 +31,17 @@ import org.jdom.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.javafx.collections.NonIterableChange.SimplePermutationChange;
+
 
 public class XmlTreeViewMediator
 {
 	static final Logger log = LoggerFactory.getLogger(XmlTreeViewMediator.class);
-	
-	
+
+
 	private TreeView<Object> treeView;
-	
-	
+
+
 	private Map<TreeItem<Object>, Integer> nodeDepthMap = new HashMap<TreeItem<Object>, Integer>();
 
 
@@ -55,6 +59,7 @@ public class XmlTreeViewMediator
 		this.treeView = treeView;
 	}
 
+
 	public XmlTreeViewMediator(final TreeView<Object> treeView)
 	{
 		setTreeView(treeView);
@@ -66,49 +71,15 @@ public class XmlTreeViewMediator
 				return new XmlTreeCell();
 			}
 		});
-		
-		treeView.setOnEditCommit(new EventHandler<TreeView.EditEvent<Object>>() {
 
-			public void handle(TreeView.EditEvent<Object> event)
-			{
-				log.debug("new {}", event.getNewValue());
-				log.debug("old {}", event.getOldValue());
-			}
-			
-		});
-		
 		treeView.addEventFilter(KeyEvent.ANY, new XmlTreeViewKeyboardController(this));
-		treeView.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-			public void handle(MouseEvent event)
-			{
-				log.debug("filter {}", event);
-				log.debug("{}", treeView.getSelectionModel().getSelectedIndex());
-				log.debug("{}", treeView.getFocusModel().getFocusedIndex());
-			}
-			
-		});
-		
-		treeView.addEventHandler(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
-
-			public void handle(MouseEvent event)
-			{
-				log.debug("handler {}", event);
-				log.debug("{}", treeView.getSelectionModel().getSelectedIndex());
-				log.debug("{}", treeView.getFocusModel().getFocusedIndex());
-				
-				// fix
-				//treeView.getFocusModel().focus(treeView.getSelectionModel().getSelectedIndex());
-			}
-			
-		});
 	}
 
 
 	public void clearSelection()
 	{
 		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
-		
+
 		treeView.getSelectionModel().clearSelection();
 		treeView.getFocusModel().focus(focusedItemIndex);
 	}
@@ -117,10 +88,24 @@ public class XmlTreeViewMediator
 	public void setFocussedAsSelection()
 	{
 		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
-		
+
 		if (focusedItemIndex >= 0)
 		{
 			treeView.getSelectionModel().clearAndSelect(focusedItemIndex);
+		}
+	}
+	
+	public void toggleSelectionOnFocused()
+	{
+		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
+		
+		if (treeView.getSelectionModel().isSelected(focusedItemIndex))
+		{
+			treeView.getSelectionModel().clearSelection(focusedItemIndex);
+		}
+		else
+		{
+			treeView.getSelectionModel().select(focusedItemIndex);
 		}
 	}
 
@@ -128,7 +113,7 @@ public class XmlTreeViewMediator
 	public void selectFocussed()
 	{
 		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
-		
+
 		treeView.getSelectionModel().select(focusedItemIndex);
 	}
 
@@ -136,7 +121,7 @@ public class XmlTreeViewMediator
 	public void deselectFocussed()
 	{
 		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
-		
+
 		treeView.getSelectionModel().clearSelection(focusedItemIndex);
 	}
 
@@ -144,14 +129,14 @@ public class XmlTreeViewMediator
 	public boolean editFocused()
 	{
 		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
-		
+
 		if (focusedItem != null && !focusedItem.equals(treeView.getEditingItem()))
 		{
 			treeView.edit(focusedItem);
-			
+
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -159,14 +144,14 @@ public class XmlTreeViewMediator
 	public void focusNextRow()
 	{
 		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
-		
+
 		treeView.getFocusModel().focus(focusedItemIndex + 1);
-		
+
 		if (treeView.getFocusModel().getFocusedIndex() == -1)
 		{
 			treeView.getFocusModel().focus(focusedItemIndex);
 		}
-		
+
 		treeView.scrollTo(treeView.getFocusModel().getFocusedIndex());
 	}
 
@@ -174,30 +159,30 @@ public class XmlTreeViewMediator
 	public void focusPrevRow()
 	{
 		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
-		
+
 		treeView.getFocusModel().focus(focusedItemIndex - 1);
-		
+
 		if (treeView.getFocusModel().getFocusedIndex() == -1)
 		{
 			treeView.getFocusModel().focus(focusedItemIndex);
 		}
-		
+
 		treeView.scrollTo(treeView.getFocusModel().getFocusedIndex());
 	}
-	
-	
+
+
 	protected void focusNextSibling()
 	{
 		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
-		
+
 		if (focusedItem != null)
 		{
 			TreeItem<Object> next = focusedItem.nextSibling();
-			
+
 			if (next != null)
 			{
 				int nextIndex = treeView.getRow(next);
-				
+
 				treeView.getFocusModel().focus(nextIndex);
 				treeView.scrollTo(nextIndex);
 			}
@@ -208,84 +193,84 @@ public class XmlTreeViewMediator
 	protected void focusPrevSibling()
 	{
 		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
-		
+
 		if (focusedItem != null)
 		{
 			TreeItem<Object> prev = focusedItem.previousSibling();
-			
+
 			if (prev != null)
 			{
 				int prevIndex = treeView.getRow(prev);
-				
+
 				treeView.getFocusModel().focus(prevIndex);
 				treeView.scrollTo(prevIndex);
 			}
 		}
 	}
-	
-	
+
+
 	public int getExpandedDepth(TreeItem<Object> root)
 	{
 		Integer cached = nodeDepthMap.get(root);
-		
+
 		if (cached == null)
 		{
 			int depth = 0;
-			
+
 			if (root.isExpanded())
 			{
 				for (TreeItem<Object> child : root.getChildren())
 				{
 					int nodeDepth = getExpandedDepth(child) + 1;
-					
+
 					if (depth < nodeDepth)
 					{
 						depth = nodeDepth;
 					}
 				}
 			}
-			
+
 			cached = depth;
-			
+
 			nodeDepthMap.put(root, cached);
 		}
-		
+
 		return cached;
 	}
-	
-	
+
+
 	public int getNodeLevel(TreeItem<Object> node)
 	{
 		Integer cached = nodeLevelMap.get(node);
-		
+
 		if (cached == null)
 		{
 			int level = 0;
-			
+
 			TreeItem<Object> parent = node.getParent();
-			
+
 			if (parent != null)
 			{
 				level = getNodeLevel(parent) + 1;
 			}
-			
+
 			cached = level;
-			
+
 			nodeDepthMap.put(node, cached);
 		}
-		
+
 		return cached;
 	}
-	
-	
+
+
 	public void expandLevel(TreeItem<Object> root, int level)
 	{
 		if (root != null)
 		{
 			boolean expand = level == -1 || getNodeLevel(root) < level;
-			
+
 			root.setExpanded(expand);
-			
+
 			if (expand)
 			{
 				for (TreeItem<Object> child : root.getChildren())
@@ -301,14 +286,14 @@ public class XmlTreeViewMediator
 	{
 		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
 		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
-		
+
 		// clear depth cache
 		nodeDepthMap.clear();
-		
+
 		if (focusedItem != null)
 		{
 			int currentDepth = getExpandedDepth(focusedItem) + getNodeLevel(focusedItem) + 1;
-			
+
 			expandLevel(focusedItem, currentDepth);
 			treeView.getFocusModel().focus(focusedItemIndex);
 		}
@@ -319,14 +304,14 @@ public class XmlTreeViewMediator
 	{
 		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
 		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
-		
+
 		// clear depth cache
 		nodeDepthMap.clear();
-		
+
 		if (focusedItem != null)
 		{
 			int currentDepth = getExpandedDepth(focusedItem) + getNodeLevel(focusedItem) - 1;
-			
+
 			if (currentDepth >= 0)
 			{
 				expandLevel(focusedItem, currentDepth);
@@ -340,10 +325,10 @@ public class XmlTreeViewMediator
 	{
 		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
 		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
-		
+
 		// clear depth cache
 		nodeDepthMap.clear();
-		
+
 		if (focusedItem != null)
 		{
 			expandLevel(focusedItem, -1);
@@ -356,31 +341,31 @@ public class XmlTreeViewMediator
 	{
 		TreeItem<Object> focusedItem = treeView.getFocusModel().getFocusedItem();
 		int focusedItemIndex = treeView.getFocusModel().getFocusedIndex();
-		
+
 		// clear depth cache
 		nodeDepthMap.clear();
-		
+
 		if (focusedItem != null)
 		{
 			expandLevel(focusedItem, 0);
 			treeView.getFocusModel().focus(focusedItemIndex);
 		}
 	}
-	
-	
+
+
 	public void deleteSelected()
 	{
 		List<TreeItem<Object>> itemsToRemove = new ArrayList<TreeItem<Object>>();
-		
+
 		for (TreeItem<Object> selectedItem : treeView.getSelectionModel().getSelectedItems())
 		{
 			itemsToRemove.add(selectedItem);
 		}
-		
+
 		for (TreeItem<Object> item : itemsToRemove)
 		{
 			TreeItem<Object> parent = item.getParent();
-			
+
 			if (parent != null)
 			{
 				parent.getChildren().remove(item);
@@ -392,18 +377,18 @@ public class XmlTreeViewMediator
 	public void copySelectedItemToClipboard()
 	{
 		TreeItem<Object> selectedItem = treeView.getSelectionModel().getSelectedItem();
-		
+
 		if (selectedItem != null)
 		{
 			Map<DataFormat, Object> map = new HashMap<DataFormat, Object>();
-			
+
 			Object data = selectedItem.getValue();
-			
+
 			if (data instanceof Element)
 			{
 				XMLOutputter xmlOut = new XMLOutputter();
 				String xml = xmlOut.outputString((Element) data);
-				
+
 				map.put(DataFormat.HTML, xml);
 				map.put(DataFormat.PLAIN_TEXT, xml);
 			}
@@ -412,24 +397,25 @@ public class XmlTreeViewMediator
 				String txt = ((Text) data).getTextTrim();
 				map.put(DataFormat.PLAIN_TEXT, txt);
 			}
-			
+
 			Clipboard clipboard = Clipboard.getSystemClipboard();
 			clipboard.setContent(map);
 		}
 	}
-	
-	
+
+
 	public String copyElementToString()
 	{
 		String result = "";
-		
-		/*if (data instanceof Element)
-		{
-			XMLOutputter xmlOut = new XMLOutputter();
-			String xml = xmlOut.outputString((Element) data);
-		
-		}*/
-		
+
+		/*
+		 * if (data instanceof Element)
+		 * {
+		 * XMLOutputter xmlOut = new XMLOutputter();
+		 * String xml = xmlOut.outputString((Element) data);
+		 * }
+		 */
+
 		return result;
 	}
 
@@ -437,33 +423,33 @@ public class XmlTreeViewMediator
 	public void pasteItemFromClipboard()
 	{
 		TreeItem<Object> selectedItem = treeView.getSelectionModel().getSelectedItem();
-		
+
 		if (selectedItem != null)
 		{
 			Clipboard clipboard = Clipboard.getSystemClipboard();
-			
+
 			if (clipboard.hasContent(DataFormat.lookupMimeType("text/xml")))
 			{
 				String xml = (String) clipboard.getContent(DataFormat.lookupMimeType("text/xml"));
-				
+
 				TreeItem<Object> dataItem = getXmlAsTree(xml);
-				
+
 				selectedItem.getChildren().add(dataItem);
 			}
 			else if (clipboard.hasContent(DataFormat.HTML))
 			{
 				String xml = (String) clipboard.getContent(DataFormat.HTML);
-				
+
 				TreeItem<Object> dataItem = getXmlAsTree(xml);
-				
+
 				selectedItem.getChildren().add(dataItem);
 			}
 			else if (clipboard.hasContent(DataFormat.PLAIN_TEXT))
 			{
 				String xml = (String) clipboard.getContent(DataFormat.PLAIN_TEXT);
-				
+
 				TreeItem<Object> dataItem = getXmlAsTree(xml);
-				
+
 				selectedItem.getChildren().add(dataItem);
 			}
 		}
@@ -488,8 +474,8 @@ public class XmlTreeViewMediator
 		{
 			e.printStackTrace();
 		}
-		
-		return new XmlTreeItem(new Text(source));
+
+		return new TreeItem<Object>(new Text(source));
 	}
 
 
@@ -498,11 +484,11 @@ public class XmlTreeViewMediator
 	 */
 	public TreeItem<Object> converToTreeItem(Element xmlNode)
 	{
-		TreeItem<Object> rootNode = new XmlTreeItem(xmlNode);
+		TreeItem<Object> rootNode = new TreeItem<Object>(xmlNode);
 
 		for (Object obj : xmlNode.getAttributes())
 		{
-			rootNode.getChildren().add(new XmlTreeItem(obj));
+			rootNode.getChildren().add(new TreeItem<Object>(obj));
 		}
 
 		for (Object obj : xmlNode.getContent())
@@ -511,7 +497,7 @@ public class XmlTreeViewMediator
 			{
 				if (!((Text) obj).getTextTrim().isEmpty())
 				{
-					rootNode.getChildren().add(new XmlTreeItem(obj));
+					rootNode.getChildren().add(new TreeItem<Object>(obj));
 				}
 			}
 			else if (obj instanceof Element)
