@@ -44,3 +44,11 @@ Experiment03
 Simple graph visualization.
 
 [Experiment03 details](/experiment03)
+
+
+Experiment04
+------------
+
+Xml editor via TreeView waste of time really bugged in 1.7 and poor API for handling events on tree item nodes.
+
+[Experiment04 details](/experiment04)

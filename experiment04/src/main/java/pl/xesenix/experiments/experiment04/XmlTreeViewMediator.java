@@ -22,6 +22,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -392,6 +393,19 @@ public class XmlTreeViewMediator
 				map.put(DataFormat.HTML, xml);
 				map.put(DataFormat.PLAIN_TEXT, xml);
 			}
+			else if (data instanceof Attribute)
+			{
+				DataFormat df = DataFormat.lookupMimeType("text/attribute");
+				
+				if (df == null)
+				{
+					df = new DataFormat("text/attribute");
+				}
+				
+				String txt = ((Attribute) data).getName() + "=\"" + ((Attribute) data).getValue() + "\"";
+				map.put(df, txt);
+				map.put(DataFormat.PLAIN_TEXT, txt);
+			}
 			else if (data instanceof Text)
 			{
 				String txt = ((Text) data).getTextTrim();
@@ -407,14 +421,12 @@ public class XmlTreeViewMediator
 	public String copyElementToString()
 	{
 		String result = "";
-
-		/*
-		 * if (data instanceof Element)
-		 * {
-		 * XMLOutputter xmlOut = new XMLOutputter();
-		 * String xml = xmlOut.outputString((Element) data);
-		 * }
-		 */
+		
+		/*if (data instanceof Element)
+		{
+			XMLOutputter xmlOut = new XMLOutputter();
+			String xml = xmlOut.outputString((Element) data);
+		}*/
 
 		return result;
 	}
@@ -426,25 +438,10 @@ public class XmlTreeViewMediator
 
 		if (selectedItem != null)
 		{
+			Element parent = (Element) selectedItem.getValue();
 			Clipboard clipboard = Clipboard.getSystemClipboard();
 
-			if (clipboard.hasContent(DataFormat.lookupMimeType("text/xml")))
-			{
-				String xml = (String) clipboard.getContent(DataFormat.lookupMimeType("text/xml"));
-
-				TreeItem<Object> dataItem = getXmlAsTree(xml);
-
-				selectedItem.getChildren().add(dataItem);
-			}
-			else if (clipboard.hasContent(DataFormat.HTML))
-			{
-				String xml = (String) clipboard.getContent(DataFormat.HTML);
-
-				TreeItem<Object> dataItem = getXmlAsTree(xml);
-
-				selectedItem.getChildren().add(dataItem);
-			}
-			else if (clipboard.hasContent(DataFormat.PLAIN_TEXT))
+			if (clipboard.hasContent(DataFormat.PLAIN_TEXT))
 			{
 				String xml = (String) clipboard.getContent(DataFormat.PLAIN_TEXT);
 
@@ -475,7 +472,7 @@ public class XmlTreeViewMediator
 			e.printStackTrace();
 		}
 
-		return new TreeItem<Object>(new Text(source));
+		return new XmlItem(new Text(source));
 	}
 
 
@@ -484,11 +481,11 @@ public class XmlTreeViewMediator
 	 */
 	public TreeItem<Object> converToTreeItem(Element xmlNode)
 	{
-		TreeItem<Object> rootNode = new TreeItem<Object>(xmlNode);
+		TreeItem<Object> rootNode = new XmlItem(xmlNode);
 
 		for (Object obj : xmlNode.getAttributes())
 		{
-			rootNode.getChildren().add(new TreeItem<Object>(obj));
+			rootNode.getChildren().add(new XmlItem(obj));
 		}
 
 		for (Object obj : xmlNode.getContent())
@@ -497,7 +494,7 @@ public class XmlTreeViewMediator
 			{
 				if (!((Text) obj).getTextTrim().isEmpty())
 				{
-					rootNode.getChildren().add(new TreeItem<Object>(obj));
+					rootNode.getChildren().add(new XmlItem(obj));
 				}
 			}
 			else if (obj instanceof Element)
