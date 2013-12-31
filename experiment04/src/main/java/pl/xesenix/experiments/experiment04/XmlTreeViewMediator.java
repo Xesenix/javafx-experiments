@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.collections.ListChangeListener;
 import javafx.event.Event;
@@ -23,6 +25,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
 import org.jdom.Attribute;
+import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -64,6 +67,7 @@ public class XmlTreeViewMediator
 	public XmlTreeViewMediator(final TreeView<Object> treeView)
 	{
 		setTreeView(treeView);
+		treeView.setShowRoot(false);
 		treeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		treeView.setCellFactory(new Callback<TreeView<Object>, TreeCell<Object>>() {
 
@@ -445,61 +449,138 @@ public class XmlTreeViewMediator
 			{
 				String xml = (String) clipboard.getContent(DataFormat.PLAIN_TEXT);
 
-				TreeItem<Object> dataItem = getXmlAsTree(xml);
-
-				selectedItem.getChildren().add(dataItem);
+				getXmlAsTree(xml, selectedItem);
 			}
 		}
 	}
 
 
-	public TreeItem<Object> getXmlAsTree(String source)
+	public void getXmlAsTree(String source, TreeItem<Object> rootItem)
 	{
-		StringReader xmlReader = new StringReader(source);
-
-		SAXBuilder builder = new SAXBuilder();
-
-		try
+		Pattern xmlPattern = Pattern.compile("(<[a-zA-Z]+)");
+		Matcher matcher = xmlPattern.matcher(source);
+		
+		if (matcher.find())
 		{
-			Document document = (Document) builder.build(xmlReader);
-
-			Element xmlNode = document.getRootElement();
-
-			return converToTreeItem(xmlNode);
+			// detected xml string
+			// create temporary root
+			source = source.replaceFirst("(<[a-zA-Z]+)", "<root>$1") + "</root>";
+			
+			StringReader xmlReader = new StringReader(source);
+			SAXBuilder builder = new SAXBuilder();
+			
+			try
+			{
+				Document document = (Document) builder.build(xmlReader);
+				
+				if (rootItem == null)
+				{
+					rootItem = converToTreeItem(document.getRootElement());
+					
+					treeView.setRoot(rootItem);
+				}
+				else
+				{
+					if (rootItem.getValue() instanceof Element)
+					{
+						Element element = (Element) rootItem.getValue();
+						
+						for (Object obj : document.getRootElement().getContent())
+						{
+							element.addContent((Content) ((Content) obj).clone());
+						}
+						
+						TreeItem<Object> parentItem = rootItem.getParent();
+						
+						if (parentItem == null)
+						{
+							treeView.setRoot(converToTreeItem(element));
+						}
+						else
+						{
+							int index = parentItem.getChildren().indexOf(rootItem);
+							
+							parentItem.getChildren().set(index, converToTreeItem(element));
+						}
+					}
+				}
+			}
+			catch (JDOMException | IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
-		catch (JDOMException | IOException e)
+		else
 		{
-			e.printStackTrace();
+			Pattern attributePattern = Pattern.compile("([a-zA-Z]+[a-zA-Z0-9\\-_]*)=\"([^\"]*)\"");
+			matcher = attributePattern.matcher(source);
+			
+			if (rootItem != null && rootItem.getValue() instanceof Element)
+			{
+				Element element = (Element) rootItem.getValue();
+				
+				while (matcher.find())
+				{
+					if (rootItem != null && rootItem.getValue() instanceof Element)
+					{
+						element.setAttribute(matcher.group(1), matcher.group(2));
+					}
+				}
+				
+				TreeItem<Object> parentItem = rootItem.getParent();
+				
+				if (parentItem == null)
+				{
+					treeView.setRoot(converToTreeItem(element));
+				}
+				else
+				{
+					int index = parentItem.getChildren().indexOf(rootItem);
+					
+					parentItem.getChildren().set(index, converToTreeItem(element));
+				}
+			}
 		}
-
-		return new XmlItem(new Text(source));
 	}
 
 
 	/**
 	 * @param xmlNode
 	 */
-	public TreeItem<Object> converToTreeItem(Element xmlNode)
+	public XmlItem converToTreeItem(Object xmlNode)
 	{
-		TreeItem<Object> rootNode = new XmlItem(xmlNode);
-
-		for (Object obj : xmlNode.getAttributes())
+		XmlItem rootNode = new XmlItem(xmlNode);
+		List content = null;
+		
+		if (xmlNode instanceof Element)
 		{
-			rootNode.getChildren().add(new XmlItem(obj));
-		}
-
-		for (Object obj : xmlNode.getContent())
-		{
-			if (obj instanceof Text)
+			for (Object obj : ((Element) xmlNode).getAttributes())
 			{
-				if (!((Text) obj).getTextTrim().isEmpty())
-				{
-					rootNode.getChildren().add(new XmlItem(obj));
-				}
+				rootNode.getChildren().add(new XmlItem(obj));
 			}
-			else if (obj instanceof Element)
+			
+			content = ((Element) xmlNode).getContent();
+		}
+		else if (xmlNode instanceof Document)
+		{
+			content = ((Document) xmlNode).getContent();
+		}
+		
+		if (content != null)
+		{
+			for (Object obj : content)
 			{
-				rootNode.getChildren().add(converToTreeItem((Element) obj));
+				if (obj instanceof Text)
+				{
+					if (!((Text) obj).getTextTrim().isEmpty())
+					{
+						rootNode.getChildren().add(new XmlItem(obj));
+					}
+				}
+				else if (obj instanceof Element)
+				{
+					rootNode.getChildren().add(converToTreeItem(obj));
+				}
 			}
 		}
 

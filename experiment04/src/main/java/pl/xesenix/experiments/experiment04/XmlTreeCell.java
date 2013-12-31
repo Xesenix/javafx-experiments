@@ -20,6 +20,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
 import org.jdom.Attribute;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.slf4j.Logger;
@@ -247,6 +248,18 @@ public class XmlTreeCell extends TreeCell<Object>
 			setContextMenu(getAttributeMenu());
 			
 			getStyleClass().add("xml-attribute");
+		}
+		else if (data instanceof Document)
+		{
+			Document document = (Document) data;
+			
+			setText(String.format("<root/>"));
+			
+			prefixLabel.setText("");
+			editField.setText("");
+			postfixLabel.setText("");
+			
+			getStyleClass().add("xml-document");
 		}
 		else
 		{

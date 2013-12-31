@@ -9,8 +9,6 @@ import com.sun.javafx.collections.NonIterableChange.SimpleAddChange;
 import com.sun.javafx.collections.NonIterableChange.SimpleRemovedChange;
 
 import javafx.collections.ListChangeListener;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.scene.control.TreeItem;
 
 public class XmlItem extends TreeItem<Object>
@@ -28,29 +26,39 @@ public class XmlItem extends TreeItem<Object>
 
 				public void onChanged(ListChangeListener.Change<? extends TreeItem<Object>> c)
 				{
-					log.debug("list of children change {}", c);
-					
-					// THIS API SUCKS
-					
-					if (!(c instanceof NonIterableChange))
+					while (c.next())
 					{
-						while (c.next())
+						if (!c.wasPermutated() || !c.wasUpdated())
 						{
-							if (!c.wasPermutated() || !c.wasUpdated())
+							if (c.wasAdded())
 							{
-								if (c.wasAdded())
+								for (TreeItem<Object> addedItem : c.getAddedSubList())
 								{
-									for (TreeItem<Object> addedItem : c.getAddedSubList())
+									log.debug("added {}", addedItem);
+									
+									Element parent = (Element) getValue();
+									Object obj = addedItem.getValue();
+									
+									if (obj instanceof Element)
 									{
-										log.debug("added {}", addedItem);
+										//((Element) obj).detach();
+									//	parent.addContent((Element) obj);
 									}
 								}
-								
-								if (c.wasRemoved())
+							}
+							
+							if (c.wasRemoved())
+							{
+								for (TreeItem<Object> removedItem : c.getRemoved())
 								{
-									for (TreeItem<Object> removedItem : c.getRemoved())
+									log.debug("removed {}", removedItem);
+									
+									Element parent = (Element) getValue();
+									Object obj = removedItem.getValue();
+									
+									if (obj instanceof Element)
 									{
-										log.debug("removed {}", removedItem);
+										parent.removeContent((Element) obj);
 									}
 								}
 							}
@@ -58,14 +66,6 @@ public class XmlItem extends TreeItem<Object>
 					}
 				}
 				
-			});
-			
-			addEventHandler(Event.ANY, new EventHandler<Event>() {
-
-				public void handle(Event event)
-				{
-					log.debug("item event {}", event.getEventType());
-				}
 			});
 		}
 	}
