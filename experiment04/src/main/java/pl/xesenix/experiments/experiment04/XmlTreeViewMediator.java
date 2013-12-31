@@ -449,13 +449,13 @@ public class XmlTreeViewMediator
 			{
 				String xml = (String) clipboard.getContent(DataFormat.PLAIN_TEXT);
 
-				getXmlAsTree(xml, selectedItem);
+				updateTree(xml, selectedItem);
 			}
 		}
 	}
 
 
-	public void getXmlAsTree(String source, TreeItem<Object> rootItem)
+	public void updateTree(String source, TreeItem<Object> updatedItem)
 	{
 		Pattern xmlPattern = Pattern.compile("(<[a-zA-Z]+)");
 		Matcher matcher = xmlPattern.matcher(source);
@@ -463,7 +463,7 @@ public class XmlTreeViewMediator
 		if (matcher.find())
 		{
 			// detected xml string
-			// create temporary root
+			// add root element
 			source = source.replaceFirst("(<[a-zA-Z]+)", "<root>$1") + "</root>";
 			
 			StringReader xmlReader = new StringReader(source);
@@ -471,37 +471,30 @@ public class XmlTreeViewMediator
 			
 			try
 			{
+				// parse source as xml with additional root element
 				Document document = (Document) builder.build(xmlReader);
 				
-				if (rootItem == null)
+				if (updatedItem == null)
 				{
-					rootItem = converToTreeItem(document.getRootElement());
+					// convert to tree and put it all in tree view
+					updatedItem = converToTreeItem(document.getRootElement());
 					
-					treeView.setRoot(rootItem);
+					treeView.setRoot(updatedItem);
 				}
 				else
 				{
-					if (rootItem.getValue() instanceof Element)
+					// appending existing item
+					if (updatedItem.getValue() instanceof Element)
 					{
-						Element element = (Element) rootItem.getValue();
+						Element element = (Element) updatedItem.getValue();
 						
+						// rewrite encapsulated content to target item element
 						for (Object obj : document.getRootElement().getContent())
 						{
 							element.addContent((Content) ((Content) obj).clone());
 						}
 						
-						TreeItem<Object> parentItem = rootItem.getParent();
-						
-						if (parentItem == null)
-						{
-							treeView.setRoot(converToTreeItem(element));
-						}
-						else
-						{
-							int index = parentItem.getChildren().indexOf(rootItem);
-							
-							parentItem.getChildren().set(index, converToTreeItem(element));
-						}
+						rebuildSubtree(updatedItem, element);
 					}
 				}
 			}
@@ -512,34 +505,69 @@ public class XmlTreeViewMediator
 		}
 		else
 		{
-			Pattern attributePattern = Pattern.compile("([a-zA-Z]+[a-zA-Z0-9\\-_]*)=\"([^\"]*)\"");
-			matcher = attributePattern.matcher(source);
+			// handling source that isn`t xml
 			
-			if (rootItem != null && rootItem.getValue() instanceof Element)
+			if (updatedItem == null)
 			{
-				Element element = (Element) rootItem.getValue();
+				// tree is empty create root and add source as it content
 				
-				while (matcher.find())
+				Element root = new Element("root");
+				
+				root.addContent(source);
+				
+				treeView.setRoot(converToTreeItem(root));
+			}
+			else if (updatedItem.getValue() instanceof Element)
+			{
+				// adding to existing node
+				
+				Element newElementValue = (Element) updatedItem.getValue();
+				
+				Pattern attributePattern = Pattern.compile("([a-zA-Z]+[a-zA-Z0-9\\-_]*)=\"([^\"]*)\"");
+				matcher = attributePattern.matcher(source);
+				
+				// check if passed in data isn`t list of attributes
+				if (matcher.matches())
 				{
-					if (rootItem != null && rootItem.getValue() instanceof Element)
+					// rewrite attributes to element
+					while (matcher.find())
 					{
-						element.setAttribute(matcher.group(1), matcher.group(2));
+						if (updatedItem != null && updatedItem.getValue() instanceof Element)
+						{
+							newElementValue.setAttribute(matcher.group(1), matcher.group(2));
+						}
 					}
-				}
-				
-				TreeItem<Object> parentItem = rootItem.getParent();
-				
-				if (parentItem == null)
-				{
-					treeView.setRoot(converToTreeItem(element));
 				}
 				else
 				{
-					int index = parentItem.getChildren().indexOf(rootItem);
-					
-					parentItem.getChildren().set(index, converToTreeItem(element));
+					// add source as text content
+					newElementValue.addContent(source);
 				}
+				
+				rebuildSubtree(updatedItem, newElementValue);
 			}
+		}
+	}
+
+
+	/**
+	 * @param updatedItem
+	 * @param element
+	 */
+	public void rebuildSubtree(TreeItem<Object> updatedItem, Element element)
+	{
+		// recreate subtree 
+		TreeItem<Object> parentItem = updatedItem.getParent();
+		
+		if (parentItem == null)
+		{
+			treeView.setRoot(converToTreeItem(element));
+		}
+		else
+		{
+			int index = parentItem.getChildren().indexOf(updatedItem);
+			
+			parentItem.getChildren().set(index, converToTreeItem(element));
 		}
 	}
 
