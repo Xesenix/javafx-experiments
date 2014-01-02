@@ -13,7 +13,7 @@ import javafx.scene.control.TreeItem;
 
 public class XmlItem extends TreeItem<Object>
 {
-	static final Logger log = LoggerFactory.getLogger(XmlTreeViewMediator.class);
+	static final Logger log = LoggerFactory.getLogger(XmlItem.class);
 	
 	
 	public XmlItem(Object obj)

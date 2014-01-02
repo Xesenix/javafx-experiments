@@ -24,14 +24,14 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
-import org.jdom.Attribute;
-import org.jdom.Content;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.Text;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.Attribute;
+import org.jdom2.Content;
+import org.jdom2.Element;
+import org.jdom2.filter.Filters;
+import org.jdom2.output.XMLOutputter;
+import org.jdom2.xpath.XPath;
+import org.jdom2.xpath.XPathFactory;
+import org.jdom2.xpath.XPathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -373,9 +373,79 @@ public class XmlTreeViewMediator
 
 			if (parent != null)
 			{
-				parent.getChildren().remove(item);
+				//parent.getChildren().remove(item);
+				
+				Element parentElement = (Element) parent.getValue();
+				
+				if (item.getValue() instanceof Attribute)
+				{
+					parentElement.removeAttribute((Attribute) item.getValue());
+				}
+				else
+				{
+					parentElement.removeContent((Content) item.getValue());
+				}
 			}
 		}
+		
+		commitXmlChange();
+	}
+
+
+	public void commitXmlChange()
+	{
+		TreeItem<Object> rootItem = treeView.getRoot();
+		Element root = null;
+		
+		if (rootItem != null)
+		{
+			root = (Element) rootItem.getValue();
+		}
+		
+		List<String> expanded = collectExpanded(rootItem);
+		
+		rebuildSubtree(rootItem, root);
+		
+		expandFromList(rootItem, expanded);
+	}
+
+
+	public void expandFromList(TreeItem<Object> rootItem, List<String> expanded)
+	{
+		if (rootItem.getValue() instanceof Element)
+		{
+			for (TreeItem<Object> item : rootItem.getChildren())
+			{
+				expanded.addAll(collectExpanded(item));
+			}
+			
+			rootItem.setExpanded(expanded.contains(rootItem.getValue()));
+		}
+		else
+		{
+			rootItem.setExpanded(false);
+		}
+	}
+
+
+	public List<String> collectExpanded(TreeItem<Object> collectedItem)
+	{
+		List<String> expanded = new ArrayList<String>();
+		
+		if (collectedItem.getValue() instanceof Element)
+		{
+			for (TreeItem<Object> item : collectedItem.getChildren())
+			{
+				expanded.addAll(collectExpanded(item));
+			}
+			
+			if (collectedItem.isExpanded())
+			{
+				expanded.add(XPathHelper.getAbsolutePath((Content) collectedItem.getValue()));
+			}
+		}
+		
+		return expanded;
 	}
 
 
@@ -588,14 +658,7 @@ public class XmlTreeViewMediator
 			}
 			
 			content = ((Element) xmlNode).getContent();
-		}
-		else if (xmlNode instanceof Document)
-		{
-			content = ((Document) xmlNode).getContent();
-		}
-		
-		if (content != null)
-		{
+			
 			for (Object obj : content)
 			{
 				if (obj instanceof Text)
