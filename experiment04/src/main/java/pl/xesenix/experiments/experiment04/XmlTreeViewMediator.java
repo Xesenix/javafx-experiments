@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,10 +27,15 @@ import javafx.util.Callback;
 
 import org.jdom2.Attribute;
 import org.jdom2.Content;
+import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Text;
 import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPath;
+import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.jdom2.xpath.XPathHelper;
 import org.slf4j.Logger;
@@ -50,6 +56,9 @@ public class XmlTreeViewMediator
 
 
 	private Map<TreeItem<Object>, Integer> nodeLevelMap = new HashMap<TreeItem<Object>, Integer>();
+	
+	
+	private WeakHashMap<Object, XmlItem> elementToItemMap = new WeakHashMap<Object, XmlItem>();
 
 
 	public TreeView<Object> getTreeView()
@@ -412,18 +421,14 @@ public class XmlTreeViewMediator
 
 	public void expandFromList(TreeItem<Object> rootItem, List<String> expanded)
 	{
-		if (rootItem.getValue() instanceof Element)
+		for (String path : expanded)
 		{
-			for (TreeItem<Object> item : rootItem.getChildren())
-			{
-				expanded.addAll(collectExpanded(item));
-			}
+			XPathExpression<Element> xpath = XPathFactory.instance().compile(path, Filters.element());
 			
-			rootItem.setExpanded(expanded.contains(rootItem.getValue()));
-		}
-		else
-		{
-			rootItem.setExpanded(false);
+			for (Element expandedElement : xpath.evaluate(treeView.getRoot().getValue()))
+			{
+				elementToItemMap.get(expandedElement).setExpanded(true);
+			}
 		}
 	}
 
@@ -547,7 +552,7 @@ public class XmlTreeViewMediator
 				if (updatedItem == null)
 				{
 					// convert to tree and put it all in tree view
-					updatedItem = converToTreeItem(document.getRootElement());
+					updatedItem = convertElementToTreeItem(document.getRootElement());
 					
 					treeView.setRoot(updatedItem);
 				}
@@ -585,7 +590,7 @@ public class XmlTreeViewMediator
 				
 				root.addContent(source);
 				
-				treeView.setRoot(converToTreeItem(root));
+				treeView.setRoot(convertElementToTreeItem(root));
 			}
 			else if (updatedItem.getValue() instanceof Element)
 			{
@@ -631,50 +636,57 @@ public class XmlTreeViewMediator
 		
 		if (parentItem == null)
 		{
-			treeView.setRoot(converToTreeItem(element));
+			treeView.setRoot(convertElementToTreeItem(element));
 		}
 		else
 		{
 			int index = parentItem.getChildren().indexOf(updatedItem);
 			
-			parentItem.getChildren().set(index, converToTreeItem(element));
+			parentItem.getChildren().set(index, convertElementToTreeItem(element));
 		}
 	}
 
 
 	/**
-	 * @param xmlNode
+	 * @param xmlElement
 	 */
-	public XmlItem converToTreeItem(Object xmlNode)
+	public XmlItem convertElementToTreeItem(Object xmlElement)
 	{
-		XmlItem rootNode = new XmlItem(xmlNode);
-		List content = null;
+		XmlItem treeViewElementItem = new XmlItem(xmlElement);
 		
-		if (xmlNode instanceof Element)
+		elementToItemMap.put(xmlElement, treeViewElementItem);
+		
+		if (xmlElement instanceof Element)
 		{
-			for (Object obj : ((Element) xmlNode).getAttributes())
+			for (Object attribute : ((Element) xmlElement).getAttributes())
 			{
-				rootNode.getChildren().add(new XmlItem(obj));
+				XmlItem treeViewAttributeItem = new XmlItem(attribute);
+				
+				elementToItemMap.put(attribute, treeViewAttributeItem);
+				
+				treeViewElementItem.getChildren().add(treeViewAttributeItem);
 			}
 			
-			content = ((Element) xmlNode).getContent();
-			
-			for (Object obj : content)
+			for (Object obj : ((Element) xmlElement).getContent())
 			{
 				if (obj instanceof Text)
 				{
 					if (!((Text) obj).getTextTrim().isEmpty())
 					{
-						rootNode.getChildren().add(new XmlItem(obj));
+						XmlItem treeViewTextItem = new XmlItem(obj);
+						
+						elementToItemMap.put(obj, treeViewTextItem);
+						
+						treeViewElementItem.getChildren().add(treeViewTextItem);
 					}
 				}
 				else if (obj instanceof Element)
 				{
-					rootNode.getChildren().add(converToTreeItem(obj));
+					treeViewElementItem.getChildren().add(convertElementToTreeItem(obj));
 				}
 			}
 		}
 
-		return rootNode;
+		return treeViewElementItem;
 	}
 }
