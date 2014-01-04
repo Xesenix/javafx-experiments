@@ -63,7 +63,7 @@ public class Controller
 	@FXML
 	void loadXml(ActionEvent event)
 	{
-		xmlTreeViewDecorator.updateTree(console.getText(), null);
+		xmlTreeViewDecorator.loadXml(console.getText());
 		
 		treeView.requestFocus();
 		treeView.getSelectionModel().select(0);

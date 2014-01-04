@@ -137,6 +137,16 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 					event.consume();
 				}
 			}
+			else if (copyKeyCombination.match(event))
+			{
+				XmlTreeViewMediator.log.debug("copy");
+				mediator.copySelectedItemToClipboard();
+			}
+			else if (pasteKeyCombination.match(event))
+			{
+				XmlTreeViewMediator.log.debug("paste");
+				mediator.pasteItemFromClipboard();
+			}
 		}
 		else if (event.getEventType().equals(KeyEvent.KEY_RELEASED))
 		{
@@ -176,16 +186,6 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 			{
 				XmlTreeViewMediator.log.debug("delete");
 				mediator.deleteSelected();
-			}
-			else if (copyKeyCombination.match(event))
-			{
-				XmlTreeViewMediator.log.debug("copy");
-				mediator.copySelectedItemToClipboard();
-			}
-			else if (pasteKeyCombination.match(event))
-			{
-				XmlTreeViewMediator.log.debug("paste");
-				mediator.pasteItemFromClipboard();
 			}
 		}
 	}

@@ -61,6 +61,12 @@ public class XmlTreeViewMediator
 	private WeakHashMap<Object, XmlItem> elementToItemMap = new WeakHashMap<Object, XmlItem>();
 
 
+	private List<String> expandedElements;
+
+
+	private List<String> selectedElements;
+
+
 	public TreeView<Object> getTreeView()
 	{
 		return treeView;
@@ -369,12 +375,9 @@ public class XmlTreeViewMediator
 
 	public void deleteSelected()
 	{
-		List<TreeItem<Object>> itemsToRemove = new ArrayList<TreeItem<Object>>();
-
-		for (TreeItem<Object> selectedItem : treeView.getSelectionModel().getSelectedItems())
-		{
-			itemsToRemove.add(selectedItem);
-		}
+		startXmlChange();
+		
+		List<TreeItem<Object>> itemsToRemove = getSelectedItems();
 
 		for (TreeItem<Object> item : itemsToRemove)
 		{
@@ -382,8 +385,6 @@ public class XmlTreeViewMediator
 
 			if (parent != null)
 			{
-				//parent.getChildren().remove(item);
-				
 				Element parentElement = (Element) parent.getValue();
 				
 				if (item.getValue() instanceof Attribute)
@@ -401,56 +402,29 @@ public class XmlTreeViewMediator
 	}
 
 
-	public void commitXmlChange()
+	/**
+	 * @return
+	 */
+	public List<TreeItem<Object>> getSelectedItems()
 	{
-		TreeItem<Object> rootItem = treeView.getRoot();
-		Element root = null;
-		
-		if (rootItem != null)
+		List<TreeItem<Object>> itemsToRemove = new ArrayList<TreeItem<Object>>();
+
+		for (TreeItem<Object> selectedItem : treeView.getSelectionModel().getSelectedItems())
 		{
-			root = (Element) rootItem.getValue();
+			itemsToRemove.add(selectedItem);
 		}
 		
-		List<String> expanded = collectExpanded(rootItem);
-		
-		rebuildSubtree(rootItem, root);
-		
-		expandFromList(rootItem, expanded);
+		return itemsToRemove;
 	}
-
-
-	public void expandFromList(TreeItem<Object> rootItem, List<String> expanded)
+	
+	
+	public void loadXml(String xml)
 	{
-		for (String path : expanded)
-		{
-			XPathExpression<Element> xpath = XPathFactory.instance().compile(path, Filters.element());
-			
-			for (Element expandedElement : xpath.evaluate(treeView.getRoot().getValue()))
-			{
-				elementToItemMap.get(expandedElement).setExpanded(true);
-			}
-		}
-	}
-
-
-	public List<String> collectExpanded(TreeItem<Object> collectedItem)
-	{
-		List<String> expanded = new ArrayList<String>();
+		startXmlChange();
 		
-		if (collectedItem.getValue() instanceof Element)
-		{
-			for (TreeItem<Object> item : collectedItem.getChildren())
-			{
-				expanded.addAll(collectExpanded(item));
-			}
-			
-			if (collectedItem.isExpanded())
-			{
-				expanded.add(XPathHelper.getAbsolutePath((Content) collectedItem.getValue()));
-			}
-		}
+		updateTree(xml, null);
 		
-		return expanded;
+		commitXmlChange();
 	}
 
 
@@ -497,51 +471,42 @@ public class XmlTreeViewMediator
 	}
 
 
-	public String copyElementToString()
-	{
-		String result = "";
-		
-		/*if (data instanceof Element)
-		{
-			XMLOutputter xmlOut = new XMLOutputter();
-			String xml = xmlOut.outputString((Element) data);
-		}*/
-
-		return result;
-	}
-
-
 	public void pasteItemFromClipboard()
 	{
-		TreeItem<Object> selectedItem = treeView.getSelectionModel().getSelectedItem();
-
-		if (selectedItem != null)
+		startXmlChange();
+		
+		Clipboard clipboard = Clipboard.getSystemClipboard();
+		
+		if (clipboard.hasContent(DataFormat.PLAIN_TEXT))
 		{
-			Element parent = (Element) selectedItem.getValue();
-			Clipboard clipboard = Clipboard.getSystemClipboard();
-
-			if (clipboard.hasContent(DataFormat.PLAIN_TEXT))
+			String xml = (String) clipboard.getContent(DataFormat.PLAIN_TEXT);
+			
+			List<TreeItem<Object>> selected = getSelectedItems();
+		
+			for (TreeItem<Object> selectedItem : selected)
 			{
-				String xml = (String) clipboard.getContent(DataFormat.PLAIN_TEXT);
-
 				updateTree(xml, selectedItem);
 			}
 		}
+		
+		commitXmlChange();
 	}
 
 
-	public void updateTree(String source, TreeItem<Object> updatedItem)
+	protected void updateTree(String xml, TreeItem<Object> updatedItem)
 	{
 		Pattern xmlPattern = Pattern.compile("(<[a-zA-Z]+)");
-		Matcher matcher = xmlPattern.matcher(source);
+		Matcher matcher = xmlPattern.matcher(xml);
+		
+		startXmlChange();
 		
 		if (matcher.find())
 		{
 			// detected xml string
 			// add root element
-			source = source.replaceFirst("(<[a-zA-Z]+)", "<root>$1") + "</root>";
+			xml = xml.replaceFirst("(<[a-zA-Z]+)", "<root>$1") + "</root>";
 			
-			StringReader xmlReader = new StringReader(source);
+			StringReader xmlReader = new StringReader(xml);
 			SAXBuilder builder = new SAXBuilder();
 			
 			try
@@ -588,7 +553,7 @@ public class XmlTreeViewMediator
 				
 				Element root = new Element("root");
 				
-				root.addContent(source);
+				root.addContent(xml);
 				
 				treeView.setRoot(convertElementToTreeItem(root));
 			}
@@ -599,7 +564,7 @@ public class XmlTreeViewMediator
 				Element newElementValue = (Element) updatedItem.getValue();
 				
 				Pattern attributePattern = Pattern.compile("([a-zA-Z]+[a-zA-Z0-9\\-_]*)=\"([^\"]*)\"");
-				matcher = attributePattern.matcher(source);
+				matcher = attributePattern.matcher(xml);
 				
 				// check if passed in data isn`t list of attributes
 				if (matcher.matches())
@@ -616,12 +581,114 @@ public class XmlTreeViewMediator
 				else
 				{
 					// add source as text content
-					newElementValue.addContent(source);
+					newElementValue.addContent(xml);
 				}
 				
 				rebuildSubtree(updatedItem, newElementValue);
 			}
 		}
+	}
+	
+	
+	protected void startXmlChange()
+	{
+		TreeItem<Object> rootItem = treeView.getRoot();
+		
+		selectedElements = collectSelectedXPaths();
+		expandedElements = collectExpandedXPaths(rootItem);
+	}
+
+
+	protected void commitXmlChange()
+	{
+		TreeItem<Object> rootItem = treeView.getRoot();
+		Element root = null;
+		
+		if (rootItem != null)
+		{
+			root = (Element) rootItem.getValue();
+		}
+		
+		rebuildSubtree(rootItem, root);
+		
+		expandFromXPathList(rootItem, expandedElements);
+		//selectFromXPathList(selectedElements);
+	}
+
+
+	protected void expandFromXPathList(TreeItem<Object> rootItem, List<String> expanded)
+	{
+		for (String path : expanded)
+		{
+			XPathExpression<Element> xpath = XPathFactory.instance().compile(path, Filters.element());
+			
+			for (Element expandedElement : xpath.evaluate(treeView.getRoot().getValue()))
+			{
+				elementToItemMap.get(expandedElement).setExpanded(true);
+			}
+		}
+	}
+
+
+	protected List<String> collectExpandedXPaths(TreeItem<Object> collectedItem)
+	{
+		List<String> expanded = new ArrayList<String>();
+		
+		if (collectedItem != null && collectedItem.getValue() instanceof Element)
+		{
+			for (TreeItem<Object> item : collectedItem.getChildren())
+			{
+				expanded.addAll(collectExpandedXPaths(item));
+			}
+			
+			if (collectedItem.isExpanded())
+			{
+				expanded.add(XPathHelper.getAbsolutePath((Content) collectedItem.getValue()));
+			}
+		}
+		
+		return expanded;
+	}
+
+
+	protected void selectFromXPathList(List<String> selected)
+	{
+		treeView.getSelectionModel().clearSelection();
+		
+		for (String path : selected)
+		{
+			XPathExpression<Object> xpath = XPathFactory.instance().compile(path);
+			
+			for (Object selectedObj : xpath.evaluate(treeView.getRoot().getValue()))
+			{
+				TreeItem<Object> selectedItem = elementToItemMap.get(selectedObj);
+				
+				treeView.getSelectionModel().select(treeView.getRow(selectedItem));
+			}
+		}
+	}
+
+
+	protected List<String> collectSelectedXPaths()
+	{
+		List<String> selected = new ArrayList<String>();
+		
+		for (TreeItem<Object> item : treeView.getSelectionModel().getSelectedItems())
+		{
+			if (item != null)
+			{
+				if (item.getValue() instanceof Content)
+				{
+					selected.add(XPathHelper.getAbsolutePath((Content) item.getValue()));
+				}
+				else if (item.getValue() instanceof Attribute)
+				{
+					selected.add(XPathHelper.getAbsolutePath((Attribute) item.getValue()));
+				}
+			}
+		}
+		
+		return selected;
 	}
 
 
@@ -629,7 +696,7 @@ public class XmlTreeViewMediator
 	 * @param updatedItem
 	 * @param element
 	 */
-	public void rebuildSubtree(TreeItem<Object> updatedItem, Element element)
+	protected void rebuildSubtree(TreeItem<Object> updatedItem, Element element)
 	{
 		// recreate subtree 
 		TreeItem<Object> parentItem = updatedItem.getParent();
@@ -650,7 +717,7 @@ public class XmlTreeViewMediator
 	/**
 	 * @param xmlElement
 	 */
-	public XmlItem convertElementToTreeItem(Object xmlElement)
+	protected XmlItem convertElementToTreeItem(Object xmlElement)
 	{
 		XmlItem treeViewElementItem = new XmlItem(xmlElement);
 		
