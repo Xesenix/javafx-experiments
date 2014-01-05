@@ -29,7 +29,7 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 	// private KeyCodeCombination addToSelectionCurrentFocussedKeyCombination = new KeyCodeCombination(KeyCode.SPACE, KeyCombination.CONTROL_DOWN);
 
 
-	private KeyCodeCombination deselectCurrentKeyCombination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
+	// private KeyCodeCombination deselectCurrentKeyCombination = new KeyCodeCombination(KeyCode.LEFT, KeyCombination.CONTROL_DOWN);
 
 
 	private KeyCodeCombination expandAllKeyCombination = new KeyCodeCombination(KeyCode.RIGHT, KeyCombination.ALT_DOWN);
@@ -50,6 +50,12 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 	private KeyCodeCombination nextSiblingKeyCombination = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.ALT_DOWN);
 
 
+	private KeyCodeCombination moveUpKeyCombination = new KeyCodeCombination(KeyCode.UP, KeyCombination.CONTROL_DOWN);
+
+
+	private KeyCodeCombination moveDownKeyCombination = new KeyCodeCombination(KeyCode.DOWN, KeyCombination.CONTROL_DOWN);
+
+
 	private KeyCodeCombination prevRowKeyCombination = new KeyCodeCombination(KeyCode.UP);
 
 
@@ -57,6 +63,9 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 
 
 	private KeyCodeCombination copyKeyCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
+
+
+	private KeyCodeCombination cutKeyCombination = new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
 
 
 	private KeyCodeCombination pasteKeyCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN);
@@ -137,10 +146,26 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 					event.consume();
 				}
 			}
+			else if (moveUpKeyCombination.match(event))
+			{
+				XmlTreeViewMediator.log.debug("up");
+				mediator.moveSelected(-1);
+			}
+			else if (moveDownKeyCombination.match(event))
+			{
+				XmlTreeViewMediator.log.debug("down");
+				mediator.moveSelected(1);
+			}
 			else if (copyKeyCombination.match(event))
 			{
 				XmlTreeViewMediator.log.debug("copy");
 				mediator.copySelectedItemToClipboard();
+			}
+			else if (cutKeyCombination.match(event))
+			{
+				XmlTreeViewMediator.log.debug("cut");
+				mediator.copySelectedItemToClipboard();
+				mediator.deleteSelected();
 			}
 			else if (pasteKeyCombination.match(event))
 			{

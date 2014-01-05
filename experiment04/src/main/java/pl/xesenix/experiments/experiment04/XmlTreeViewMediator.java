@@ -25,11 +25,13 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
+import org.apache.commons.lang3.Range;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
+import org.jdom2.Parent;
 import org.jdom2.Text;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
@@ -506,11 +508,12 @@ public class XmlTreeViewMediator
 			
 			StringReader xmlReader = new StringReader(xml);
 			SAXBuilder builder = new SAXBuilder();
+			builder.setIgnoringBoundaryWhitespace(true);
 			
 			try
 			{
 				// parse source as xml with additional root element
-				Document document = (Document) builder.build(xmlReader);
+				Document document = builder.build(xmlReader);
 				
 				for (Object obj : document.getRootElement().getContent())
 				{
@@ -561,6 +564,7 @@ public class XmlTreeViewMediator
 	{
 		startXmlChange();
 		
+		context = null;
 		updateTree(xml, "/root");
 		
 		commitXmlChange();
@@ -719,5 +723,114 @@ public class XmlTreeViewMediator
 		}
 
 		return treeViewElementItem;
+	}
+
+
+	public void moveSelected(int offset)
+	{
+		startXmlChange();
+		selectedElements.clear();
+		
+		List<TreeItem<Object>> selected = getSelectedItems();
+		Map<Parent, List<Integer>> permutations = new HashMap<Parent, List<Integer>>();
+		
+		// collect base permutations
+		for (TreeItem<Object> selectedItem : selected)
+		{
+			if (selectedItem.getValue() instanceof Content)
+			{
+				Content content = (Content) selectedItem.getValue();
+				Parent parent = content.getParent();
+				
+				List<Integer> permutation = null;
+				
+				if (!permutations.containsKey(parent))
+				{
+					permutation = new ArrayList<Integer>();
+					
+					for (int i = 0; i < parent.getContent().size(); i++)
+					{
+						
+						permutation.add(i, i);
+					}
+					
+					permutations.put(parent, permutation);
+				}
+				else
+				{
+					permutation = permutations.get(parent);
+				}
+				
+				int currentIndex = parent.getContent().indexOf(content);
+				permutation.set(currentIndex, currentIndex + offset);
+			}
+		}
+		
+		for (Map.Entry<Parent, List<Integer>> entry : permutations.entrySet())
+		{
+			Parent parent = entry.getKey();
+			List<Integer> permutation = entry.getValue();
+			
+			// fix permutation
+			int index = -1, sum = 0;
+			
+			log.debug("pre: {}", permutation);
+			
+			for (int i = 0; i < permutation.size(); i++)
+			{
+				if (permutation.get(i) < i)
+				{
+					if (index >= 0)
+					{
+						permutation.set(index, permutation.get(index) + 1);
+					}
+					else
+					{
+						permutation.set(i, permutation.get(i) + 1);
+					}
+				}
+				else if (permutation.get(i) > i)
+				{
+					sum ++;
+					index = i;
+				}
+				else
+				{
+					index = i;
+					permutation.set(index, permutation.get(index) - sum);
+					sum = 0;
+				}
+			}
+			
+			while (sum > 0)
+			{
+				permutation.set(index, permutation.get(index) - 1);
+				sum --;
+				index --;
+			}
+			
+			log.debug("perm: {}", permutation);
+			
+			// perform permutation - works for step of 1
+			List<Content> list = parent.getContent();
+			Content[] permutated = new Content[list.size()];
+			
+			for (int i = 0; i < permutation.size(); i++)
+			{
+				permutated[permutation.get(i)] = list.get(i);
+			}
+			
+			for (int i = 0; i < permutated.length; i++)
+			{
+				list.set(i, permutated[i].clone());
+				
+				if (treeView.getSelectionModel().getSelectedItems().indexOf(elementToItemMap.get(permutated[i])) >= 0)
+				{
+					selectedElements.add(XPathHelper.getAbsolutePath(list.get(i)));
+				}
+			}
+		}
+		
+		commitXmlChange();
 	}
 }
