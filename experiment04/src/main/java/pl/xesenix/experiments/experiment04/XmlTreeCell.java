@@ -209,7 +209,7 @@ public class XmlTreeCell extends TreeCell<Object>
 				
 				attributes.append(" ");
 				attributes.append(attribute.getName());
-				attributes.append(" = \"");
+				attributes.append("=\"");
 				attributes.append(attribute.getValue());
 				attributes.append("\"");
 			}

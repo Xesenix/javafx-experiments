@@ -67,6 +67,9 @@ public class XmlTreeViewMediator
 	private List<String> selectedElements;
 
 
+	private Document context;
+
+
 	public TreeView<Object> getTreeView()
 	{
 		return treeView;
@@ -416,55 +419,42 @@ public class XmlTreeViewMediator
 		
 		return itemsToRemove;
 	}
-	
-	
-	public void loadXml(String xml)
-	{
-		startXmlChange();
-		
-		updateTree(xml, null);
-		
-		commitXmlChange();
-	}
 
 
 	public void copySelectedItemToClipboard()
 	{
-		TreeItem<Object> selectedItem = treeView.getSelectionModel().getSelectedItem();
-
-		if (selectedItem != null)
+		if (!treeView.getSelectionModel().getSelectedItems().isEmpty())
 		{
 			Map<DataFormat, Object> map = new HashMap<DataFormat, Object>();
-
-			Object data = selectedItem.getValue();
-
-			if (data instanceof Element)
+			StringBuilder plainText = new StringBuilder();
+			
+			for (TreeItem<Object> selectedItem : treeView.getSelectionModel().getSelectedItems())
 			{
-				XMLOutputter xmlOut = new XMLOutputter();
-				String xml = xmlOut.outputString((Element) data);
-
-				map.put(DataFormat.HTML, xml);
-				map.put(DataFormat.PLAIN_TEXT, xml);
-			}
-			else if (data instanceof Attribute)
-			{
-				DataFormat df = DataFormat.lookupMimeType("text/attribute");
-				
-				if (df == null)
+				Object data = selectedItem.getValue();
+	
+				if (data instanceof Element)
 				{
-					df = new DataFormat("text/attribute");
+					XMLOutputter xmlOut = new XMLOutputter();
+					String xml = xmlOut.outputString((Element) data);
+					
+					plainText.append(xml);
 				}
-				
-				String txt = ((Attribute) data).getName() + "=\"" + ((Attribute) data).getValue() + "\"";
-				map.put(df, txt);
-				map.put(DataFormat.PLAIN_TEXT, txt);
+				else if (data instanceof Attribute)
+				{
+					String txt = ((Attribute) data).getName() + "=\"" + ((Attribute) data).getValue() + "\"";
+					
+					plainText.append(txt);
+				}
+				else if (data instanceof Text)
+				{
+					String txt = ((Text) data).getTextTrim();
+					
+					plainText.append(txt);
+				}
 			}
-			else if (data instanceof Text)
-			{
-				String txt = ((Text) data).getTextTrim();
-				map.put(DataFormat.PLAIN_TEXT, txt);
-			}
-
+			
+			map.put(DataFormat.PLAIN_TEXT, plainText.toString());
+			
 			Clipboard clipboard = Clipboard.getSystemClipboard();
 			clipboard.setContent(map);
 		}
@@ -481,11 +471,18 @@ public class XmlTreeViewMediator
 		{
 			String xml = (String) clipboard.getContent(DataFormat.PLAIN_TEXT);
 			
-			List<TreeItem<Object>> selected = getSelectedItems();
+			List<String> selected = collectSelectedXPaths();
 		
-			for (TreeItem<Object> selectedItem : selected)
+			if (selected.isEmpty())
 			{
-				updateTree(xml, selectedItem);
+				updateTree(xml, "/root");
+			}
+			else
+			{
+				for (String xpath : selected)
+				{
+					updateTree(xml, xpath);
+				}
 			}
 		}
 		
@@ -493,12 +490,13 @@ public class XmlTreeViewMediator
 	}
 
 
-	protected void updateTree(String xml, TreeItem<Object> updatedItem)
+	protected void updateTree(String xml, String path)
 	{
 		Pattern xmlPattern = Pattern.compile("(<[a-zA-Z]+)");
 		Matcher matcher = xmlPattern.matcher(xml);
 		
-		startXmlChange();
+		XPathExpression<Object> xpath = XPathFactory.instance().compile(path);
+		List<Object> updatedElements = xpath.evaluate(getContext());
 		
 		if (matcher.find())
 		{
@@ -514,27 +512,11 @@ public class XmlTreeViewMediator
 				// parse source as xml with additional root element
 				Document document = (Document) builder.build(xmlReader);
 				
-				if (updatedItem == null)
+				for (Object obj : document.getRootElement().getContent())
 				{
-					// convert to tree and put it all in tree view
-					updatedItem = convertElementToTreeItem(document.getRootElement());
-					
-					treeView.setRoot(updatedItem);
-				}
-				else
-				{
-					// appending existing item
-					if (updatedItem.getValue() instanceof Element)
+					for (Object element : updatedElements)
 					{
-						Element element = (Element) updatedItem.getValue();
-						
-						// rewrite encapsulated content to target item element
-						for (Object obj : document.getRootElement().getContent())
-						{
-							element.addContent((Content) ((Content) obj).clone());
-						}
-						
-						rebuildSubtree(updatedItem, element);
+						((Element) element).addContent((Content) ((Content) obj).clone());
 					}
 				}
 			}
@@ -547,76 +529,77 @@ public class XmlTreeViewMediator
 		{
 			// handling source that isn`t xml
 			
-			if (updatedItem == null)
+			Pattern attributePattern = Pattern.compile("([a-zA-Z]+[a-zA-Z0-9\\-_]*)=\"([^\"]*)\"");
+			matcher = attributePattern.matcher(xml);
+			
+			// check if passed in data isn`t list of attributes
+			if (matcher.find())
 			{
-				// tree is empty create root and add source as it content
-				
-				Element root = new Element("root");
-				
-				root.addContent(xml);
-				
-				treeView.setRoot(convertElementToTreeItem(root));
-			}
-			else if (updatedItem.getValue() instanceof Element)
-			{
-				// adding to existing node
-				
-				Element newElementValue = (Element) updatedItem.getValue();
-				
-				Pattern attributePattern = Pattern.compile("([a-zA-Z]+[a-zA-Z0-9\\-_]*)=\"([^\"]*)\"");
-				matcher = attributePattern.matcher(xml);
-				
-				// check if passed in data isn`t list of attributes
-				if (matcher.matches())
+				// rewrite attributes to element
+				do
 				{
-					// rewrite attributes to element
-					while (matcher.find())
+					for (Object element : updatedElements)
 					{
-						if (updatedItem != null && updatedItem.getValue() instanceof Element)
-						{
-							newElementValue.setAttribute(matcher.group(1), matcher.group(2));
-						}
+						((Element) element).setAttribute(matcher.group(1), matcher.group(2));
 					}
 				}
-				else
+				while (matcher.find());
+			}
+			else
+			{
+				// add source as text content
+				for (Object element : updatedElements)
 				{
-					// add source as text content
-					newElementValue.addContent(xml);
+					((Element) element).addContent(xml);
 				}
-				
-				rebuildSubtree(updatedItem, newElementValue);
 			}
 		}
 	}
 	
 	
+	public void loadXml(String xml)
+	{
+		startXmlChange();
+		
+		updateTree(xml, "/root");
+		
+		commitXmlChange();
+	}
+	
+	
+	protected Document getContext()
+	{
+		if (context == null)
+		{
+			context = new Document();
+			context.addContent(new Element("root"));
+		}
+		
+		return context;
+	}
+
+
 	protected void startXmlChange()
 	{
 		TreeItem<Object> rootItem = treeView.getRoot();
 		
-		selectedElements = collectSelectedXPaths();
 		expandedElements = collectExpandedXPaths(rootItem);
+		selectedElements = collectSelectedXPaths();
 	}
 
 
 	protected void commitXmlChange()
 	{
-		TreeItem<Object> rootItem = treeView.getRoot();
-		Element root = null;
+		TreeItem<Object> rootItem = convertElementToTreeItem(getContext().getRootElement());
 		
-		if (rootItem != null)
-		{
-			root = (Element) rootItem.getValue();
-		}
+		treeView.setRoot(rootItem);
 		
-		rebuildSubtree(rootItem, root);
-		
-		expandFromXPathList(rootItem, expandedElements);
-		//selectFromXPathList(selectedElements);
+		expandFromXPathList(expandedElements);
+		selectFromXPathList(selectedElements);
 	}
 
 
-	protected void expandFromXPathList(TreeItem<Object> rootItem, List<String> expanded)
+	protected void expandFromXPathList(List<String> expanded)
 	{
 		for (String path : expanded)
 		{
@@ -655,15 +638,18 @@ public class XmlTreeViewMediator
 	{
 		treeView.getSelectionModel().clearSelection();
 		
-		for (String path : selected)
+		if (selected != null)
 		{
-			XPathExpression<Object> xpath = XPathFactory.instance().compile(path);
-			
-			for (Object selectedObj : xpath.evaluate(treeView.getRoot().getValue()))
+			for (String path : selected)
 			{
-				TreeItem<Object> selectedItem = elementToItemMap.get(selectedObj);
+				XPathExpression<Object> xpath = XPathFactory.instance().compile(path);
 				
-				treeView.getSelectionModel().select(treeView.getRow(selectedItem));
+				for (Object selectedObj : xpath.evaluate(treeView.getRoot().getValue()))
+				{
+					TreeItem<Object> selectedItem = elementToItemMap.get(selectedObj);
+					
+					treeView.getSelectionModel().select(treeView.getRow(selectedItem));
+				}
 			}
 		}
 	}
@@ -689,28 +675,6 @@ public class XmlTreeViewMediator
 		}
 		
 		return selected;
-	}
-
-
-	/**
-	 * @param updatedItem
-	 * @param element
-	 */
-	protected void rebuildSubtree(TreeItem<Object> updatedItem, Element element)
-	{
-		// recreate subtree 
-		TreeItem<Object> parentItem = updatedItem.getParent();
-		
-		if (parentItem == null)
-		{
-			treeView.setRoot(convertElementToTreeItem(element));
-		}
-		else
-		{
-			int index = parentItem.getChildren().indexOf(updatedItem);
-			
-			parentItem.getChildren().set(index, convertElementToTreeItem(element));
-		}
 	}
 
 
