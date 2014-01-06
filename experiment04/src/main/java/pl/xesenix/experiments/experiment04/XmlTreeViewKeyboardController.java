@@ -71,6 +71,12 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 	private KeyCodeCombination pasteKeyCombination = new KeyCodeCombination(KeyCode.V, KeyCombination.CONTROL_DOWN);
 
 
+	private KeyCodeCombination undoKeyCombination = new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
+
+
+	private KeyCodeCombination redoKeyCombination = new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN);
+
+
 	XmlTreeViewKeyboardController(XmlTreeViewMediator mediator)
 	{
 		this.mediator = mediator;
@@ -171,6 +177,16 @@ public class XmlTreeViewKeyboardController implements EventHandler<KeyEvent>
 			{
 				XmlTreeViewMediator.log.debug("paste");
 				mediator.pasteItemFromClipboard();
+			}
+			else if (undoKeyCombination.match(event))
+			{
+				XmlTreeViewMediator.log.debug("undo");
+				mediator.getMementoManager().undo();
+			}
+			else if (redoKeyCombination.match(event))
+			{
+				XmlTreeViewMediator.log.debug("redo");
+				mediator.getMementoManager().redo();
 			}
 		}
 		else if (event.getEventType().equals(KeyEvent.KEY_RELEASED))

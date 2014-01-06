@@ -11,21 +11,15 @@ import java.util.WeakHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javafx.collections.ListChangeListener;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
-import javafx.scene.control.TreeView.EditEvent;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.util.Callback;
 
-import org.apache.commons.lang3.Range;
 import org.jdom2.Attribute;
 import org.jdom2.Content;
 import org.jdom2.Document;
@@ -36,14 +30,11 @@ import org.jdom2.Text;
 import org.jdom2.filter.Filters;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.XMLOutputter;
-import org.jdom2.xpath.XPath;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 import org.jdom2.xpath.XPathHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.sun.javafx.collections.NonIterableChange.SimplePermutationChange;
 
 
 public class XmlTreeViewMediator
@@ -70,6 +61,9 @@ public class XmlTreeViewMediator
 
 
 	private Document context;
+	
+	
+	private MementoManager mementoManager = new MementoManager(this);
 
 
 	public TreeView<Object> getTreeView()
@@ -594,9 +588,11 @@ public class XmlTreeViewMediator
 
 	protected void commitXmlChange()
 	{
-		TreeItem<Object> rootItem = convertElementToTreeItem(getContext().getRootElement());
+		Element root = getContext().getRootElement();
+		TreeItem<Object> rootItem = convertElementToTreeItem(root);
 		
 		treeView.setRoot(rootItem);
+		mementoManager.pushState(root);
 		
 		expandFromXPathList(expandedElements);
 		selectFromXPathList(selectedElements);
@@ -832,5 +828,80 @@ public class XmlTreeViewMediator
 		}
 		
 		commitXmlChange();
+	}
+
+
+	public MementoManager getMementoManager()
+	{
+		return mementoManager;
+	}
+	
+	
+	public static class MementoManager
+	{
+		private List<Element> stateList = new ArrayList<Element>();
+		
+		
+		private int top = -1;
+		
+		
+		private int max = 0;
+		
+		
+		private XmlTreeViewMediator mediator;
+		
+		
+		public MementoManager(XmlTreeViewMediator mediator)
+		{
+			this.mediator = mediator;
+		}
+		
+		
+		public void pushState(Element state)
+		{
+			stateList.add(++ top, state.clone());
+			max = top;
+			
+			log.debug("{}/{}", top, max);
+			XMLOutputter xmlOut = new XMLOutputter();
+			String xml = xmlOut.outputString((Element) state);
+			log.debug("{}", xml);
+		}
+		
+		
+		public void undo()
+		{
+			int current = --top;
+			
+			if (current >= 0)
+			{
+				Element state = stateList.get(current);
+				
+				mediator.getTreeView().setRoot(mediator.convertElementToTreeItem(state));
+				
+				log.debug("{}/{}", top, max);
+				XMLOutputter xmlOut = new XMLOutputter();
+				String xml = xmlOut.outputString((Element) state);
+				log.debug("{}", xml);
+			}
+		}
+		
+		
+		public void redo()
+		{
+			int current = ++top;
+			
+			if (current < max)
+			{
+				Element state = stateList.get(current);
+				
+				mediator.getTreeView().setRoot(mediator.convertElementToTreeItem(state));
+				
+				log.debug("{}/{}", top, max);
+				XMLOutputter xmlOut = new XMLOutputter();
+				String xml = xmlOut.outputString((Element) state);
+				log.debug("{}", xml);
+			}
+		}
 	}
 }
