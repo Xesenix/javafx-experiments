@@ -552,52 +552,6 @@ public class XmlTreeViewMediator
 			}
 		}
 	}
-	
-	
-	public void loadXml(String xml)
-	{
-		startXmlChange();
-		
-		context = null;
-		updateTree(xml, "/root");
-		
-		commitXmlChange();
-	}
-	
-	
-	protected Document getContext()
-	{
-		if (context == null)
-		{
-			context = new Document();
-			context.addContent(new Element("root"));
-		}
-		
-		return context;
-	}
-
-
-	protected void startXmlChange()
-	{
-		TreeItem<Object> rootItem = treeView.getRoot();
-		
-		expandedElements = collectExpandedXPaths(rootItem);
-		selectedElements = collectSelectedXPaths();
-	}
-
-
-	protected void commitXmlChange()
-	{
-		Element root = getContext().getRootElement();
-		TreeItem<Object> rootItem = convertElementToTreeItem(root);
-		
-		treeView.setRoot(rootItem);
-		mementoManager.pushState(root);
-		
-		expandFromXPathList(expandedElements);
-		selectFromXPathList(selectedElements);
-	}
-
 
 	protected void expandFromXPathList(List<String> expanded)
 	{
@@ -829,6 +783,57 @@ public class XmlTreeViewMediator
 		
 		commitXmlChange();
 	}
+	
+	
+	public void loadXml(String xml)
+	{
+		startXmlChange();
+		
+		context = null;
+		updateTree(xml, "/root");
+		
+		commitXmlChange();
+	}
+	
+	
+	protected Document getContext()
+	{
+		if (context == null)
+		{
+			context = new Document();
+			context.addContent(new Element("root"));
+		}
+		
+		return context;
+	}
+
+
+
+	protected void startXmlChange()
+	{
+		TreeItem<Object> rootItem = treeView.getRoot();
+		
+		expandedElements = collectExpandedXPaths(rootItem);
+		selectedElements = collectSelectedXPaths();
+	}
+
+
+	protected void commitXmlChange()
+	{
+		Element root = getContext().getRootElement();
+		//TreeItem<Object> rootItem = convertElementToTreeItem(root);
+		
+		//treeView.setRoot(rootItem);
+		
+		Memento memento = new Memento();
+		
+		memento.setXmlState(root);
+		memento.setExpandedNodes(expandedElements);
+		memento.setSelectedNodes(selectedElements);
+		
+		mementoManager.pushState(memento);
+		mementoManager.loadState();
+	}
 
 
 	public MementoManager getMementoManager()
@@ -837,9 +842,65 @@ public class XmlTreeViewMediator
 	}
 	
 	
+	public static class Memento
+	{
+		private Element xmlState;
+		
+		
+		private List<String> selectedNodes = new ArrayList<String>();
+		
+		
+		private List<String> expandedNodes = new ArrayList<String>();
+
+
+		public Element getXmlState()
+		{
+			return xmlState;
+		}
+
+
+		public void setXmlState(Element xmlState)
+		{
+			this.xmlState = xmlState.clone();
+		}
+
+
+		public List<String> getSelectedNodes()
+		{
+			return selectedNodes;
+		}
+
+
+		public void setSelectedNodes(List<String> selection)
+		{
+			this.selectedNodes.clear();
+			this.selectedNodes.addAll(selection);
+		}
+
+
+		public List<String> getExpandedNodes()
+		{
+			return expandedNodes;
+		}
+
+
+		public void setExpandedNodes(List<String> expandedNodes)
+		{
+			this.expandedNodes.clear();
+			this.expandedNodes.addAll(expandedNodes);
+		}
+		
+		
+		public String toString()
+		{
+			return String.format("[Memento:\n%s]", xmlState);
+		}
+	}
+	
+	
 	public static class MementoManager
 	{
-		private List<Element> stateList = new ArrayList<Element>();
+		private List<Memento> stateList = new ArrayList<Memento>();
 		
 		
 		private int top = -1;
@@ -857,51 +918,60 @@ public class XmlTreeViewMediator
 		}
 		
 		
-		public void pushState(Element state)
+		public void loadState()
 		{
-			stateList.add(++ top, state.clone());
+			int current = top;
+			
+			if (current >= 0 && current <= max)
+			{
+				Memento state = stateList.get(current);
+				Element root = state.getXmlState().clone();
+				
+				mediator.getContext().setContent(0, root);
+				
+				mediator.getTreeView().setRoot(mediator.convertElementToTreeItem(root));
+				mediator.expandFromXPathList(state.getExpandedNodes());
+				mediator.selectFromXPathList(state.getSelectedNodes());
+				
+				log.debug("load {}/{}", top, max);
+				XMLOutputter xmlOut = new XMLOutputter();
+				String xml = xmlOut.outputString(root);
+				log.debug("{}", xml);
+			}
+		}
+
+
+		public void pushState(Memento state)
+		{
+			stateList.add(++ top, state);
 			max = top;
 			
 			log.debug("{}/{}", top, max);
 			XMLOutputter xmlOut = new XMLOutputter();
-			String xml = xmlOut.outputString((Element) state);
+			String xml = xmlOut.outputString(state.getXmlState());
 			log.debug("{}", xml);
 		}
 		
 		
 		public void undo()
 		{
-			int current = --top;
-			
-			if (current >= 0)
+			if (top > 0)
 			{
-				Element state = stateList.get(current);
-				
-				mediator.getTreeView().setRoot(mediator.convertElementToTreeItem(state));
-				
-				log.debug("{}/{}", top, max);
-				XMLOutputter xmlOut = new XMLOutputter();
-				String xml = xmlOut.outputString((Element) state);
-				log.debug("{}", xml);
+				top --;
 			}
+			
+			loadState();
 		}
 		
 		
 		public void redo()
 		{
-			int current = ++top;
-			
-			if (current < max)
+			if (top < max)
 			{
-				Element state = stateList.get(current);
-				
-				mediator.getTreeView().setRoot(mediator.convertElementToTreeItem(state));
-				
-				log.debug("{}/{}", top, max);
-				XMLOutputter xmlOut = new XMLOutputter();
-				String xml = xmlOut.outputString((Element) state);
-				log.debug("{}", xml);
+				top ++;
 			}
+			
+			loadState();
 		}
 	}
 }
