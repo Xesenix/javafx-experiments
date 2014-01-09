@@ -249,18 +249,6 @@ public class XmlTreeCell extends TreeCell<Object>
 			
 			getStyleClass().add("xml-attribute");
 		}
-		else if (data instanceof Document)
-		{
-			Document document = (Document) data;
-			
-			setText(String.format("<root/>"));
-			
-			prefixLabel.setText("");
-			editField.setText("");
-			postfixLabel.setText("");
-			
-			getStyleClass().add("xml-document");
-		}
 		else
 		{
 			Text text = (Text) data;

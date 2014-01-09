@@ -11,10 +11,13 @@ import java.util.WeakHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.control.TreeView.EditEvent;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.DataFormat;
 import javafx.scene.input.KeyEvent;
@@ -92,6 +95,22 @@ public class XmlTreeViewMediator
 		});
 
 		treeView.addEventFilter(KeyEvent.ANY, new XmlTreeViewKeyboardController(this));
+		
+		treeView.setOnEditStart(new EventHandler<TreeView.EditEvent<Object>>() {
+			
+			public void handle(EditEvent<Object> event)
+			{
+				startXmlChange();
+			}
+		});
+		
+		treeView.setOnEditCommit(new EventHandler<TreeView.EditEvent<Object>>() {
+			
+			public void handle(EditEvent<Object> event)
+			{
+				commitXmlChange();
+			}
+		});
 	}
 
 
